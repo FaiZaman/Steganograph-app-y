@@ -6,6 +6,7 @@ class GraphicalUserInterface(object):
     def __init__(self):
         
         self.app_name = "Steganograph-App-y"
+        self.algorithm_list = ["LSB", "LSBM", "LSBMR", "PVD"]
 
 
     def create_home_window(self):
@@ -13,9 +14,8 @@ class GraphicalUserInterface(object):
         home_screen = [
             [gui.Text('Welcome to {0}!'.format(self.app_name), font=('Helvetica', 16), 
                 justification='center')],
-            [gui.Text('_'  * 100, size=(65, 1))],
             [gui.Text('Please select whether you would like to embed or extract a secret message.', 
-                font=('Helvetica', 12))],
+                font=('Helvetica', 11))],
             [gui.Button('Embed'), gui.Button('Extract'), gui.Button('Exit')]
         ]
 
@@ -27,9 +27,17 @@ class GraphicalUserInterface(object):
 
         embedding_screen = [
             [gui.Text('Embedding', font=('Helvetica', 15), justification='center')],
-            [gui.Text('Choose File: ')],
-            [gui.Text('Secret Key: ')],
-            [gui.Button('Back to Main Menu')]
+            [gui.Text('_'  * 100, size=(65, 1))],
+            [gui.Text('')],
+            [gui.Text('Embedding algorithm', size=(16, 1)), 
+                gui.Combo(self.algorithm_list, size=(10, 1))],
+            [gui.Text('Image file', size=(16, 1)),
+                gui.In(size=(40, 1), enable_events=True, key="-COVERIMAGE-"), gui.FileBrowse()],
+            [gui.Text('Text file', size=(16, 1)),
+                gui.In(size=(40, 1), enable_events=True, key="-INPUTMESSAGE-"), gui.FileBrowse()],
+            [gui.Text('Secret key', size=(16, 1)), gui.Input(size=(40, 1), key="-INPUTKEY-")],
+             [gui.Text('')],
+            [gui.Button('Embed'), gui.Button('Back to Main Menu')]
         ]
 
         embed_window = gui.Window('{0} - Embedding'.format(self.app_name), embedding_screen)
@@ -37,12 +45,20 @@ class GraphicalUserInterface(object):
 
 
     def create_extracting_window(self):
-        
+
         extracting_screen = [
             [gui.Text('Extracting', font=('Helvetica', 15), justification='center')],
-            [gui.Text('Choose File: ')],
-            [gui.Text('Secret Key')],
-            [gui.Button('Back to Main Menu')]
+            [gui.Text('_'  * 100, size=(65, 1))],
+            [gui.Text('')],
+            [gui.Text('Extracting algorithm', size=(16, 1)), 
+                gui.Combo(self.algorithm_list, size=(10, 1))],
+            [gui.Text('Image file', size=(16, 1)),
+                gui.In(size=(40, 1), enable_events=True, key="-STEGOIMAGE-"), gui.FileBrowse()],
+            [gui.Text('Text file', size=(16, 1)),
+                gui.In(size=(40, 1), enable_events=True, key="-OUTPUTMESSAGE-"), gui.FileBrowse()],
+            [gui.Text('Secret key', size=(16, 1)), gui.Input(size=(40, 1), key="-OUTPUTKEY-")],
+             [gui.Text('')],
+            [gui.Button('Extract'), gui.Button('Back to Main Menu')]
         ]
 
         extract_window = gui.Window('{0} - Extracting'.format(self.app_name), extracting_screen)
