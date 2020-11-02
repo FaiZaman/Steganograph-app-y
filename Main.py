@@ -30,13 +30,15 @@ class GraphicalUserInterface(object):
             [gui.Text('_'  * 100, size=(65, 1))],
             [gui.Text('')],
             [gui.Text('Embedding algorithm', size=(16, 1)), 
-                gui.Combo(self.algorithm_list, size=(10, 1))],
+                gui.Combo(self.algorithm_list, size=(10, 1)), gui.Button('Algorithm Information')],
             [gui.Text('Image file', size=(16, 1)),
-                gui.In(size=(40, 1), enable_events=True, key="-COVERIMAGE-"), gui.FileBrowse()],
+                gui.In(size=(40, 1), enable_events=True, key="-COVERIMAGE-"), 
+                gui.FileBrowse(file_types=(("Image Files", "*.png *.jpg"),))],
             [gui.Text('Text file', size=(16, 1)),
-                gui.In(size=(40, 1), enable_events=True, key="-INPUTMESSAGE-"), gui.FileBrowse()],
+                gui.In(size=(40, 1), enable_events=True, key="-INPUTMESSAGE-"),
+                gui.FileBrowse(file_types=(("Text Files", "*.txt"),))],
             [gui.Text('Secret key', size=(16, 1)), gui.Input(size=(40, 1), key="-INPUTKEY-")],
-             [gui.Text('')],
+            [gui.Text('')],
             [gui.Button('Embed'), gui.Button('Back to Main Menu')]
         ]
 
@@ -50,14 +52,13 @@ class GraphicalUserInterface(object):
             [gui.Text('Extracting', font=('Helvetica', 15), justification='center')],
             [gui.Text('_'  * 100, size=(65, 1))],
             [gui.Text('')],
-            [gui.Text('Extracting algorithm', size=(16, 1)), 
-                gui.Combo(self.algorithm_list, size=(10, 1))],
+            [gui.Text('Extracting algorithm', size=(16, 1)),
+                gui.Combo(self.algorithm_list, size=(10, 1)), gui.Button('Algorithm Information')],
             [gui.Text('Image file', size=(16, 1)),
-                gui.In(size=(40, 1), enable_events=True, key="-STEGOIMAGE-"), gui.FileBrowse()],
-            [gui.Text('Text file', size=(16, 1)),
-                gui.In(size=(40, 1), enable_events=True, key="-OUTPUTMESSAGE-"), gui.FileBrowse()],
+                gui.In(size=(40, 1), enable_events=True, key="-STEGOIMAGE-"),
+                gui.FileBrowse(file_types=(("Text Files", "*.txt"),))],
             [gui.Text('Secret key', size=(16, 1)), gui.Input(size=(40, 1), key="-OUTPUTKEY-")],
-             [gui.Text('')],
+            [gui.Text('')],
             [gui.Button('Extract'), gui.Button('Back to Main Menu')]
         ]
 
