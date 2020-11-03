@@ -11,6 +11,12 @@ class LSB():
         self.key = key
 
 
+    def encode(self):
+
+        binary = string_to_binary(self.message)
+
+
+
 if __name__ == '__main__':
 
     algorithm = LSB(1, "Hello World!", 2)

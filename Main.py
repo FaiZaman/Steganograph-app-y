@@ -1,5 +1,6 @@
 import sys
 import PySimpleGUI as gui
+#from algorithms.LSB import LSB, utility
 
 class GraphicalUserInterface(object):
 
@@ -7,6 +8,10 @@ class GraphicalUserInterface(object):
         
         self.app_name = "Steganograph-App-y"
         self.algorithm_list = ["LSB", "LSBM", "LSBMR", "PVD"]
+        #self.instantiators = {
+        #    "LSB": LSB,
+        #    "LSBM": LSBM
+        #}
 
 
     def create_home_window(self):
@@ -54,7 +59,8 @@ class GraphicalUserInterface(object):
             [gui.Text('_'  * 70)],
             [gui.Text('')],
             [gui.Text('Extracting algorithm', size=(16, 1)),
-                gui.Combo(self.algorithm_list, size=(10, 1)), gui.Button('Algorithm Information')],
+                gui.Combo(self.algorithm_list, size=(10, 1), key="output_algorithm"),
+                gui.Button('Algorithm Information')],
             [gui.Text('Image file', size=(16, 1)),
                 gui.In(size=(40, 1), enable_events=True, key="stego_image"),
                 gui.FileBrowse(file_types=(("Text Files", "*.txt"),))],
@@ -80,6 +86,18 @@ class GraphicalUserInterface(object):
 
         info_window = gui.Window('{0} - Information'.format(self.app_name), info_screen)
         return info_window
+    
+
+    def check_algorithm_information(self, event, values, embedding):
+
+        if event == 'Algorithm Information':
+            algorithm = values['input_algorithm'] if embedding else values['output_algorithm']
+            info_window = self.create_info_window(algorithm)
+            while True:
+                event, values = info_window.read()
+                if event in (None, 'Close'):
+                    info_window.close()
+                    break
 
 
     def display(self):
@@ -113,14 +131,12 @@ class GraphicalUserInterface(object):
                     event, values = window.read()
                     if event is None:
                         sys.exit()
-                    if event == 'Algorithm Information':
-                        algorithm = values['input_algorithm']
-                        info_window = self.create_info_window(algorithm)
-                        while True:
-                            event, values = info_window.read()
-                            if event in (None, 'Close'):
-                                info_window.close()
-                                break
+                    self.check_algorithm_information(event, values, embedding=True)
+                    if event == 'Embed':
+                        algorithm, cover, message, key =\
+                            values['input_algorithm'], values['cover_image'],\
+                                values['message'], values['input_key']
+                        instantiators[algorithm]()
                     if event == 'Back to Main Menu':
                         break
 
@@ -135,6 +151,9 @@ class GraphicalUserInterface(object):
                     event, values = window.read()
                     if event is None:
                         sys.exit()
+                    self.check_algorithm_information(event, values, embedding=False)
+                    if event == 'Extract':
+                        pass
                     if event == 'Back to Main Menu':
                         break
 
