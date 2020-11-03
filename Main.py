@@ -27,17 +27,18 @@ class GraphicalUserInterface(object):
 
         embedding_screen = [
             [gui.Text('Embedding', font=('Helvetica', 15), justification='center')],
-            [gui.Text('_'  * 100, size=(65, 1))],
+            [gui.Text('_'  * 70)],
             [gui.Text('')],
             [gui.Text('Embedding algorithm', size=(16, 1)), 
-                gui.Combo(self.algorithm_list, size=(10, 1)), gui.Button('Algorithm Information')],
+                gui.Combo(self.algorithm_list, size=(10, 1), key="input_algorithm"),
+                gui.Button('Algorithm Information')],
             [gui.Text('Image file', size=(16, 1)),
-                gui.In(size=(40, 1), enable_events=True, key="-COVERIMAGE-"), 
+                gui.In(size=(40, 1), enable_events=True, key="cover_image"), 
                 gui.FileBrowse(file_types=(("Image Files", "*.png *.jpg"),))],
             [gui.Text('Text file', size=(16, 1)),
-                gui.In(size=(40, 1), enable_events=True, key="-INPUTMESSAGE-"),
+                gui.In(size=(40, 1), enable_events=True, key="message"),
                 gui.FileBrowse(file_types=(("Text Files", "*.txt"),))],
-            [gui.Text('Secret key', size=(16, 1)), gui.Input(size=(40, 1), key="-INPUTKEY-")],
+            [gui.Text('Secret key', size=(16, 1)), gui.Input(size=(40, 1), key="input_key")],
             [gui.Text('')],
             [gui.Button('Embed'), gui.Button('Back to Main Menu')]
         ]
@@ -50,20 +51,35 @@ class GraphicalUserInterface(object):
 
         extracting_screen = [
             [gui.Text('Extracting', font=('Helvetica', 15), justification='center')],
-            [gui.Text('_'  * 100, size=(65, 1))],
+            [gui.Text('_'  * 70)],
             [gui.Text('')],
             [gui.Text('Extracting algorithm', size=(16, 1)),
                 gui.Combo(self.algorithm_list, size=(10, 1)), gui.Button('Algorithm Information')],
             [gui.Text('Image file', size=(16, 1)),
-                gui.In(size=(40, 1), enable_events=True, key="-STEGOIMAGE-"),
+                gui.In(size=(40, 1), enable_events=True, key="stego_image"),
                 gui.FileBrowse(file_types=(("Text Files", "*.txt"),))],
-            [gui.Text('Secret key', size=(16, 1)), gui.Input(size=(40, 1), key="-OUTPUTKEY-")],
+            [gui.Text('Secret key', size=(16, 1)), gui.Input(size=(40, 1), key="output_key")],
             [gui.Text('')],
             [gui.Button('Extract'), gui.Button('Back to Main Menu')]
         ]
 
         extract_window = gui.Window('{0} - Extracting'.format(self.app_name), extracting_screen)
         return extract_window
+    
+
+    def create_info_window(self, algorithm):
+
+        info_screen = [
+            [gui.Text('Information', font=('Helvetica', 15), justification='center')],
+            [gui.Text('_'  * 70)],
+            [gui.Text('')],
+            [gui.Text('Description of ' + algorithm)],
+            [gui.Text('')],
+            [gui.Button('Close')]
+        ]
+
+        info_window = gui.Window('{0} - Information'.format(self.app_name), info_screen)
+        return info_window
 
 
     def display(self):
@@ -97,8 +113,14 @@ class GraphicalUserInterface(object):
                     event, values = window.read()
                     if event is None:
                         sys.exit()
-                    if event == 'Choose File':
-                        pass
+                    if event == 'Algorithm Information':
+                        algorithm = values['input_algorithm']
+                        info_window = self.create_info_window(algorithm)
+                        while True:
+                            event, values = info_window.read()
+                            if event in (None, 'Close'):
+                                info_window.close()
+                                break
                     if event == 'Back to Main Menu':
                         break
 
@@ -113,8 +135,6 @@ class GraphicalUserInterface(object):
                     event, values = window.read()
                     if event is None:
                         sys.exit()
-                    if event == 'Choose File':
-                        pass
                     if event == 'Back to Main Menu':
                         break
 
