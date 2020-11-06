@@ -1,6 +1,4 @@
 import cv2
-from utility import string_to_binary, binary_to_string
-
 
 class LSB():
 
@@ -13,13 +11,13 @@ class LSB():
 
     def encode(self):
 
-        binary = string_to_binary(self.message)
-
+        #binary = string_to_binary(self.message)
+        pass
 
 
 if __name__ == '__main__':
 
     algorithm = LSB(1, "Hello World!", 2)
 
-    binary_string = string_to_binary(algorithm.message)
-    string = binary_to_string(binary_string)
+    #binary_string = string_to_binary(algorithm.message)
+    #string = binary_to_string(binary_string)
