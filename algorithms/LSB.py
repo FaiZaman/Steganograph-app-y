@@ -1,4 +1,5 @@
 import cv2
+import numpy as np
 
 class LSB():
 
@@ -11,13 +12,17 @@ class LSB():
 
     def encode(self):
 
-        #binary = string_to_binary(self.message)
-        pass
+        width = np.size(self.cover, 1)
+        height = np.size(self.cover, 0)
+
+        num_bytes = width * height * 3   # 3 colour channels
+        message_length = len(self.message)
+
+        
 
 
-if __name__ == '__main__':
 
-    algorithm = LSB(1, "Hello World!", 2)
 
-    #binary_string = string_to_binary(algorithm.message)
-    #string = binary_to_string(binary_string)
+#if __name__ == '__main__':
+#
+#    algorithm = LSB(1, "Hello World!", 2)
