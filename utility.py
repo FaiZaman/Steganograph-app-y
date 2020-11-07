@@ -3,7 +3,7 @@ import numpy as np
 def message_to_binary(message):
 
     if type(message) == str:
-        return ' '.join(format(ord(char), 'b') for char in message)
+        return ''.join(format(ord(char), '08b') for char in message)
     elif type(message) == bytes or type(message) == np.ndarray:
         return [format(char, "08b") for char in message]
     elif type(message) == int:
