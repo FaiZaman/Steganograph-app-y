@@ -22,4 +22,7 @@ if __name__ == '__main__':
     cover, message = read_files(cover_file, message_file)
     algorithm = algorithm_name(cover, message, key)
 
-    algorithm.encode()
+    stego = algorithm.encode()
+    extract = algorithm.decode()
+
+    print(extract)

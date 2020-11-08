@@ -11,6 +11,11 @@ class LSB():
         self.message = message + self.delimiter
         self.key = key
 
+        # get dimensions of cover image
+        self.width = np.size(self.cover, 1)
+        self.height = np.size(self.cover, 0)
+        self.num_bytes = self.width * self.height * 3   # 3 colour channels
+
 
     def embed_pixel(self, pixel, colour, colour_index, message_index, message_length):
 
@@ -26,23 +31,19 @@ class LSB():
 
     def encode(self):
 
-        # get dimensions of cover image
-        width = np.size(self.cover, 1)
-        height = np.size(self.cover, 0)
-        num_bytes = width * height * 3   # 3 colour channels
-
+        # convert message to binary
         self.message = message_to_binary(self.message)
         message_index = 0
         message_length = len(self.message)
 
-        if message_length > num_bytes:
+        if message_length > self.num_bytes:
             raise ValueError("The message is too large for the image.")
 
         cover_image = self.cover    # so cover is not modified
 
         # loop through image pixels
-        for x in range(0, width):
-            for y in range(0, height):
+        for x in range(0, self.width):
+            for y in range(0, self.height):
 
                 # assign, retrieve, and convert RGB values
                 pixel = cover_image[y][x]
@@ -66,3 +67,23 @@ class LSB():
         # reassign and return stego image
         self.stego = cover_image
         return self.stego
+
+
+    def decode(self):
+
+        binary_message = ""
+        extracted_message = ""
+
+        for x in range(0, self.width):
+            for y in range(0, self.height):
+
+                stego_pixel = self.stego[y][x]
+                r, g, b = message_to_binary(stego_pixel)
+
+                binary_message += r[-1] + g[-1] + b[-1]
+
+        message_bytes = [binary_message[i : i + 8] for i in range(0, len(binary_message), 8)]
+        
+        for byte in message_bytes:
+            char = chr(int(byt)
+

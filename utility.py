@@ -12,12 +12,12 @@ def message_to_binary(message):
         raise TypeError("Unrecognised input.")
 
 
-def binary_to_string(binary_string):
+def binary_to_string(binary_message):
 
-    binary_values = binary_string.split()
+    message_bytes = [binary_message[i : i + 8] for i in range(0, len(binary_message), 8)]
     string = ""
 
-    for value in binary_values:
+    for value in message_bytes:
 
         an_integer = int(value, 2)
         char = chr(an_integer)
