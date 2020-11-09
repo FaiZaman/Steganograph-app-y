@@ -1,5 +1,6 @@
 import numpy as np
 
+# convert any message to a binary string
 def message_to_binary(message):
 
     if type(message) == str:
@@ -12,15 +13,23 @@ def message_to_binary(message):
         raise TypeError("Unrecognised input.")
 
 
-def binary_to_string(binary_message):
+# convert a binary string into a UTF-8 string message
+def binary_to_string(binary_message, delimiter):
 
+    delimiter_length = len(delimiter) * -1
+
+    # split into bytes
     message_bytes = [binary_message[i : i + 8] for i in range(0, len(binary_message), 8)]
-    string = ""
+    message = ""
 
-    for value in message_bytes:
+    # convert each byte and append to message
+    for byte in message_bytes:
 
-        an_integer = int(value, 2)
-        char = chr(an_integer)
-        string += char
+        char = chr(int(byte, 2))
+        message += char
 
-    return string
+        if message[delimiter_length:] == delimiter:   # reached the delimiter
+            message = message[:delimiter_length]
+            break
+
+    return message

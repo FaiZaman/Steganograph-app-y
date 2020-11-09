@@ -72,18 +72,16 @@ class LSB():
     def decode(self):
 
         binary_message = ""
-        extracted_message = ""
 
+        # loop through image pixels
         for x in range(0, self.width):
             for y in range(0, self.height):
 
+                # assign, retrieve, convert, and append LSBs to binary message
                 stego_pixel = self.stego[y][x]
                 r, g, b = message_to_binary(stego_pixel)
-
                 binary_message += r[-1] + g[-1] + b[-1]
-
-        message_bytes = [binary_message[i : i + 8] for i in range(0, len(binary_message), 8)]
         
-        for byte in message_bytes:
-            char = chr(int(byt)
-
+        # extract the original message and return
+        extracted_message = binary_to_string(binary_message, self.delimiter)
+        return extracted_message

@@ -20,6 +20,7 @@ if __name__ == '__main__':
 
     # convert into proper formats and initialise algorithm
     cover, message = read_files(cover_file, message_file)
+    print(message)
     algorithm = algorithm_name(cover, message, key)
 
     stego = algorithm.encode()
