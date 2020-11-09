@@ -43,6 +43,9 @@ class GraphicalUserInterface(object):
                 gui.In(size=(40, 1), enable_events=True, key="message"),
                 gui.FileBrowse(file_types=(("Text Files", "*.txt"),))],
             [gui.Text('Secret key', size=(16, 1)), gui.Input(size=(40, 1), key="input_key")],
+            [gui.Text('Save Folder', size=(16, 1)),
+                gui.In(size=(40, 1), enable_events=True, key="save_folder"),
+                gui.FolderBrowse()],
             [gui.Text('')],
             [gui.Button('Embed'), gui.Button('Back to Main Menu')]
         ]
@@ -64,6 +67,9 @@ class GraphicalUserInterface(object):
                 gui.In(size=(40, 1), enable_events=True, key="stego_image"),
                 gui.FileBrowse(file_types=(("Text Files", "*.txt"),))],
             [gui.Text('Secret key', size=(16, 1)), gui.Input(size=(40, 1), key="output_key")],
+            [gui.Text('Save Folder', size=(16, 1)),
+                gui.In(size=(40, 1), enable_events=True, key="save_folder"),
+                gui.FolderBrowse()],
             [gui.Text('')],
             [gui.Button('Extract'), gui.Button('Back to Main Menu')]
         ]
@@ -132,11 +138,13 @@ class GraphicalUserInterface(object):
                         sys.exit()
                     self.check_algorithm_information(event, values, embedding=True)
                     if event == 'Embed':
-                        algorithm_name, cover_file, message_file, key =\
+                        algorithm_name, cover_file, message_file, key, save_path =\
                             values['input_algorithm'], values['cover_image'],\
-                                values['message'], values['input_key']
-                        
-                        return self.instantiators[algorithm_name], cover_file, message_file, key
+                                values['message'], values['input_key'], values['save_folder']
+
+                        window.close()
+                        return [self.instantiators[algorithm_name],\
+                            cover_file, message_file, key, save_path, embedding]
 
                     if event == 'Back to Main Menu':
                         break
@@ -154,7 +162,13 @@ class GraphicalUserInterface(object):
                         sys.exit()
                     self.check_algorithm_information(event, values, embedding=False)
                     if event == 'Extract':
-                        pass
+                        algorithm_name, stego_file, key, save_path =\
+                            values['input_algorithm'], values['cover_image'],\
+                                values['input_key'], values['save_folder']
+                        
+                        return [self.instantiators[algorithm_name],\
+                            stego_file, key, save_path, embedding]
+
                     if event == 'Back to Main Menu':
                         break
 

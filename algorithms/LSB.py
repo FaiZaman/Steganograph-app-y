@@ -1,19 +1,22 @@
 import cv2
+import os
 import numpy as np
+from datetime import datetime
 from utility import message_to_binary, binary_to_string
 
 class LSB():
 
-    def __init__(self, cover, message, key):
+    def __init__(self, image, message, key, save_path):
 
-        self.cover = cover
+        self.image = image
         self.delimiter = "-----"
         self.message = message + self.delimiter
         self.key = key
+        self.save_path = save_path
 
-        # get dimensions of cover image
-        self.width = np.size(self.cover, 1)
-        self.height = np.size(self.cover, 0)
+        # get dimensions of image
+        self.width = np.size(self.image, 1)
+        self.height = np.size(self.image, 0)
         self.num_bytes = self.width * self.height * 3   # 3 colour channels
 
 
@@ -39,7 +42,7 @@ class LSB():
         if message_length > self.num_bytes:
             raise ValueError("The message is too large for the image.")
 
-        cover_image = self.cover    # so cover is not modified
+        cover_image = self.image    # so image is not modified
 
         # loop through image pixels
         for x in range(0, self.width):
@@ -64,9 +67,8 @@ class LSB():
                     else:
                         break   # no more data so break
 
-        # reassign and return stego image
-        self.stego = cover_image
-        return self.stego
+        # save image
+        self.save_image()
 
 
     def decode(self):
@@ -85,3 +87,9 @@ class LSB():
         # extract the original message and return
         extracted_message = binary_to_string(binary_message, self.delimiter)
         return extracted_message
+
+
+    def save_image(self):
+
+        time_string = "{:%Y_%m_%d_%H_%M}".format(datetime.now())
+        cv2.imwrite(os.path.join(self.save_path, '{0}.png'.format(time_string)), self.stego)
