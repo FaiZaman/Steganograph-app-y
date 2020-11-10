@@ -38,7 +38,7 @@ class GraphicalUserInterface(object):
                 gui.Button('Algorithm Information')],
             [gui.Text('Image file', size=(16, 1)),
                 gui.In(size=(40, 1), enable_events=True, key="cover_image"), 
-                gui.FileBrowse(file_types=(("Image Files", "*.png *.jpg"),))],
+                gui.FileBrowse(file_types=(("Image Files", "*.png"),))],
             [gui.Text('Text file', size=(16, 1)),
                 gui.In(size=(40, 1), enable_events=True, key="message"),
                 gui.FileBrowse(file_types=(("Text Files", "*.txt"),))],
@@ -65,7 +65,7 @@ class GraphicalUserInterface(object):
                 gui.Button('Algorithm Information')],
             [gui.Text('Image file', size=(16, 1)),
                 gui.In(size=(40, 1), enable_events=True, key="stego_image"),
-                gui.FileBrowse(file_types=(("Text Files", "*.txt"),))],
+                gui.FileBrowse(file_types=(("Image Files", "*.png"),))],
             [gui.Text('Secret key', size=(16, 1)), gui.Input(size=(40, 1), key="output_key")],
             [gui.Text('Save Folder', size=(16, 1)),
                 gui.In(size=(40, 1), enable_events=True, key="save_folder"),
@@ -163,8 +163,8 @@ class GraphicalUserInterface(object):
                     self.check_algorithm_information(event, values, embedding=False)
                     if event == 'Extract':
                         algorithm_name, stego_file, key, save_path =\
-                            values['input_algorithm'], values['cover_image'],\
-                                values['input_key'], values['save_folder']
+                            values['output_algorithm'], values['stego_image'],\
+                                values['output_key'], values['save_folder']
                         
                         return [self.instantiators[algorithm_name],\
                             stego_file, key, save_path, embedding]

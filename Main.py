@@ -1,15 +1,25 @@
 import cv2
+import ntpath
 from GUI import GraphicalUserInterface
 
-def read_files(cover_file, message_file):
+def read_image(image_file):
 
-    cover = cv2.imread(cover_file)
+    image = cv2.imread(image_file)
+    image_name = ntpath.basename(image_file)
+    image_data = (image_name, image)
+
+    return image_data
+
+
+def read_files(image_file, message_file):
+
+    image_data = read_image(image_file)
 
     message_file = open(message_file, "r")
     message = message_file.read()
     message_file.close()
 
-    return cover, message
+    return image_data, message
 
 
 if __name__ == '__main__':
@@ -24,20 +34,19 @@ if __name__ == '__main__':
 
         if embedding:
 
-            algorithm_name, cover_file, message_file, key, save_path =\ 
+            algorithm_name, cover_file, message_file, key, save_path =\
                 data[0], data[1], data[2], data[3], data[4]
-            cover, message = read_files(cover_file, message_file)
-            print(message)
+            cover_data, message = read_files(cover_file, message_file)
 
             # convert into proper formats and initialise algorithm
-            algorithm = algorithm_name(cover, message, key, save_path)
+            algorithm = algorithm_name(cover_data, message, key, save_path)
             algorithm.encode()
 
         else:
 
             algorithm_name, stego_file, key, save_path = data[0], data[1], data[2], data[3]
-            stego = cv2.imread(stego_file)
+            stego_data = read_image(stego_file)
+            message = ""
 
-            algorithm = algorithm_name(stego, message, key, save_path)
+            algorithm = algorithm_name(stego_data, message, key, save_path)
             extract = algorithm.decode()
-            print(extract)

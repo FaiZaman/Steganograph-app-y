@@ -8,7 +8,8 @@ class LSB():
 
     def __init__(self, image, message, key, save_path):
 
-        self.image = image
+        self.image_name = image[0]
+        self.image = image[1]
         self.delimiter = "-----"
         self.message = message + self.delimiter
         self.key = key
@@ -18,6 +19,8 @@ class LSB():
         self.width = np.size(self.image, 1)
         self.height = np.size(self.image, 0)
         self.num_bytes = self.width * self.height * 3   # 3 colour channels
+
+        self.time_string = "{:%Y_%m_%d_%H;%M}".format(datetime.now())
 
 
     def embed_pixel(self, pixel, colour, colour_index, message_index, message_length):
@@ -67,8 +70,9 @@ class LSB():
                     else:
                         break   # no more data so break
 
-        # save image
-        self.save_image()
+        # reassign and save image
+        stego_image = cover_image
+        self.save_image(stego_image)
 
 
     def decode(self):
@@ -80,16 +84,24 @@ class LSB():
             for y in range(0, self.height):
 
                 # assign, retrieve, convert, and append LSBs to binary message
-                stego_pixel = self.stego[y][x]
+                stego_pixel = self.image[y][x]
                 r, g, b = message_to_binary(stego_pixel)
                 binary_message += r[-1] + g[-1] + b[-1]
-        
-        # extract the original message and return
+
+        # extract the original message, save to file, and return
         extracted_message = binary_to_string(binary_message, self.delimiter)
+        self.save_message(extracted_message)
         return extracted_message
 
 
-    def save_image(self):
+    def save_image(self, stego):
 
-        time_string = "{:%Y_%m_%d_%H_%M}".format(datetime.now())
-        cv2.imwrite(os.path.join(self.save_path, '{0}.png'.format(time_string)), self.stego)
+        cv2.imwrite(os.path.join(self.save_path, '{0}_{1}'.\
+            format(self.time_string, self.image_name)), stego)
+
+
+    def save_message(self, message):
+
+        message_file = open(os.path.join(self.save_path, "{0}.txt".format(self.time_string)), "w")
+        message_file.write(message)
+        message_file.close()
