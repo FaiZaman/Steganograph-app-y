@@ -1,6 +1,7 @@
 import sys
 import PySimpleGUI as gui
 from algorithms.LSB import LSB
+from algorithms.LSBM import LSBM
 
 class GraphicalUserInterface(object):
 
@@ -9,7 +10,8 @@ class GraphicalUserInterface(object):
         self.app_name = "Steganograph-App-y"
         self.algorithm_list = ["LSB", "LSBM", "LSBMR", "PVD"]
         self.instantiators = {
-            "LSB": LSB
+            "LSB": LSB,
+            "LSBM": LSBM
         }
 
 
@@ -166,6 +168,7 @@ class GraphicalUserInterface(object):
                             values['output_algorithm'], values['stego_image'],\
                                 values['output_key'], values['save_folder']
                         
+                        window.close()
                         return [self.instantiators[algorithm_name],\
                             stego_file, key, save_path, embedding]
 
