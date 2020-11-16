@@ -1,147 +1,52 @@
-import sys
-import PySimpleGUI as gui
+import cv2
+import ntpath
+from GUI import GraphicalUserInterface
 
-class GraphicalUserInterface(object):
+def read_image(image_file):
 
-    def __init__(self):
-        
-        self.app_name = "Steganograph-App-y"
-        self.algorithm_list = ["LSB", "LSBM", "LSBMR", "PVD"]
+    image = cv2.imread(image_file)
+    image_name = ntpath.basename(image_file)
+    image_data = (image_name, image)
 
-
-    def create_home_window(self):
-
-        home_screen = [
-            [gui.Text('Welcome to {0}!'.format(self.app_name), font=('Helvetica', 16), 
-                justification='center')],
-            [gui.Text('Please select whether you would like to embed or extract a secret message.', 
-                font=('Helvetica', 11))],
-            [gui.Button('Embed'), gui.Button('Extract'), gui.Button('Exit')]
-        ]
-
-        home_window = gui.Window('{}'.format(self.app_name), home_screen)
-        return home_window
+    return image_data
 
 
-    def create_embedding_window(self):
+def read_files(image_file, message_file):
 
-        embedding_screen = [
-            [gui.Text('Embedding', font=('Helvetica', 15), justification='center')],
-            [gui.Text('_'  * 70)],
-            [gui.Text('')],
-            [gui.Text('Embedding algorithm', size=(16, 1)), 
-                gui.Combo(self.algorithm_list, size=(10, 1), key="input_algorithm"),
-                gui.Button('Algorithm Information')],
-            [gui.Text('Image file', size=(16, 1)),
-                gui.In(size=(40, 1), enable_events=True, key="cover_image"), 
-                gui.FileBrowse(file_types=(("Image Files", "*.png *.jpg"),))],
-            [gui.Text('Text file', size=(16, 1)),
-                gui.In(size=(40, 1), enable_events=True, key="message"),
-                gui.FileBrowse(file_types=(("Text Files", "*.txt"),))],
-            [gui.Text('Secret key', size=(16, 1)), gui.Input(size=(40, 1), key="input_key")],
-            [gui.Text('')],
-            [gui.Button('Embed'), gui.Button('Back to Main Menu')]
-        ]
+    image_data = read_image(image_file)
 
-        embed_window = gui.Window('{0} - Embedding'.format(self.app_name), embedding_screen)
-        return embed_window
+    message_file = open(message_file, "r")
+    message = message_file.read()
+    message_file.close()
 
-
-    def create_extracting_window(self):
-
-        extracting_screen = [
-            [gui.Text('Extracting', font=('Helvetica', 15), justification='center')],
-            [gui.Text('_'  * 70)],
-            [gui.Text('')],
-            [gui.Text('Extracting algorithm', size=(16, 1)),
-                gui.Combo(self.algorithm_list, size=(10, 1)), gui.Button('Algorithm Information')],
-            [gui.Text('Image file', size=(16, 1)),
-                gui.In(size=(40, 1), enable_events=True, key="stego_image"),
-                gui.FileBrowse(file_types=(("Text Files", "*.txt"),))],
-            [gui.Text('Secret key', size=(16, 1)), gui.Input(size=(40, 1), key="output_key")],
-            [gui.Text('')],
-            [gui.Button('Extract'), gui.Button('Back to Main Menu')]
-        ]
-
-        extract_window = gui.Window('{0} - Extracting'.format(self.app_name), extracting_screen)
-        return extract_window
-    
-
-    def create_info_window(self, algorithm):
-
-        info_screen = [
-            [gui.Text('Information', font=('Helvetica', 15), justification='center')],
-            [gui.Text('_'  * 70)],
-            [gui.Text('')],
-            [gui.Text('Description of ' + algorithm)],
-            [gui.Text('')],
-            [gui.Button('Close')]
-        ]
-
-        info_window = gui.Window('{0} - Information'.format(self.app_name), info_screen)
-        return info_window
-
-
-    def display(self):
-
-        selecting = True
-
-        while selecting:
-
-            window = self.create_home_window()
-            embedding = extracting = False
-
-            while True:
-                event, values = window.read()
-                if event in (None, 'Exit'):
-                    sys.exit()
-                    break
-                if event == 'Embed':
-                    embedding = True
-                    break
-                if event == 'Extract':
-                    extracting = True
-                    break
-
-            window.close()
-
-            if embedding:
-
-                window = self.create_embedding_window()
-
-                while True:
-                    event, values = window.read()
-                    if event is None:
-                        sys.exit()
-                    if event == 'Algorithm Information':
-                        algorithm = values['input_algorithm']
-                        info_window = self.create_info_window(algorithm)
-                        while True:
-                            event, values = info_window.read()
-                            if event in (None, 'Close'):
-                                info_window.close()
-                                break
-                    if event == 'Back to Main Menu':
-                        break
-
-                window.close()
-
-
-            if extracting:
-
-                window = self.create_extracting_window()
-
-                while True:
-                    event, values = window.read()
-                    if event is None:
-                        sys.exit()
-                    if event == 'Back to Main Menu':
-                        break
-
-                window.close()
+    return image_data, message
 
 
 if __name__ == '__main__':
 
+    # run GUI and retrieve img and txt files
     GUI = GraphicalUserInterface()
-    GUI.display()
+
+    while True:
+
+        data = GUI.display()
+        embedding = data[-1]
+
+        if embedding:
+
+            algorithm_name, cover_file, message_file, key, save_path =\
+                data[0], data[1], data[2], data[3], data[4]
+            cover_data, message = read_files(cover_file, message_file)
+
+            # convert into proper formats and initialise algorithm
+            algorithm = algorithm_name(cover_data, message, key, save_path)
+            algorithm.encode()
+
+        else:
+
+            algorithm_name, stego_file, key, save_path = data[0], data[1], data[2], data[3]
+            stego_data = read_image(stego_file)
+            message = ""
+
+            algorithm = algorithm_name(stego_data, message, key, save_path)
+            extract = algorithm.decode()
