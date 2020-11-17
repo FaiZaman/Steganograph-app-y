@@ -27,12 +27,17 @@ class LSB():
 
         # embed a bit of the data into the Least Significant Bit of the cover image's current pixel
         if message_index < message_length:
+
+            # adding 0 or 1 (message bit) to LSB of pixel and reassigning
             bit = self.message[message_index]
-            pixel[colour_index] = int(colour[:-1] + bit, 2)
+            binary_pixel = colour[:-1]
+            new_binary_pixel = binary_pixel + bit
+            pixel[colour_index] = int(new_binary_pixel, 2)
+
+            return pixel
+
         else:
             return np.array([])     # no more data to embed
-
-        return pixel
 
 
     def encode(self):
