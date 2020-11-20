@@ -90,15 +90,21 @@ class LSB():
     def decode(self):
 
         binary_message = ""
+        random.seed(self.key)
+
+        pixels = [i for i in range(0, self.width * self.height)]     # [0, 1, 2, ..., 426400]
+        path = random.sample(pixels, self.width * self.height)   # get a random path based on seed through the pixels
 
         # loop through image pixels
-        for x in range(0, self.width):
-            for y in range(0, self.height):
+        for index in path:
 
-                # assign, retrieve, convert, and append LSBs to binary message
-                stego_pixel = self.image[y][x]
-                r, g, b = message_to_binary(stego_pixel)
-                binary_message += r[-1] + g[-1] + b[-1]
+            x = index // self.height
+            y = index % self.height
+
+            # assign, retrieve, convert, and append LSBs to binary message
+            stego_pixel = self.image[y][x]
+            r, g, b = message_to_binary(stego_pixel)
+            binary_message += r[-1] + g[-1] + b[-1]
 
         # extract the original message, save to file, and return
         extracted_message = binary_to_string(binary_message, self.delimiter)
@@ -117,24 +123,3 @@ class LSB():
         message_file = open(os.path.join(self.save_path, "{0}.txt".format(self.time_string)), "w")
         message_file.write(message)
         message_file.close()
-
-'''
-    def single_random_generator(self):
-
-        seed = 5
-        random.seed(seed)
-
-        # generate pixel numbers
-        pixels = [i for i in range(0, self.width * self.height)]     # [0, 1, 2, ..., ]
-        message_length = len(self.message)
-
-        path = random.sample(pixels, message_length)   # get a random path based on seed through the pixels
-
-        for pixel in path:
-
-            x = pixel // self.height
-            y = pixel % self.height
-
-            # embedding ...
-            cover[y][x] = self.embed_pixel()
-'''
