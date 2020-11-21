@@ -2,6 +2,7 @@ import sys
 import PySimpleGUI as gui
 from algorithms.LSB import LSB
 from algorithms.LSBM import LSBM
+from algorithms.PVD import PVD
 
 class GraphicalUserInterface(object):
 
@@ -11,7 +12,8 @@ class GraphicalUserInterface(object):
         self.algorithm_list = ["LSB", "LSBM", "LSBMR", "PVD"]
         self.instantiators = {
             "LSB": LSB,
-            "LSBM": LSBM
+            "LSBM": LSBM,
+            "PVD": PVD
         }
 
 
