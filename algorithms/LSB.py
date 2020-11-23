@@ -27,21 +27,16 @@ class LSB():
         self.time_string = "{:%Y_%m_%d_%H;%M}".format(datetime.now())
 
 
+    # embed a bit of the data into the Least Significant Bit of the cover image's current pixel
     def embed_pixel(self, binary_pixel, message_index, message_length):
 
-        # embed a bit of the data into the Least Significant Bit of the cover image's current pixel
-        if message_index < message_length:
+        # adding 0 or 1 (message bit) to LSB of pixel and reassigning
+        bit = self.message[message_index]
+        binary_pixel_msb = binary_pixel[:-1]
+        embedded_pixel = binary_pixel_msb + bit
+        embedded_pixel = int(embedded_pixel, 2)
 
-            # adding 0 or 1 (message bit) to LSB of pixel and reassigning
-            bit = self.message[message_index]
-            binary_pixel_msb = binary_pixel[:-1]
-            embedded_pixel = binary_pixel_msb + bit
-            embedded_pixel = int(embedded_pixel, 2)
-
-            return embedded_pixel
-
-        else:
-            return -1    # no more data to embed
+        return embedded_pixel
 
 
     def encode(self):
@@ -76,11 +71,8 @@ class LSB():
             embedded_pixel = self.embed_pixel(binary_pixel, message_index, message_length)
 
             # reassign embedded pixel to cover image
-            if embedded_pixel >= 0:
-                cover_image[y][x] = embedded_pixel
-                message_index += 1
-            else:
-                break   # no more data so break
+            cover_image[y][x] = embedded_pixel
+            message_index += 1
 
         # reassign and save image
         stego_image = cover_image
