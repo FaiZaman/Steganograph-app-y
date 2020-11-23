@@ -3,7 +3,7 @@ import os
 import random
 import numpy as np
 from datetime import datetime
-from utility import message_to_binary, binary_to_string
+from utility import message_to_binary, integer_to_binary, binary_to_string
 
 class LSB():
 
@@ -27,21 +27,21 @@ class LSB():
         self.time_string = "{:%Y_%m_%d_%H;%M}".format(datetime.now())
 
 
-    def embed_pixel(self, pixel, colour, colour_index, message_index, message_length):
+    def embed_pixel(self, binary_pixel, message_index, message_length):
 
         # embed a bit of the data into the Least Significant Bit of the cover image's current pixel
         if message_index < message_length:
 
             # adding 0 or 1 (message bit) to LSB of pixel and reassigning
             bit = self.message[message_index]
-            binary_pixel = colour[:-1]
-            new_binary_pixel = binary_pixel + bit
-            pixel[colour_index] = int(new_binary_pixel, 2)
+            binary_pixel_msb = binary_pixel[:-1]
+            embedded_pixel = binary_pixel_msb + bit
+            embedded_pixel = int(embedded_pixel, 2)
 
-            return pixel
+            return embedded_pixel
 
         else:
-            return np.array([])     # no more data to embed
+            return -1    # no more data to embed
 
 
     def encode(self):
@@ -68,21 +68,19 @@ class LSB():
             # assign, retrieve, and convert RGB values
             pixel = cover_image[y][x]
             embedded_pixel = pixel
-            r, g, b = message_to_binary(pixel)
+            binary_pixel = integer_to_binary(pixel)
 
             # embed message data in each colour channel
-            for colour_index, colour in enumerate([r, g, b]):
 
-                # embed data within current pixel
-                embedded_pixel = self.embed_pixel(embedded_pixel, colour,\
-                    colour_index, message_index, message_length)
+            # embed data within current pixel
+            embedded_pixel = self.embed_pixel(binary_pixel, message_index, message_length)
 
-                # reassign embedded pixel to cover image
-                if embedded_pixel.any():
-                    cover_image[y][x] = embedded_pixel
-                    message_index += 1
-                else:
-                    break   # no more data so break
+            # reassign embedded pixel to cover image
+            if embedded_pixel >= 0:
+                cover_image[y][x] = embedded_pixel
+                message_index += 1
+            else:
+                break   # no more data so break
 
         # reassign and save image
         stego_image = cover_image
@@ -104,8 +102,8 @@ class LSB():
 
             # assign, retrieve, convert, and append LSBs to binary message
             stego_pixel = self.image[y][x]
-            r, g, b = message_to_binary(stego_pixel)
-            binary_message += r[-1] + g[-1] + b[-1]
+            binary_pixel = integer_to_binary(stego_pixel)
+            binary_message += binary_pixel[-1]
 
         # extract the original message, save to file, and return
         extracted_message = binary_to_string(binary_message, self.delimiter)

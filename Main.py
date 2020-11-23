@@ -4,7 +4,7 @@ from GUI import GraphicalUserInterface
 
 def read_image(image_file):
 
-    image = cv2.imread(image_file)
+    image = cv2.imread(image_file, cv2.IMREAD_GRAYSCALE)
     image_name = ntpath.basename(image_file)
     image_data = (image_name, image)
 

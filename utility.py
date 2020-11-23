@@ -3,14 +3,15 @@ import numpy as np
 # convert any message to a binary string
 def message_to_binary(message):
 
-    if type(message) == str:
-        return ''.join(format(ord(char), '08b') for char in message)
-    elif type(message) == bytes or type(message) == np.ndarray:
-        return [format(char, "08b") for char in message]
-    elif type(message) == int:
-        return format(message, "08b")
-    else:
-        raise TypeError("Unrecognised input.")
+    binary_message = ''.join(format(ord(char), '08b') for char in message)
+    return binary_message
+
+
+# convert any integer into 8-bit binary value
+def integer_to_binary(integer):
+
+    binary_value = format(integer, "08b")
+    return binary_value
 
 
 # convert a binary string into a UTF-8 string message
