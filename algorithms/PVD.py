@@ -1,4 +1,5 @@
 import cv2
+import math
 import random
 import numpy as np
 from utility import message_to_binary, integer_to_binary, binary_to_string
@@ -57,6 +58,34 @@ class PVD():
 
         block = (current_pixel, next_pixel)
         return block
+    
+
+    def inverse_calculation(self, block, m, difference):
+
+        half_m = m / 2
+        ceiling_m = math.ceil(half_m)
+        floor_m = math.floor(half_m)
+
+        if difference % 2 == 0:
+            embedded_block = (block[0] - floor_m, block[1] + ceiling_m)
+        else:
+            embedded_block = (block[0] - ceiling_m, block[1] + floor_m)
+
+        return embedded_block
+
+
+    # check that the block chosen stays within the range [0, 255] after embedding
+    def check_fall_off(self, block, upper, difference):
+
+        m = upper - difference
+        embedded_block = self.inverse_calculation(block, m, difference)
+
+        if embedded_block[0] < 0 or embedded_block[0] > 255 or\
+            embedded_block[1] < 0 or embedded_block[1] > 255:
+
+            return True
+        
+        return False
 
 
     def encode(self):
@@ -80,3 +109,6 @@ class PVD():
             y = index // self.width
 
             block = self.get_pixel_block(x, y)
+            difference_value = abs(block[1] - block[0])
+                
+            #fall_off = self.check_fall_off(block, upper, difference_value)
