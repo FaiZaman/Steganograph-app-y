@@ -60,6 +60,7 @@ class PVD():
         return block
     
 
+    # the calculation to embed the bits into the block based on the difference values
     def inverse_calculation(self, block, m, difference):
 
         half_m = m / 2
@@ -108,7 +109,32 @@ class PVD():
             x = index % self.width
             y = index // self.width
 
+            # compute the two-pixel block and the pixel value difference
             block = self.get_pixel_block(x, y)
             difference_value = abs(block[1] - block[0])
-                
-            #fall_off = self.check_fall_off(block, upper, difference_value)
+
+            # get the lower and upper bound of the range that the difference falls into
+            lower_key = 0
+            for lower, upper in self.ranges.items():
+
+                if lower <= difference_value <= upper:
+                    lower_key = lower
+                    break
+            
+            # calculate range width and check if the block causes fall off
+            upper = self.ranges[lower_key]
+            range_width = upper - lower_key + 1
+            fall_off = self.check_fall_off(block, upper, difference_value)
+
+            if not fall_off:
+
+                # get the number of bits that can be embedded in this block based on range width
+                num_bits = int(math.log(range_width))
+                message_bits = self.message[message_index : message_index + num_bits]
+
+                # compute new difference as m & get the embedded block based off inverse calculation
+                new_difference = lower_key + int(message_bits, 2)
+                m = abs(new_difference - difference_value)
+
+                embedded_block = self.inverse_calculation(block, m, difference_value)
+                print(block, embedded_block)
