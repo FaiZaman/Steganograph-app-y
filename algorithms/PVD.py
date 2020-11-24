@@ -28,8 +28,35 @@ class PVD():
             128: 255
         }
 
-        # set PseudoRandom Number Generator seed as the secret key
+        # set PseudoRandom Number Generator seed as the secret key and generate list of pixel indices
         random.seed(key)
+        self.pixels = [i for i in range(0, self.num_bytes - 1)]     # [0, 1, 2, ..., num_pixels]
+
+
+    # takes the coordinates of current pixel and returns a two-pixel block based on PVD img traversal
+    def get_pixel_block(self, x, y):
+
+        current_pixel = self.image[y][x]
+        next_pixel = None
+
+        if y % 2 == 0:  # going right
+
+            if x < self.width - 1:      # keep going right if the end of image is not reached
+                next_pixel = self.image[y][x + 1]
+
+            else:      # go down a row
+                next_pixel = self.image[y + 1][x]
+
+        else:   # going left
+
+            if x > 0:   # keep going left if the end of image is not reached
+                next_pixel = self.image[y][x - 1]
+
+            else:       # go down a row
+                next_pixel = self.image[y + 1][x]
+
+        block = (current_pixel, next_pixel)
+        return block
 
 
     def encode(self):
@@ -41,34 +68,15 @@ class PVD():
         if message_length > self.num_bytes:
             raise ValueError("The message is too large for the image.")
 
+        # get a random path based on seed through the pixels
+        path = random.sample(self.pixels, self.num_bytes - 1)
         cover_image = self.image  # so image is not modified
         x = y = 0
 
-        while True:
+        for index in path:
 
-            current_pixel = cover_image[y][x]
+            # get pixel coordiantes based on index
+            x = index % self.width
+            y = index // self.width
 
-            if y % 2 == 0:  # going right
-
-                if x < self.width - 1:
-                    x += 1
-                    next_pixel = cover_image[y][x]
-
-                else:
-
-                    if y == self.height - 1:
-                        break
-
-                    y += 1
-                    next_pixel = cover_image[y][x]
-
-
-            else:   # going left
-
-                if x > 0:
-                    x -= 1
-                    next_pixel = cover_image[y][x]
-
-                else:
-                    y += 1
-                    next_pixel = cover_image[y][x]
+            block = self.get_pixel_block(x, y)
