@@ -18,17 +18,17 @@ class LSB():
         # get dimensions of image
         self.width = np.size(self.image, 1)
         self.height = np.size(self.image, 0)
-        self.num_bytes = self.width * self.height * 3   # 3 colour channels
+        self.num_bytes = self.width * self.height   # total number of pixels in image
 
         # set PseudoRandom Number Generator seed as the secret key and generate list of pixel indices
         random.seed(key)
-        self.pixels = [i for i in range(0, self.width * self.height)]     # [0, 1, 2, ..., num_pixels]
+        self.pixels = [i for i in range(0, self.num_bytes)]     # [0, 1, 2, ..., num_pixels]
 
         self.time_string = "{:%Y_%m_%d_%H;%M}".format(datetime.now())
 
 
     # embed a bit of the data into the Least Significant Bit of the cover image's current pixel
-    def embed_pixel(self, binary_pixel, message_index, message_length):
+    def embed_pixel(self, binary_pixel, message_index):
 
         # adding 0 or 1 (message bit) to LSB of pixel and reassigning
         bit = self.message[message_index]
@@ -57,18 +57,16 @@ class LSB():
         for index in path:
 
             # get pixel coordiantes based on index
-            x = index // self.height
-            y = index % self.height
+            x = index % self.width
+            y = index // self.width
 
             # assign, retrieve, and convert RGB values
             pixel = cover_image[y][x]
             embedded_pixel = pixel
             binary_pixel = integer_to_binary(pixel)
 
-            # embed message data in each colour channel
-
             # embed data within current pixel
-            embedded_pixel = self.embed_pixel(binary_pixel, message_index, message_length)
+            embedded_pixel = self.embed_pixel(binary_pixel, message_index)
 
             # reassign embedded pixel to cover image
             cover_image[y][x] = embedded_pixel
@@ -83,14 +81,14 @@ class LSB():
 
         # initialise binary message and get a random path based on seed through the pixels
         binary_message = ""
-        path = random.sample(self.pixels, self.width * self.height)
+        path = random.sample(self.pixels, self.num_bytes)
 
         # loop through image pixels
         for index in path:
 
             # get pixel coordiantes based on index
-            x = index // self.height
-            y = index % self.height
+            x = index % self.width
+            y = index // self.width
 
             # assign, retrieve, convert, and append LSBs to binary message
             stego_pixel = self.image[y][x]
