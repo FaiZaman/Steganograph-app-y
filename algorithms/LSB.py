@@ -1,9 +1,8 @@
-import cv2
 import os
 import random
 import numpy as np
 from datetime import datetime
-from utility import message_to_binary, integer_to_binary, binary_to_string
+from utility import message_to_binary, integer_to_binary, binary_to_string, save_image, save_message
 
 class LSB():
 
@@ -74,7 +73,7 @@ class LSB():
 
         # reassign and save image
         stego_image = cover_image
-        self.save_image(stego_image)
+        save_image(self.save_path, self.image_name, self.time_string, stego_image)
 
 
     def decode(self):
@@ -97,25 +96,5 @@ class LSB():
 
         # extract the original message, save to file, and return
         extracted_message = binary_to_string(binary_message, self.delimiter)
-        self.save_message(extracted_message)
+        save_message(self.save_path, self.time_string, extracted_message)
         return extracted_message
-
-
-    def save_image(self, stego):
-
-        cv2.imwrite(os.path.join(self.save_path, '{0}_{1}'.\
-            format(self.time_string, self.image_name)), stego)
-
-
-    def save_message(self, message):
-
-        file_path = os.path.join(self.save_path, "{0}.txt".format(self.time_string))
-        message_file = open(file_path, "w")
-
-        try:
-            message_file.write(message)
-            message_file.close()
-        except UnicodeEncodeError:
-            print("Incorrect secret key - your file was not saved. Please try again.")
-            message_file.close()
-            os.remove(file_path)

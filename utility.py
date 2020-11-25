@@ -1,3 +1,5 @@
+import os
+import cv2
 import numpy as np
 
 # convert any message to a binary string
@@ -34,3 +36,22 @@ def binary_to_string(binary_message, delimiter):
             break
 
     return message
+
+
+def save_image(save_path, image_name, time_string, stego):
+
+    cv2.imwrite(os.path.join(save_path, '{0}_{1}'.format(time_string, image_name)), stego)
+
+
+def save_message(save_path, time_string, message):
+
+    file_path = os.path.join(save_path, "{0}.txt".format(time_string))
+    message_file = open(file_path, "w")
+
+    try:
+        message_file.write(message)
+        message_file.close()
+    except UnicodeEncodeError:
+        print("Incorrect secret key - your file was not saved. Please try again.")
+        message_file.close()
+        os.remove(file_path)

@@ -103,6 +103,7 @@ class PVD():
         cover_image = self.image  # so image is not modified
         x = y = 0
 
+        all_data_embedded = False
         for index in path:
 
             # get pixel coordiantes based on index
@@ -111,7 +112,7 @@ class PVD():
 
             # compute the two-pixel block and the pixel value difference
             block = self.get_pixel_block(x, y)
-            difference_value = abs(block[1] - block[0])
+            difference_value = abs(int(block[1]) - int(block[0]))
 
             # get the lower and upper bound of the range that the difference falls into
             lower_key = 0
@@ -124,17 +125,27 @@ class PVD():
             # calculate range width and check if the block causes fall off
             upper = self.ranges[lower_key]
             range_width = upper - lower_key + 1
-            fall_off = self.check_fall_off(block, upper, difference_value)
+            fall_off = self.check_fall_off(block, upper - difference_value, difference_value)
 
             if not fall_off:
 
                 # get the number of bits that can be embedded in this block based on range width
                 num_bits = int(math.log(range_width))
-                message_bits = self.message[message_index : message_index + num_bits]
+                new_message_index = message_index + num_bits
+
+                if new_message_index > message_length:
+                    all_data_embedded = True
+                    new_message_index = message_length
+
+                message_bits = self.message[message_index : new_message_index]
+                print(message_index, new_message_index, message_bits)
 
                 # compute new difference as m & get the embedded block based off inverse calculation
                 new_difference = lower_key + int(message_bits, 2)
                 m = abs(new_difference - difference_value)
 
                 embedded_block = self.inverse_calculation(block, m, difference_value)
-                print(block, embedded_block)
+                message_index = new_message_index
+
+                if all_data_embedded:
+                    break
