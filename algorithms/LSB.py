@@ -55,7 +55,7 @@ class LSB():
         # loop through image pixels in pseudorandom order based on secret key
         for index in path:
 
-            # get pixel coordiantes based on index
+            # get pixel coordinates based on index
             x = index % self.width
             y = index // self.width
 
@@ -85,7 +85,7 @@ class LSB():
         # loop through image pixels
         for index in path:
 
-            # get pixel coordiantes based on index
+            # get pixel coordinates based on index
             x = index % self.width
             y = index // self.width
 

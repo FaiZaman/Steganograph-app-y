@@ -64,7 +64,17 @@ class PVD():
 
         block = (x, y), (current_pixel, next_pixel)
         return block
-    
+
+
+    # get the lower and upper bound of the range that the difference falls into
+    def get_range_bounds(self, difference):
+
+        lower_key = 0
+        for lower, upper in self.ranges.items():
+
+            if lower <= difference <= upper:
+                return lower, self.ranges[lower]
+
 
     # the calculation to embed the bits into the block based on the difference values
     def inverse_calculation(self, block, m, difference):
@@ -95,6 +105,7 @@ class PVD():
         return False
 
 
+    # loops through the cover image based on pseudorandom path and chooses blocks to embed data
     def encode(self):
 
         self.message = message_to_binary(self.message)
@@ -112,28 +123,21 @@ class PVD():
         all_data_embedded = False
         for index in path:
 
-            # get pixel coordiantes based on index
+            # get pixel coordinates based on index
             x = index % self.width
             y = index // self.width
 
-            # compute the two-pixel block and the coordinates of the next pixel with difference val
+            # compute the two-pixel block and the coordinates of the next pixel
             next_coordinates, block = self.get_pixel_block(x, y)
             next_x = next_coordinates[0]
             next_y = next_coordinates[1]
 
+            # get difference value and compute 
             difference_value = abs(int(block[1]) - int(block[0]))
+            lower, upper = self.get_range_bounds(difference_value)
 
-            # get the lower and upper bound of the range that the difference falls into
-            lower_key = 0
-            for lower, upper in self.ranges.items():
-
-                if lower <= difference_value <= upper:
-                    lower_key = lower
-                    break
-            
             # calculate range width and check if the block causes fall off
-            upper = self.ranges[lower_key]
-            range_width = upper - lower_key + 1
+            range_width = upper - lower + 1
             fall_off = self.check_fall_off(block, upper - difference_value, difference_value)
 
             if not fall_off:
@@ -166,3 +170,23 @@ class PVD():
         stego_image = cover_image
         save_image(self.save_path, self.image_name, self.time_string, stego_image)
 
+
+    # loops through image in same order as when encoding and extracts message bits
+    def decode(self):
+
+        # initialise message and same pseudorandom embedding path
+        binary_message = ""
+        path = random.sample(self.pixels, self.num_bytes - 1)
+
+        # loop through image pixel blocks
+        for index in path:
+
+            # get pixel coordinates based on index
+            x = index % self.width
+            y = index // self.width
+
+            # retrieve block and difference value between stego pixels in block
+            next_coordinates, stego_block = self.get_pixel_block(x, y)
+            difference_value = abs(int(steg_block[1]) - int(stego_block[0]))
+
+            lower, upper = self.get_range_bounds(difference_value)
