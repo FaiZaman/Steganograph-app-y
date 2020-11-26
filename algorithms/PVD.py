@@ -2,8 +2,8 @@ import cv2
 import math
 import random
 import numpy as np
-from utility import message_to_binary, integer_to_binary, binary_to_string
-
+from datetime import datetime
+from utility import message_to_binary, integer_to_binary, binary_to_string, save_image, save_message
 
 class PVD():
 
@@ -33,6 +33,8 @@ class PVD():
         random.seed(key)
         self.pixels = [i for i in range(0, self.num_bytes - 1)]     # [0, 1, 2, ..., num_pixels]
 
+        self.time_string = "{:%Y_%m_%d_%H;%M}".format(datetime.now())
+
 
     # takes the coordinates of current pixel and returns a two-pixel block based on PVD img traversal
     def get_pixel_block(self, x, y):
@@ -43,20 +45,24 @@ class PVD():
         if y % 2 == 0:  # going right
 
             if x < self.width - 1:      # keep going right if the end of image is not reached
-                next_pixel = self.image[y][x + 1]
+                x += 1
+                next_pixel = self.image[y][x]
 
             else:      # go down a row
-                next_pixel = self.image[y + 1][x]
+                y += 1
+                next_pixel = self.image[y][x]
 
         else:   # going left
 
             if x > 0:   # keep going left if the end of image is not reached
-                next_pixel = self.image[y][x - 1]
+                x -= 1
+                next_pixel = self.image[y][x]
 
             else:       # go down a row
-                next_pixel = self.image[y + 1][x]
+                y += 1
+                next_pixel = self.image[y][x]
 
-        block = (current_pixel, next_pixel)
+        block = (x, y), (current_pixel, next_pixel)
         return block
     
 
@@ -110,8 +116,11 @@ class PVD():
             x = index % self.width
             y = index // self.width
 
-            # compute the two-pixel block and the pixel value difference
-            block = self.get_pixel_block(x, y)
+            # compute the two-pixel block and the coordinates of the next pixel with difference val
+            next_coordinates, block = self.get_pixel_block(x, y)
+            next_x = next_coordinates[0]
+            next_y = next_coordinates[1]
+
             difference_value = abs(int(block[1]) - int(block[0]))
 
             # get the lower and upper bound of the range that the difference falls into
@@ -133,19 +142,27 @@ class PVD():
                 num_bits = int(math.log(range_width))
                 new_message_index = message_index + num_bits
 
+                # check for the index surpassing the whole message: if so, everything embedded
                 if new_message_index > message_length:
                     all_data_embedded = True
                     new_message_index = message_length
 
                 message_bits = self.message[message_index : new_message_index]
-                print(message_index, new_message_index, message_bits)
 
                 # compute new difference as m & get the embedded block based off inverse calculation
                 new_difference = lower_key + int(message_bits, 2)
                 m = abs(new_difference - difference_value)
 
+                # calculate new embedded block values and reassign to stego image
                 embedded_block = self.inverse_calculation(block, m, difference_value)
-                message_index = new_message_index
+                cover_image[y][x] = embedded_block[0]
+                cover_image[next_y][next_x] = embedded_block[1]
 
-                if all_data_embedded:
+                message_index = new_message_index   # increment index by num_bits
+
+                if all_data_embedded or message_index == message_length:
                     break
+
+        stego_image = cover_image
+        save_image(self.save_path, self.image_name, self.time_string, stego_image)
+
