@@ -78,17 +78,26 @@ class PVD():
 
 
     # the calculation to embed the bits into the block based on the difference values
-    def inverse_calculation(self, block, m, difference):
+    def new_inverse_calculation(self, block, m, difference, new_difference):
 
         half_m = m / 2
         ceiling_m = math.ceil(half_m)
         floor_m = math.floor(half_m)
 
-        if difference % 2 == 0:
-            embedded_block = (block[0] - floor_m, block[1] + ceiling_m)
-        else:
-            embedded_block = (block[0] - ceiling_m, block[1] + floor_m)
+        if new_difference > difference:
 
+            if block[0] >= block[1]:
+                embedded_block = (block[0] + ceiling_m, block[1] - floor_m)
+            else:
+                embedded_block = (block[0] - floor_m, block[1] + ceiling_m)
+        
+        else:
+
+            if block[0] >= block[1]:
+                embedded_block = (block[0] - ceiling_m, block[1] + floor_m)
+            else:
+                embedded_block = (block[0] + ceiling_m, block[1] - floor_m)
+        
         return embedded_block
 
 
@@ -96,13 +105,13 @@ class PVD():
     def check_fall_off(self, block, upper, difference):
 
         m = upper - difference
-        embedded_block = self.inverse_calculation(block, m, difference)
+        embedded_block = self.new_inverse_calculation(block, m, difference, new_difference=0)
 
         if embedded_block[0] < 0 or embedded_block[0] > 255 or\
             embedded_block[1] < 0 or embedded_block[1] > 255:
 
             return True
-        
+
         return False
 
 
@@ -144,7 +153,7 @@ class PVD():
             if not fall_off:
 
                 # get the number of bits that can be embedded in this block based on range width
-                num_bits = int(math.log(range_width))
+                num_bits = int(math.log(range_width, 2))
                 new_message_index = message_index + num_bits
 
                 # check for the index surpassing the whole message: if so, everything embedded
@@ -156,11 +165,10 @@ class PVD():
 
                 # compute new difference as m & get the embedded block based off inverse calculation
                 new_difference = lower + int(message_bits, 2)
-                print(new_difference, message_bits, int(message_bits, 2))
                 m = abs(new_difference - difference_value)
 
                 # calculate new embedded block values and reassign to stego image
-                embedded_block = self.inverse_calculation(block, m, difference_value)
+                embedded_block = self.new_inverse_calculation(block, m, difference_value, new_difference)
                 cover_image[y][x] = embedded_block[0]
                 cover_image[next_y][next_x] = embedded_block[1]
 
@@ -199,14 +207,11 @@ class PVD():
 
             if not fall_off:
 
-                num_bits = int(math.log(range_width))
+                num_bits = int(math.log(range_width, 2))
                 integer_value = difference_value - lower
 
                 binary_value = integer_to_binary(integer_value)
-                binary_message += binary_value[:num_bits]
-
-                print(difference_value, binary_value[:num_bits], integer_value)
-
+                binary_message += binary_value[-num_bits:]
 
         extracted_message = binary_to_string(binary_message, self.delimiter)
         save_message(self.save_path, self.time_string, extracted_message)
