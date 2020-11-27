@@ -11,7 +11,8 @@ class PVD():
 
         self.image_name = image[0]
         self.image = image[1]
-        self.message = message
+        self.delimiter = "-----"
+        self.message = message + self.delimiter
         self.key = key
         self.save_path = save_path
 
@@ -138,7 +139,7 @@ class PVD():
 
             # calculate range width and check if the block causes fall off
             range_width = upper - lower + 1
-            fall_off = self.check_fall_off(block, upper - difference_value, difference_value)
+            fall_off = self.check_fall_off(block, upper, difference_value)
 
             if not fall_off:
 
@@ -154,7 +155,8 @@ class PVD():
                 message_bits = self.message[message_index : new_message_index]
 
                 # compute new difference as m & get the embedded block based off inverse calculation
-                new_difference = lower_key + int(message_bits, 2)
+                new_difference = lower + int(message_bits, 2)
+                print(new_difference, message_bits, int(message_bits, 2))
                 m = abs(new_difference - difference_value)
 
                 # calculate new embedded block values and reassign to stego image
@@ -187,6 +189,26 @@ class PVD():
 
             # retrieve block and difference value between stego pixels in block
             next_coordinates, stego_block = self.get_pixel_block(x, y)
-            difference_value = abs(int(steg_block[1]) - int(stego_block[0]))
+            difference_value = abs(int(stego_block[1]) - int(stego_block[0]))
 
+            # get bounds and calculate range width within which difference falls into
             lower, upper = self.get_range_bounds(difference_value)
+            range_width = upper - lower + 1
+
+            fall_off = self.check_fall_off(stego_block, upper, difference_value)
+
+            if not fall_off:
+
+                num_bits = int(math.log(range_width))
+                integer_value = difference_value - lower
+
+                binary_value = integer_to_binary(integer_value)
+                binary_message += binary_value[:num_bits]
+
+                print(difference_value, binary_value[:num_bits], integer_value)
+
+
+        extracted_message = binary_to_string(binary_message, self.delimiter)
+        save_message(self.save_path, self.time_string, extracted_message)
+
+        return extracted_message
