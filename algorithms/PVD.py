@@ -84,6 +84,7 @@ class PVD():
         ceiling_m = math.ceil(half_m)
         floor_m = math.floor(half_m)
 
+        # conditions defined as per https://royalsocietypublishing.org/doi/10.1098/rsos.161066
         if new_difference > difference:
 
             if block[0] >= block[1]:
@@ -180,6 +181,8 @@ class PVD():
         stego_image = cover_image
         save_image(self.save_path, self.image_name, self.time_string, stego_image)
 
+        return stego_image
+
 
     # loops through image in same order as when encoding and extracts message bits
     def decode(self):
@@ -203,16 +206,19 @@ class PVD():
             lower, upper = self.get_range_bounds(difference_value)
             range_width = upper - lower + 1
 
+            # check for fall off and extract if not
             fall_off = self.check_fall_off(stego_block, upper, difference_value)
-
             if not fall_off:
 
+                # compute the bits embedded into the difference value
+                message_integer_value = difference_value - lower
+                embedded_bits = integer_to_binary(message_integer_value)
+
+                # calculate the number of bits and retrieve from the bits embedded
                 num_bits = int(math.log(range_width, 2))
-                integer_value = difference_value - lower
+                binary_message += embedded_bits[-num_bits:]
 
-                binary_value = integer_to_binary(integer_value)
-                binary_message += binary_value[-num_bits:]
-
+        # extract the original message, save to file, and return
         extracted_message = binary_to_string(binary_message, self.delimiter)
         save_message(self.save_path, self.time_string, extracted_message)
 
