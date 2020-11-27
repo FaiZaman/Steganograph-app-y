@@ -1,16 +1,19 @@
+import os
+import cv2
 import numpy as np
 
 # convert any message to a binary string
 def message_to_binary(message):
 
-    if type(message) == str:
-        return ''.join(format(ord(char), '08b') for char in message)
-    elif type(message) == bytes or type(message) == np.ndarray:
-        return [format(char, "08b") for char in message]
-    elif type(message) == int:
-        return format(message, "08b")
-    else:
-        raise TypeError("Unrecognised input.")
+    binary_message = ''.join(format(ord(char), '08b') for char in message)
+    return binary_message
+
+
+# convert any integer into 8-bit binary value
+def integer_to_binary(integer):
+
+    binary_value = format(integer, "08b")
+    return binary_value
 
 
 # convert a binary string into a UTF-8 string message
@@ -33,3 +36,22 @@ def binary_to_string(binary_message, delimiter):
             break
 
     return message
+
+
+def save_image(save_path, image_name, time_string, stego):
+
+    cv2.imwrite(os.path.join(save_path, '{0}_{1}'.format(time_string, image_name)), stego)
+
+
+def save_message(save_path, time_string, message):
+
+    file_path = os.path.join(save_path, "{0}.txt".format(time_string))
+    message_file = open(file_path, "w")
+
+    try:
+        message_file.write(message)
+        message_file.close()
+    except UnicodeEncodeError:
+        print("Incorrect secret key - your file was not saved. Please try again.")
+        message_file.close()
+        os.remove(file_path)

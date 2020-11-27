@@ -1,9 +1,8 @@
-import cv2
 import os
 import random
 import numpy as np
 from datetime import datetime
-from utility import message_to_binary, binary_to_string
+from utility import message_to_binary, integer_to_binary, binary_to_string, save_image, save_message
 
 class LSB():
 
@@ -18,30 +17,25 @@ class LSB():
         # get dimensions of image
         self.width = np.size(self.image, 1)
         self.height = np.size(self.image, 0)
-        self.num_bytes = self.width * self.height * 3   # 3 colour channels
+        self.num_bytes = self.width * self.height   # total number of pixels in image
 
         # set PseudoRandom Number Generator seed as the secret key and generate list of pixel indices
         random.seed(key)
-        self.pixels = [i for i in range(0, self.width * self.height)]     # [0, 1, 2, ..., num_pixels]
+        self.pixels = [i for i in range(0, self.num_bytes)]     # [0, 1, 2, ..., num_pixels]
 
         self.time_string = "{:%Y_%m_%d_%H;%M}".format(datetime.now())
 
 
-    def embed_pixel(self, pixel, colour, colour_index, message_index, message_length):
+    # embed a bit of the data into the Least Significant Bit of the cover image's current pixel
+    def embed_pixel(self, binary_pixel, message_index):
 
-        # embed a bit of the data into the Least Significant Bit of the cover image's current pixel
-        if message_index < message_length:
+        # adding 0 or 1 (message bit) to LSB of pixel and reassigning
+        bit = self.message[message_index]
+        binary_pixel_msb = binary_pixel[:-1]
+        embedded_pixel = binary_pixel_msb + bit
+        embedded_pixel = int(embedded_pixel, 2)
 
-            # adding 0 or 1 (message bit) to LSB of pixel and reassigning
-            bit = self.message[message_index]
-            binary_pixel = colour[:-1]
-            new_binary_pixel = binary_pixel + bit
-            pixel[colour_index] = int(new_binary_pixel, 2)
-
-            return pixel
-
-        else:
-            return np.array([])     # no more data to embed
+        return embedded_pixel
 
 
     def encode(self):
@@ -61,73 +55,49 @@ class LSB():
         # loop through image pixels in pseudorandom order based on secret key
         for index in path:
 
-            # get pixel coordiantes based on index
-            x = index // self.height
-            y = index % self.height
+            # get pixel coordinates based on index
+            x = index % self.width
+            y = index // self.width
 
             # assign, retrieve, and convert RGB values
             pixel = cover_image[y][x]
             embedded_pixel = pixel
-            r, g, b = message_to_binary(pixel)
+            binary_pixel = integer_to_binary(pixel)
 
-            # embed message data in each colour channel
-            for colour_index, colour in enumerate([r, g, b]):
+            # embed data within current pixel
+            embedded_pixel = self.embed_pixel(binary_pixel, message_index)
 
-                # embed data within current pixel
-                embedded_pixel = self.embed_pixel(embedded_pixel, colour,\
-                    colour_index, message_index, message_length)
-
-                # reassign embedded pixel to cover image
-                if embedded_pixel.any():
-                    cover_image[y][x] = embedded_pixel
-                    message_index += 1
-                else:
-                    break   # no more data so break
+            # reassign embedded pixel to cover image
+            cover_image[y][x] = embedded_pixel
+            message_index += 1
 
         # reassign and save image
         stego_image = cover_image
-        self.save_image(stego_image)
+        save_image(self.save_path, self.image_name, self.time_string, stego_image)
+
+        return stego_image
 
 
     def decode(self):
 
         # initialise binary message and get a random path based on seed through the pixels
         binary_message = ""
-        path = random.sample(self.pixels, self.width * self.height)
+        path = random.sample(self.pixels, self.num_bytes)
 
         # loop through image pixels
         for index in path:
 
-            # get pixel coordiantes based on index
-            x = index // self.height
-            y = index % self.height
+            # get pixel coordinates based on index
+            x = index % self.width
+            y = index // self.width
 
             # assign, retrieve, convert, and append LSBs to binary message
             stego_pixel = self.image[y][x]
-            r, g, b = message_to_binary(stego_pixel)
-            binary_message += r[-1] + g[-1] + b[-1]
+            binary_pixel = integer_to_binary(stego_pixel)
+            binary_message += binary_pixel[-1]
 
         # extract the original message, save to file, and return
         extracted_message = binary_to_string(binary_message, self.delimiter)
-        self.save_message(extracted_message)
+        save_message(self.save_path, self.time_string, extracted_message)
+
         return extracted_message
-
-
-    def save_image(self, stego):
-
-        cv2.imwrite(os.path.join(self.save_path, '{0}_{1}'.\
-            format(self.time_string, self.image_name)), stego)
-
-
-    def save_message(self, message):
-
-        file_path = os.path.join(self.save_path, "{0}.txt".format(self.time_string))
-        message_file = open(file_path, "w")
-
-        try:
-            message_file.write(message)
-            message_file.close()
-        except UnicodeEncodeError:
-            print("Incorrect secret key - your file was not saved. Please try again.")
-            message_file.close()
-            os.remove(file_path)
