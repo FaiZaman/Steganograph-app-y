@@ -34,19 +34,22 @@ if __name__ == '__main__':
 
         if embedding:
 
+            # retrieve embedding data from GUI embedding screen
             algorithm_name, cover_file, message_file, key, save_path =\
                 data[0], data[1], data[2], data[3], data[4]
-            cover_data, message = read_files(cover_file, message_file)
 
-            # convert into proper formats and initialise algorithm
+            # convert into proper formats and initialise algorithm to encode message
+            cover_data, message = read_files(cover_file, message_file)
             algorithm = algorithm_name(cover_data, message, key, save_path)
             algorithm.encode()
 
         else:
 
+            # retrieve extracting data from GUI embedding screen and convert into proper formats
             algorithm_name, stego_file, key, save_path = data[0], data[1], data[2], data[3]
             stego_data = read_image(stego_file)
             message = ""
 
+            # initalise algorithm and decode message
             algorithm = algorithm_name(stego_data, message, key, save_path)
             extract = algorithm.decode()
