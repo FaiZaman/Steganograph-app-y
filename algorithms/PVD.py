@@ -13,7 +13,6 @@ class PVD():
         self.image = image[1]
         self.delimiter = "-----"
         self.message = message + self.delimiter
-        self.key = key
         self.save_path = save_path
 
         # get dimensions of image
@@ -35,6 +34,7 @@ class PVD():
         self.pixels = [i for i in range(0, self.num_bytes - 1)]     # [0, 1, 2, ..., num_pixels]
 
         self.time_string = "{:%Y_%m_%d_%H;%M}".format(datetime.now())
+        print('init PVD')
 
 
     # takes the coordinates of current pixel and returns a two-pixel block based on PVD img traversal
@@ -117,7 +117,7 @@ class PVD():
 
 
     # loops through the cover image based on pseudorandom path and chooses blocks to embed data
-    def encode(self):
+    def embed_image(self):
 
         self.message = message_to_binary(self.message)
         message_index = 0
@@ -185,7 +185,7 @@ class PVD():
 
 
     # loops through image in same order as when encoding and extracts message bits
-    def decode(self):
+    def extract(self):
 
         # initialise message and same pseudorandom embedding path
         binary_message = ""
