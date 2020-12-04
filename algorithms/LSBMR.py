@@ -11,6 +11,11 @@ class LSBMR(LSBM, PVD):
         self.pixels = [i for i in range(0, self.num_bytes - 1)]     # [0, 1, 2, ..., num_pixels]
 
 
+    def binary_function(self, a, b):
+
+        pass
+
+
     def embed_image(self):
 
         self.message = message_to_binary(self.message)
@@ -34,5 +39,22 @@ class LSBMR(LSBM, PVD):
 
             # compute the two-pixel block and the coordinates of the next pixel
             next_coordinates, block = self.get_pixel_block(x, y)
+
+            # assigning
+            first_pixel = block[0]
+            second_pixel = block[1]
             next_x = next_coordinates[0]
             next_y = next_coordinates[1]
+
+            # check if not 0 or 255 as embedding cannot be performed otherwise
+            if 0 < block[0] < 255 and 0 < block[1] < 255:
+                
+                first_msg_bit = self.message[message_index]
+                second_msg_bit = self.message[message_index + 1]
+
+                first_pixel_binary = integer_to_binary(first_pixel)
+                second_pixel_binary = integer_to_binary(second_pixel)
+
+                if first_msg_bit == first_pixel_binary[-1]:
+                    pass
+

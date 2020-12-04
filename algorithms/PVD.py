@@ -41,28 +41,24 @@ class PVD():
     def get_pixel_block(self, x, y):
 
         current_pixel = self.image[y][x]
-        next_pixel = None
 
         if y % 2 == 0:  # going right
 
             if x < self.width - 1:      # keep going right if the end of image is not reached
                 x += 1
-                next_pixel = self.image[y][x]
 
             else:      # go down a row
                 y += 1
-                next_pixel = self.image[y][x]
 
         else:   # going left
 
             if x > 0:   # keep going left if the end of image is not reached
                 x -= 1
-                next_pixel = self.image[y][x]
 
             else:       # go down a row
                 y += 1
-                next_pixel = self.image[y][x]
 
+        next_pixel = self.image[y][x]
         block = (x, y), (current_pixel, next_pixel)
         return block
 
