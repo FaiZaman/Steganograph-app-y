@@ -10,7 +10,7 @@ class LSBM(LSB):
 
 
     # embed a bit of the data into the Least Significant Bit of the cover image's current pixel
-    def embed_pixel(self, binary_pixel):
+    def embed_pixel(self, binary_pixel, message_index):
 
         bit = self.message[message_index]
         integer_pixel = int(binary_pixel, 2)
