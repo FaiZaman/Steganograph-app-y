@@ -45,10 +45,8 @@ class LSBMR(LSBM, PVD):
             next_coordinates, block = self.get_pixel_block(x, y)
 
             # assigning
-            first_pixel = block[0]
-            second_pixel = block[1]
-            next_x = next_coordinates[0]
-            next_y = next_coordinates[1]
+            first_pixel, second_pixel = block[0], block[1]
+            next_x, next_y = next_coordinates[0], next_coordinates[1]
 
             # check if not 0 or 255 as embedding cannot be performed otherwise
             if 0 < first_pixel < 255 and 0 < second_pixel < 255:
@@ -88,9 +86,29 @@ class LSBMR(LSBM, PVD):
                 if message_index == message_length:
                     break
 
-            # reassign, save, and return stego image
-            stego_image = cover_image
-            save_image(self.save_path, self.image_name, self.time_string, stego_image)
+        # reassign, save, and return stego image
+        stego_image = cover_image
+        save_image(self.save_path, self.image_name, self.time_string, stego_image)
 
-            return stego_image
+        return stego_image
 
+
+    # loops through image in the same order as when encoding and extracts message bits
+    def extract(self):
+
+        # initialise message and same pseudorandom embedding path
+        binary_message = ""
+        path = random.sample(self.pixels, self.num_bytes - 1)
+
+        # loop through image pixel blocks
+        for index in path:
+
+            # get pixel coordinates based on index
+            x = index % self.width
+            y = index // self.width
+
+            # compute the two-pixel block and the coordinates of the next pixel
+            next_coordinates, stego_block = self.get_pixel_block(x, y)
+            first_stego_pixel, second_stego_pixel = stego_block[0], stego_block[1]
+
+            

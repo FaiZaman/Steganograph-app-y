@@ -136,8 +136,7 @@ class PVD():
 
             # compute the two-pixel block and the coordinates of the next pixel
             next_coordinates, block = self.get_pixel_block(x, y)
-            next_x = next_coordinates[0]
-            next_y = next_coordinates[1]
+            next_x, next_y = next_coordinates[0], next_coordinates[1]
 
             # get difference value and compute 
             difference_value = abs(int(block[1]) - int(block[0]))
