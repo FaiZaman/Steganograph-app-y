@@ -35,7 +35,6 @@ class LSBMR(LSBM, PVD):
         cover_image = self.image  # so image is not modified
         x = y = 0
 
-        all_data_embedded = False
         for index in path:
 
             # get pixel coordinates based on index
@@ -52,8 +51,8 @@ class LSBMR(LSBM, PVD):
             next_y = next_coordinates[1]
 
             # check if not 0 or 255 as embedding cannot be performed otherwise
-            if 0 < block[0] < 255 and 0 < block[1] < 255:
-                
+            if 0 < first_pixel < 255 and 0 < second_pixel < 255:
+
                 # get inputs and convert
                 first_msg_bit = self.message[message_index]
                 second_msg_bit = self.message[message_index + 1]
@@ -68,10 +67,30 @@ class LSBMR(LSBM, PVD):
                         second_stego_pixel = self.embed_pixel(second_pixel_binary, message_index + 1)
                     else:
                         second_stego_pixel = second_pixel
-                    
+
                     first_stego_pixel = first_pixel
-                
+
                 else:
 
-                    pass
+                    if second_msg_bit == self.binary_function(first_pixel - 1, second_pixel):
+                        first_stego_pixel = first_pixel - 1
+                    else:
+                        first_stego_pixel = first_pixel + 1
+
+                    second_stego_pixel = second_pixel
+
+                # reassign new stego pixels and increment message index
+                cover_image[y][x] = first_stego_pixel
+                cover_image[next_y][next_x] = second_stego_pixel
+
+                message_index += 2
+
+                if message_index == message_length:
+                    break
+
+            # reassign, save, and return stego image
+            stego_image = cover_image
+            save_image(self.save_path, self.image_name, self.time_string, stego_image)
+
+            return stego_image
 

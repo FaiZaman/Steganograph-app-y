@@ -174,6 +174,7 @@ class PVD():
                 if all_data_embedded or message_index == message_length:
                     break
 
+        # reassign, save, and return stego image
         stego_image = cover_image
         save_image(self.save_path, self.image_name, self.time_string, stego_image)
 
