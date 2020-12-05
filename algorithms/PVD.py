@@ -34,7 +34,6 @@ class PVD():
         self.pixels = [i for i in range(0, self.num_bytes - 1)]     # [0, 1, 2, ..., num_pixels]
 
         self.time_string = "{:%Y_%m_%d_%H;%M}".format(datetime.now())
-        print('init PVD')
 
 
     # takes the coordinates of current pixel and returns a two-pixel block based on PVD img traversal

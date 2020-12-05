@@ -62,7 +62,7 @@ class LSBMR(LSBM, PVD):
                 if first_msg_bit == first_pixel_binary[-1]:
 
                     if second_msg_bit != self.binary_function(first_pixel, second_pixel):
-                        second_stego_pixel = self.embed_pixel(second_pixel_binary, message_index + 1)
+                        second_stego_pixel = self.random_increment_or_decrement(second_pixel)
                     else:
                         second_stego_pixel = second_pixel
 
