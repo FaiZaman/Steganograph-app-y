@@ -36,7 +36,8 @@ class LSB():
 
         return embedded_pixel
 
-
+    
+    # generates pixel path through image and sends pixels to be embedded with message data
     def embed_image(self):
 
         # convert message to binary
