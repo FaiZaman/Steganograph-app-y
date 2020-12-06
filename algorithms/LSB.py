@@ -1,4 +1,3 @@
-import os
 import random
 import numpy as np
 from datetime import datetime
@@ -31,14 +30,15 @@ class LSB():
 
         # adding 0 or 1 (message bit) to LSB of pixel and reassigning
         bit = self.message[message_index]
-        binary_pixel_msb = binary_pixel[:-1]
-        embedded_pixel = binary_pixel_msb + bit
+        binary_pixel_msbs = binary_pixel[:-1]
+        embedded_pixel = binary_pixel_msbs + bit
         embedded_pixel = int(embedded_pixel, 2)
 
         return embedded_pixel
 
-
-    def encode(self):
+    
+    # generates pixel path through image and sends pixels to be embedded with message data
+    def embed_image(self):
 
         # convert message to binary
         self.message = message_to_binary(self.message)
@@ -78,7 +78,7 @@ class LSB():
         return stego_image
 
 
-    def decode(self):
+    def extract(self):
 
         # initialise binary message and get a random path based on seed through the pixels
         binary_message = ""

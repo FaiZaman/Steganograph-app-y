@@ -41,7 +41,7 @@ if __name__ == '__main__':
             # convert into proper formats and initialise algorithm to encode message
             cover_data, message = read_files(cover_file, message_file)
             algorithm = algorithm_name(cover_data, message, key, save_path)
-            algorithm.encode()
+            algorithm.embed_image()
 
         else:
 
@@ -52,4 +52,4 @@ if __name__ == '__main__':
 
             # initalise algorithm and decode message
             algorithm = algorithm_name(stego_data, message, key, save_path)
-            extract = algorithm.decode()
+            extracted_message = algorithm.extract()

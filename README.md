@@ -1,4 +1,6 @@
-Welcome to the steganograph-app-y! This is a Python application where you can try out exisiting steganographic algorithms as well as a new algorithm proposed and implemented by me on an easy-to-use GUI.
+# Steganograph-App-y
+
+Welcome to the Steganograph-App-y! This is a Python application where you can try out exisiting steganographic algorithms as well as a new algorithm proposed and implemented by me on an easy-to-use GUI.
 
 # Getting Started
 

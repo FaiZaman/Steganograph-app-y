@@ -13,7 +13,6 @@ class PVD():
         self.image = image[1]
         self.delimiter = "-----"
         self.message = message + self.delimiter
-        self.key = key
         self.save_path = save_path
 
         # get dimensions of image
@@ -41,28 +40,24 @@ class PVD():
     def get_pixel_block(self, x, y):
 
         current_pixel = self.image[y][x]
-        next_pixel = None
 
         if y % 2 == 0:  # going right
 
             if x < self.width - 1:      # keep going right if the end of image is not reached
                 x += 1
-                next_pixel = self.image[y][x]
 
             else:      # go down a row
                 y += 1
-                next_pixel = self.image[y][x]
 
         else:   # going left
 
             if x > 0:   # keep going left if the end of image is not reached
                 x -= 1
-                next_pixel = self.image[y][x]
 
             else:       # go down a row
                 y += 1
-                next_pixel = self.image[y][x]
 
+        next_pixel = self.image[y][x]
         block = (x, y), (current_pixel, next_pixel)
         return block
 
@@ -117,7 +112,7 @@ class PVD():
 
 
     # loops through the cover image based on pseudorandom path and chooses blocks to embed data
-    def encode(self):
+    def embed_image(self):
 
         self.message = message_to_binary(self.message)
         message_index = 0
@@ -140,8 +135,7 @@ class PVD():
 
             # compute the two-pixel block and the coordinates of the next pixel
             next_coordinates, block = self.get_pixel_block(x, y)
-            next_x = next_coordinates[0]
-            next_y = next_coordinates[1]
+            next_x, next_y = next_coordinates[0], next_coordinates[1]
 
             # get difference value and compute 
             difference_value = abs(int(block[1]) - int(block[0]))
@@ -178,6 +172,7 @@ class PVD():
                 if all_data_embedded or message_index == message_length:
                     break
 
+        # reassign, save, and return stego image
         stego_image = cover_image
         save_image(self.save_path, self.image_name, self.time_string, stego_image)
 
@@ -185,7 +180,7 @@ class PVD():
 
 
     # loops through image in same order as when encoding and extracts message bits
-    def decode(self):
+    def extract(self):
 
         # initialise message and same pseudorandom embedding path
         binary_message = ""
