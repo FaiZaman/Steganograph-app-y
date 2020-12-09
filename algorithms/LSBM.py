@@ -1,6 +1,6 @@
 from algorithms.LSB import LSB
-import numpy as np
 import random
+import numpy as np
 
 class LSBM(LSB):
 
