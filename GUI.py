@@ -4,18 +4,20 @@ from algorithms.LSB import LSB
 from algorithms.LSBM import LSBM
 from algorithms.LSBMR import LSBMR
 from algorithms.PVD import PVD
+from algorithms.EA_LSBMR import EA_LSBMR
 
 class GraphicalUserInterface(object):
 
     def __init__(self):
 
         self.app_name = "Steganograph-App-y"
-        self.algorithm_list = ["LSB", "LSBM", "LSBMR", "PVD"]
+        self.algorithm_list = ["LSB", "LSBM", "LSBMR", "PVD", "EA-LSBMR"]
         self.instantiators = {
             "LSB": LSB,
             "LSBM": LSBM,
             "LSBMR": LSBMR,
-            "PVD": PVD
+            "PVD": PVD,
+            "EA-LSBMR": EA_LSBMR
         }
 
 
