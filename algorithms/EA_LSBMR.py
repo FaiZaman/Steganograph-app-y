@@ -25,14 +25,24 @@ class EA_LSBMR(LSBMR):
             rotated_block = cv2.rotate(block, cv2.ROTATE_90_COUNTERCLOCKWISE)
         else:
             rotated_block = block
-        
+
         return rotated_block
 
-    
-    # rearrange rotated image as row vector by raster scanning
-    def raster_scan(self, image):
 
-        pass
+    # rearrange rotated image as row vector by raster scanning
+    def convert_to_row_vector(self, image):
+
+        V = np.arange(self.num_bytes)    # row vector
+        index = 0
+
+        for y in range(0, self.height):
+            for x in range(0, self.width):
+                
+                pixel = image[y][x]
+                V[index] = pixel
+                index += 1
+
+        return V
 
 
     def embed_image(self):
@@ -50,7 +60,8 @@ class EA_LSBMR(LSBMR):
 
                     rotated_block = self.rotate_block(block)
                     rotated_image[y : y + self.Bz, x : x + self.Bz] = rotated_block
-        
-        self.raster_scan(rotated_image)
-        
+
+        # convert rotated image to row vector and divide into embedding units
+        row_vector = self.convert_to_row_vector(rotated_image)
+        embedding_units = [row_vector[i : i + 2] for i in range(0, len(row_vector), 2)]
 
