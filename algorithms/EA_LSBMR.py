@@ -9,6 +9,7 @@ class EA_LSBMR(LSBMR):
 
         super().__init__(image, message, key, save_path)
         self.Bz = 4
+        self.t = 10
         self.degrees = [0, 90, 180, 270]
 
 
@@ -45,6 +46,24 @@ class EA_LSBMR(LSBMR):
         return V
 
 
+    # divides into consecutive pairs of embedding units
+    def divide_into_embedding_units(self, row_vector, threshold):
+
+        EU = set()
+
+        for i in range(0, len(row_vector), 2):
+
+            # get difference value
+            unit = row_vector[i : i + 2]
+            difference = abs(unit[1] - unit[0])
+
+            # add index to embedding units if greater than threshold t
+            if difference >= threshold:
+                EU.add(i // 2)
+            
+        return EU
+
+
     def embed_image(self):
 
         rotated_image = self.image
@@ -63,5 +82,6 @@ class EA_LSBMR(LSBMR):
 
         # convert rotated image to row vector and divide into embedding units
         row_vector = self.convert_to_row_vector(rotated_image)
-        embedding_units = [row_vector[i : i + 2] for i in range(0, len(row_vector), 2)]
+        EU_t = self.divide_into_embedding_units(row_vector)
+
 
