@@ -9,7 +9,6 @@ class EA_LSBMR(LSBMR):
 
         super().__init__(image, message, key, save_path)
         self.Bz = 4
-        self.t = 10
         self.degrees = [0, 90, 180, 270]
 
 
@@ -60,13 +59,32 @@ class EA_LSBMR(LSBMR):
             # add index to embedding units if greater than threshold t
             if difference >= threshold:
                 EU.add(i // 2)
-            
+
         return EU
+
+
+    # calculates the threshold T
+    def calculate_threshold(self, row_vector, message_length):
+
+        argmax = 0  # initalise T
+
+        # compute EU(t) for all ts to find argmax
+        for t in range(31, -1, -1):
+
+            EU_t = self.divide_into_embedding_units(row_vector, t)
+            EU_size = len(EU_t)
+
+            # conditional argmax and replacement
+            if 2 * EU_size >= message_length:
+                return t
+
+        return 0
 
 
     def embed_image(self):
 
         rotated_image = self.image
+        message_length = len(self.message)
 
         # loop through image and split into non-overlapping blocks of size Bz x Bz
         for x in range(0, self.width, self.Bz):
@@ -80,8 +98,6 @@ class EA_LSBMR(LSBMR):
                     rotated_block = self.rotate_block(block)
                     rotated_image[y : y + self.Bz, x : x + self.Bz] = rotated_block
 
-        # convert rotated image to row vector and divide into embedding units
+        # convert rotated image to row vector and calculate threshold based on embedding units
         row_vector = self.convert_to_row_vector(rotated_image)
-        EU_t = self.divide_into_embedding_units(row_vector)
-
-
+        T = self.calculate_threshold(row_vector, message_length)
