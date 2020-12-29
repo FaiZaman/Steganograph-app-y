@@ -116,8 +116,12 @@ class EA_LSBMR(LSBMR):
 
     def embed_image(self):
 
-        rotated_image = self.image
+        rotated_image = self.image  # so image is not modified
+        message_index = 0
         message_length = len(self.message)
+        
+        if message_length > self.num_bytes:
+            raise ValueError("The message is too large for the image.")
 
         # loop through image and split into non-overlapping blocks of size Bz x Bz
         for x in range(0, self.width, self.Bz):
@@ -149,6 +153,16 @@ class EA_LSBMR(LSBMR):
             else:
                 next_x, next_y = x + 1, y
 
-            pixel1 = rotated_image[y][x]
-            pixel2 = rotated_image[next_y][next_x]
+            # get cover pixels
+            first_pixel = rotated_image[y][x]
+            second_pixel = rotated_image[next_y][next_x]
+
+            # get stego pixels using LSBMR embedding
+            first_stego_pixel, second_stego_pixel =\
+                self.embed_pixels(first_pixel, second_pixel, message_index)
+
+            message_index += 2
+        
+            if message_index == message_length:
+                break
 
