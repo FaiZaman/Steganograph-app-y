@@ -12,6 +12,7 @@ class EA_LSBMR(LSBMR):
         self.degrees = [0, 90, 180, 270]
 
 
+    # uses coordinates to get next consecutive coordinate based on raster scanning
     def get_next_pixel(self, x, y):
 
         if x < self.width - 1:
@@ -106,12 +107,10 @@ class EA_LSBMR(LSBMR):
             EU_t = self.divide_into_embedding_units(row_vector, t)
             EU_size = len(EU_t)
 
-            print(EU_size, message_length)
-
-            # conditional argmax and replacement
+            # conditional argmax and replacement with final threshold T
             if 2 * EU_size >= message_length:
                 return t
-
+        
         return 0
 
 
@@ -135,3 +134,21 @@ class EA_LSBMR(LSBMR):
         # convert rotated image to row vector and calculate threshold based on embedding units
         row_vector = self.convert_to_row_vector(rotated_image)
         T = self.calculate_threshold(row_vector, message_length, rotated_image)
+
+        # calculate new embedding units based on final threshold T
+        EU_T = self.divide_into_embedding_units(row_vector, T)
+
+        # loop through all embedding units and embed using LSBMR
+        for index in EU_T:
+
+            x = index % self.width
+            y = index // self.width
+
+            if self.width % 2 == 0 and y % 2 != 0:
+                next_x, next_y = self.get_next_pixel(x, y)
+            else:
+                next_x, next_y = x + 1, y
+
+            pixel1 = rotated_image[y][x]
+            pixel2 = rotated_image[next_y][next_x]
+

@@ -20,6 +20,11 @@ class LSBMR(LSBM, PVD):
         return binary_value[-1]
 
 
+    def embed_pixels(self, pixel1, pixel2):
+
+        pass
+
+
     # generates pixel path through image and sends pixels to be embedded with message data
     def embed_image(self):
 
@@ -57,6 +62,8 @@ class LSBMR(LSBM, PVD):
 
                 first_pixel_binary = integer_to_binary(first_pixel)
                 second_pixel_binary = integer_to_binary(second_pixel)
+
+                #embedded_pixels = self.embed_pixels(pixel1, pixel2)
 
                 # LSBMR algorithm
                 if first_msg_bit == first_pixel_binary[-1]:
