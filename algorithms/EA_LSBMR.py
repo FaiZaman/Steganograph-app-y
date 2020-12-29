@@ -12,6 +12,17 @@ class EA_LSBMR(LSBMR):
         self.degrees = [0, 90, 180, 270]
 
 
+    def get_next_pixel(self, x, y):
+
+        if x < self.width - 1:
+            x += 1
+        else:
+            x = 0
+            y += 1
+
+        return x, y                
+
+
     # rotate by a random degree as determined by secret key
     def rotate_block(self, block):
 
@@ -32,12 +43,13 @@ class EA_LSBMR(LSBMR):
     # rearrange rotated image as row vector by raster scanning
     def convert_to_row_vector(self, image):
 
+        image = image.astype(np.int16)
         V = np.arange(self.num_bytes)    # row vector
         index = 0
 
         for y in range(0, self.height):
             for x in range(0, self.width):
-                
+
                 pixel = image[y][x]
                 V[index] = pixel
                 index += 1
@@ -58,21 +70,43 @@ class EA_LSBMR(LSBMR):
 
             # add index to embedding units if greater than threshold t
             if difference >= threshold:
-                EU.add(i // 2)
+                EU.add(i)
 
         return EU
 
+    """
+    def values(self):
+
+        # get values at each index
+        for index in EU_t:
+
+            x = index % self.width
+            y = index // self.width
+
+            if self.width % 2 == 0 and y % 2 != 0:
+                next_x, next_y = self.get_next_pixel(x, y)
+            else:
+                next_x, next_y = x + 1, y
+
+            pixel1 = rotated_image[y][x]
+            pixel2 = rotated_image[next_y][next_x]
+
+        return pixel1, pixel2
+    """
 
     # calculates the threshold T
-    def calculate_threshold(self, row_vector, message_length):
+    def calculate_threshold(self, row_vector, message_length, rotated_image):
 
         argmax = 0  # initalise T
+        rotated_image = rotated_image.astype(np.int16)
 
         # compute EU(t) for all ts to find argmax
         for t in range(31, -1, -1):
 
             EU_t = self.divide_into_embedding_units(row_vector, t)
             EU_size = len(EU_t)
+
+            print(EU_size, message_length)
 
             # conditional argmax and replacement
             if 2 * EU_size >= message_length:
@@ -100,4 +134,4 @@ class EA_LSBMR(LSBMR):
 
         # convert rotated image to row vector and calculate threshold based on embedding units
         row_vector = self.convert_to_row_vector(rotated_image)
-        T = self.calculate_threshold(row_vector, message_length)
+        T = self.calculate_threshold(row_vector, message_length, rotated_image)
