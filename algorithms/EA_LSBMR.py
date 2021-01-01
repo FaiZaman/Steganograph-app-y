@@ -112,6 +112,11 @@ class EA_LSBMR(LSBMR):
                 return t
         
         return 0
+    
+
+    def adjust_values(self, first_stego_pixel, second_stego_pixel, T):
+
+        return first_stego_pixel, second_stego_pixel
 
 
     def embed_image(self):
@@ -161,8 +166,16 @@ class EA_LSBMR(LSBMR):
             first_stego_pixel, second_stego_pixel =\
                 self.embed_pixels(first_pixel, second_pixel, message_index)
 
+            # check if readjustment is needed if stego pixels out of bounds or threshold    
+            if not 0 < first_stego_pixel < 255 or not 0 < second_stego_pixel < 255\
+                or abs(first_stego_pixel - second_stego_pixel) < T:
+
+                print(first_stego_pixel, second_stego_pixel, abs(first_stego_pixel - second_stego_pixel), T)
+                first_stego_pixel, second_stego_pixel =\
+                    self.adjust_values(first_stego_pixel, second_stego_pixel, T)
+
             message_index += 2
-        
+
             if message_index == message_length:
                 break
 
