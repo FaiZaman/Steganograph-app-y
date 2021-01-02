@@ -8,8 +8,14 @@ class EA_LSBMR(LSBMR):
     def __init__(self, image, message, key, save_path):
 
         super().__init__(image, message, key, save_path)
-        self.Bz = 4
+
+        # select Bz at random
+        self.Bz_list = [1, 4, 8, 12]
+        self.Bz = random.choice(self.Bz_list)
+
+        # degrees to rotate by
         self.degrees = [0, 90, 180, 270]
+        self.opposite_degrees = [0, 270, 180, 90]
 
 
     # uses coordinates to get next consecutive coordinate based on raster scanning
@@ -25,7 +31,7 @@ class EA_LSBMR(LSBMR):
 
     
     # split image into non-overlapping blocks of size Bz x Bz
-    def divide_and_rotate(self, rotated_image):
+    def divide_and_rotate(self, rotated_image, degrees):
 
         for x in range(0, self.width, self.Bz):
             for y in range(0, self.height, self.Bz):
@@ -35,16 +41,16 @@ class EA_LSBMR(LSBMR):
                 # only look at blocks that do not go over the boundary
                 if block.shape[0] == block.shape[1]:
 
-                    rotated_block = self.rotate_block(block)
+                    rotated_block = self.rotate_block(block, degrees)
                     rotated_image[y : y + self.Bz, x : x + self.Bz] = rotated_block
 
         return rotated_image
 
 
     # rotate by a random degree as determined by secret key
-    def rotate_block(self, block):
+    def rotate_block(self, block, degrees):
 
-        degree = random.choice(self.degrees)
+        degree = random.choice(degrees)
 
         if degree == 90:
             rotated_block = cv2.rotate(block, cv2.cv2.ROTATE_90_CLOCKWISE)
@@ -127,7 +133,8 @@ class EA_LSBMR(LSBMR):
             raise ValueError("The message is too large for the image.")
 
         # get image after dividing and rotating blocks of size Bz
-        cover_image = self.divide_and_rotate(self.image)
+        cover_image = self.divide_and_rotate(self.image, self.degrees)
+        cv2.imshow('cover', cover_image)
 
         # convert rotated image to row vector and calculate threshold based on embedding units
         row_vector = self.convert_to_row_vector(cover_image)
@@ -171,5 +178,9 @@ class EA_LSBMR(LSBMR):
             if message_index == message_length:
                 break
 
-        #stego_image = self.divide_and_rotate()
+        # reset seed for opposite degrees and redivide and rotate image
+        random.seed(self.key)
+        self.Bz = random.choice(self.Bz_list)
+        stego_image = self.divide_and_rotate(cover_image, self.opposite_degrees)
 
+        cv2.imshow('stego', stego_image)

@@ -11,6 +11,7 @@ class LSB():
         self.image = image[1]
         self.delimiter = "-----"
         self.message = message + self.delimiter
+        self.key = key
         self.save_path = save_path
 
         # get dimensions of image
