@@ -21,7 +21,24 @@ class EA_LSBMR(LSBMR):
             x = 0
             y += 1
 
-        return x, y                
+        return x, y
+
+    
+    # split image into non-overlapping blocks of size Bz x Bz
+    def divide_and_rotate(self, rotated_image):
+
+        for x in range(0, self.width, self.Bz):
+            for y in range(0, self.height, self.Bz):
+
+                block = self.image[y : y + self.Bz, x : x + self.Bz]
+
+                # only look at blocks that do not go over the boundary
+                if block.shape[0] == block.shape[1]:
+
+                    rotated_block = self.rotate_block(block)
+                    rotated_image[y : y + self.Bz, x : x + self.Bz] = rotated_block
+
+        return rotated_image
 
 
     # rotate by a random degree as determined by secret key
@@ -75,25 +92,6 @@ class EA_LSBMR(LSBMR):
 
         return EU
 
-    """
-    def values(self):
-
-        # get values at each index
-        for index in EU_t:
-
-            x = index % self.width
-            y = index // self.width
-
-            if self.width % 2 == 0 and y % 2 != 0:
-                next_x, next_y = self.get_next_pixel(x, y)
-            else:
-                next_x, next_y = x + 1, y
-
-            pixel1 = rotated_image[y][x]
-            pixel2 = rotated_image[next_y][next_x]
-
-        return pixel1, pixel2
-    """
 
     # calculates the threshold T
     def calculate_threshold(self, row_vector, message_length, rotated_image):
@@ -112,8 +110,9 @@ class EA_LSBMR(LSBMR):
                 return t
         
         return 0
-    
 
+
+    # readjustment - TODO or simply skip over these pixels
     def adjust_values(self, first_stego_pixel, second_stego_pixel, T):
 
         return first_stego_pixel, second_stego_pixel
@@ -121,28 +120,18 @@ class EA_LSBMR(LSBMR):
 
     def embed_image(self):
 
-        rotated_image = self.image  # so image is not modified
         message_index = 0
         message_length = len(self.message)
         
         if message_length > self.num_bytes:
             raise ValueError("The message is too large for the image.")
 
-        # loop through image and split into non-overlapping blocks of size Bz x Bz
-        for x in range(0, self.width, self.Bz):
-            for y in range(0, self.height, self.Bz):
-
-                block = self.image[y : y + self.Bz, x : x + self.Bz]
-
-                # only look at blocks that do not go over the boundary
-                if block.shape[0] == block.shape[1]:
-
-                    rotated_block = self.rotate_block(block)
-                    rotated_image[y : y + self.Bz, x : x + self.Bz] = rotated_block
+        # get image after dividing and rotating blocks of size Bz
+        cover_image = self.divide_and_rotate(self.image)
 
         # convert rotated image to row vector and calculate threshold based on embedding units
-        row_vector = self.convert_to_row_vector(rotated_image)
-        T = self.calculate_threshold(row_vector, message_length, rotated_image)
+        row_vector = self.convert_to_row_vector(cover_image)
+        T = self.calculate_threshold(row_vector, message_length, cover_image)
 
         # calculate new embedding units based on final threshold T
         EU_T = self.divide_into_embedding_units(row_vector, T)
@@ -159,8 +148,8 @@ class EA_LSBMR(LSBMR):
                 next_x, next_y = x + 1, y
 
             # get cover pixels
-            first_pixel = rotated_image[y][x]
-            second_pixel = rotated_image[next_y][next_x]
+            first_pixel = cover_image[y][x]
+            second_pixel = cover_image[next_y][next_x]
 
             # get stego pixels using LSBMR embedding
             first_stego_pixel, second_stego_pixel =\
@@ -170,12 +159,17 @@ class EA_LSBMR(LSBMR):
             if not 0 < first_stego_pixel < 255 or not 0 < second_stego_pixel < 255\
                 or abs(first_stego_pixel - second_stego_pixel) < T:
 
-                print(first_stego_pixel, second_stego_pixel, abs(first_stego_pixel - second_stego_pixel), T)
                 first_stego_pixel, second_stego_pixel =\
                     self.adjust_values(first_stego_pixel, second_stego_pixel, T)
+
+            # reassign new stego pixels and increment message index
+            cover_image[y][x] = first_stego_pixel
+            cover_image[next_y][next_x] = second_stego_pixel
 
             message_index += 2
 
             if message_index == message_length:
                 break
+
+        #stego_image = self.divide_and_rotate()
 
