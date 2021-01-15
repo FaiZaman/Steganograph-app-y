@@ -29,20 +29,20 @@ class EA_LSBMR(LSBMR):
 
         return x, y
 
-    
+
     # split image into non-overlapping blocks of size Bz x Bz
     def divide_and_rotate(self, rotated_image, degrees):
 
         for x in range(0, self.width, self.Bz):
             for y in range(0, self.height, self.Bz):
 
-                block = self.image[y : y + self.Bz, x : x + self.Bz]
+                block = self.image[y : y + self.Bz][x : x + self.Bz]
 
                 # only look at blocks that do not go over the boundary
                 if block.shape[0] == block.shape[1]:
 
                     rotated_block = self.rotate_block(block, degrees)
-                    rotated_image[y : y + self.Bz, x : x + self.Bz] = rotated_block
+                    rotated_image[y : y + self.Bz][x : x + self.Bz] = rotated_block
 
         return rotated_image
 
@@ -84,7 +84,7 @@ class EA_LSBMR(LSBMR):
     # divides into consecutive pairs of embedding units
     def divide_into_embedding_units(self, row_vector, threshold):
 
-        EU = set()
+        EU = []
 
         for i in range(0, len(row_vector), 2):
 
@@ -94,7 +94,7 @@ class EA_LSBMR(LSBMR):
 
             # add index to embedding units if greater than threshold t
             if difference >= threshold:
-                EU.add(i)
+                EU.append(i)
 
         return EU
 
@@ -124,6 +124,16 @@ class EA_LSBMR(LSBMR):
         return first_stego_pixel, second_stego_pixel
 
 
+    # embeds Bz and T in a preset region where data has not been hidden
+    def embed_parameters(self, T):
+
+        # convert parameters to binary
+        Bz_index = self.Bz_list.index(self.Bz)
+        Bz_binary = bin(Bz_index)[2:]
+        T_binary = bin(T)[2:]
+
+
+
     def embed_image(self):
 
         message_index = 0
@@ -140,8 +150,9 @@ class EA_LSBMR(LSBMR):
         row_vector = self.convert_to_row_vector(cover_image)
         T = self.calculate_threshold(row_vector, message_length, cover_image)
 
-        # calculate new embedding units based on final threshold T
+        # calculate new embedding units based on final threshold T and randomise the embedding order
         EU_T = self.divide_into_embedding_units(row_vector, T)
+        random.shuffle(EU_T)
 
         # loop through all embedding units and embed using LSBMR
         for index in EU_T:
@@ -182,5 +193,8 @@ class EA_LSBMR(LSBMR):
         random.seed(self.key)
         self.Bz = random.choice(self.Bz_list)
         stego_image = self.divide_and_rotate(cover_image, self.opposite_degrees)
+
+        # embeds Bz and T
+        self.embed_parameters(T)
 
         cv2.imshow('stego', stego_image)
