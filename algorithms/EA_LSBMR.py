@@ -36,7 +36,7 @@ class EA_LSBMR(LSBMR):
 
 
     # split image into non-overlapping blocks of size Bz x Bz
-    def divide_and_rotate(self, rotated_image, degrees):
+    def divide_and_rotate(self, img, degrees):
 
         for x in range(0, self.width, self.Bz):
             for y in range(0, self.height, self.Bz):
@@ -78,9 +78,9 @@ class EA_LSBMR(LSBMR):
 
                         self.new_preset_region.append((new_y, new_x))
 
-                    rotated_image[y : y + self.Bz, x : x + self.Bz] = rotated_block
+                    img[y : y + self.Bz, x : x + self.Bz] = rotated_block
 
-        return rotated_image
+        return img
 
 
     # rotate by a random degree as determined by secret key
@@ -120,24 +120,6 @@ class EA_LSBMR(LSBMR):
         return V
 
 
-    # divides into consecutive pairs of embedding units
-    def divide_into_embedding_units(self, row_vector, threshold):
-
-        EU = []
-
-        for i in range(0, len(row_vector), 2):
-
-            # get difference value
-            unit = row_vector[i : i + 2]
-            difference = abs(unit[1] - unit[0])
-
-            # add index to embedding units if greater than threshold t
-            if difference >= threshold:
-                EU.append(i)
-
-        return EU
-
-
     # calculates the threshold T
     def calculate_threshold(self, row_vector, message_length, rotated_image):
 
@@ -157,6 +139,24 @@ class EA_LSBMR(LSBMR):
         return 0
 
 
+    # divides into consecutive pairs of embedding units
+    def divide_into_embedding_units(self, row_vector, threshold):
+
+        EU = []
+
+        for i in range(0, len(row_vector), 2):
+
+            # get difference value
+            unit = row_vector[i : i + 2]
+            difference = abs(unit[1] - unit[0])
+
+            # add index to embedding units if greater than threshold t
+            if difference >= threshold:
+                EU.append(i)
+
+        return EU
+
+
     # readjustment - TODO or simply skip over these pixels
     def adjust_values(self, first_stego_pixel, second_stego_pixel, T):
 
@@ -165,8 +165,6 @@ class EA_LSBMR(LSBMR):
 
     # embeds Bz and T in a preset region where data has not been hidden
     def embed_parameters(self, stego_image, T):
-
-        print(self.Bz, T)
 
         # convert parameters to binary with leading zeroes
         Bz_index = self.Bz_list.index(self.Bz)
@@ -264,9 +262,8 @@ class EA_LSBMR(LSBMR):
 
     def extract(self):
 
-        # initialise binary message and throwaway Bz value to get the seed position to correspond
+        # initialise binary message
         binary_message = ""
-        throwaway_Bz = random.choice(self.Bz_list)
 
         # extract the parameters
         for (y, x) in self.preset_region[::2]:
@@ -282,10 +279,17 @@ class EA_LSBMR(LSBMR):
             binary_message += first_msg_bit + second_msg_bit
 
         # convert to binary and extract separate parameters
-        print(binary_message)
         Bz_binary = binary_message[:2]
-        T_binary = binary_message[2:-1]
+        T_binary = binary_message[2:-1]     # remove extra last bit
 
         Bz_index = int(Bz_binary, 2)
         self.Bz = self.Bz_list[Bz_index]
         T = int(T_binary, 2)
+
+        # divide the stego image into block & rotate and convert rotated image to row vector
+        stego_image = self.divide_and_rotate(self.image, self.degrees)
+        row_vector = self.convert_to_row_vector(stego_image)
+
+        # calculate new embedding units based on final threshold T and randomise the embedding order
+        EU_T = self.divide_into_embedding_units(row_vector, T)
+        random.shuffle(EU_T)
