@@ -2,7 +2,7 @@ import cv2
 import random
 import numpy as np
 from algorithms.LSBMR import LSBMR
-from utility import integer_to_binary
+from utility import integer_to_binary, save_image
 
 class EA_LSBMR(LSBMR):
 
@@ -166,6 +166,8 @@ class EA_LSBMR(LSBMR):
     # embeds Bz and T in a preset region where data has not been hidden
     def embed_parameters(self, stego_image, T):
 
+        print(self.Bz, T)
+
         # convert parameters to binary with leading zeroes
         Bz_index = self.Bz_list.index(self.Bz)
         Bz_binary = format(Bz_index, '02b')
@@ -192,6 +194,7 @@ class EA_LSBMR(LSBMR):
         return stego_image
 
 
+    # rotates image blocks, generates row vector of embedding units, and embeds using LSBMR
     def embed_image(self):
 
         message_index = 0
@@ -252,7 +255,37 @@ class EA_LSBMR(LSBMR):
         self.Bz = random.choice(self.Bz_list)
         stego_image = self.divide_and_rotate(cover_image, self.opposite_degrees)
 
-        # embeds Bz and T
+        # embeds Bz and T and saves the image
         stego_image = self.embed_parameters(stego_image, T)
+        save_image(self.save_path, self.image_name, self.time_string, stego_image)
 
         cv2.imshow('stego', stego_image)
+
+
+    def extract(self):
+
+        # initialise binary message and throwaway Bz value to get the seed position to correspond
+        binary_message = ""
+        throwaway_Bz = random.choice(self.Bz_list)
+
+        # extract the parameters
+        for (y, x) in self.preset_region[::2]:
+
+            first_stego_pixel = self.image[y][x]
+            second_stego_pixel = self.image[y + 1][x]
+
+            # extract both bits from the pixel pair
+            first_binary_pixel = integer_to_binary(first_stego_pixel)
+            first_msg_bit = first_binary_pixel[-1]
+            second_msg_bit = self.binary_function(first_stego_pixel, second_stego_pixel)
+        
+            binary_message += first_msg_bit + second_msg_bit
+
+        # convert to binary and extract separate parameters
+        print(binary_message)
+        Bz_binary = binary_message[:2]
+        T_binary = binary_message[2:-1]
+
+        Bz_index = int(Bz_binary, 2)
+        self.Bz = self.Bz_list[Bz_index]
+        T = int(T_binary, 2)
