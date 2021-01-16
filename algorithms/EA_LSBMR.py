@@ -17,6 +17,10 @@ class EA_LSBMR(LSBMR):
         self.degrees = [0, 90, 180, 270]
         self.opposite_degrees = [0, 270, 180, 90]
 
+        # storing 7 bits of preset data
+        self.preset_region = [(y, 0) for y in range(0, 7)]
+        self.new_preset_region = []
+
 
     # uses coordinates to get next consecutive coordinate based on raster scanning
     def get_next_pixel(self, x, y):
@@ -40,8 +44,36 @@ class EA_LSBMR(LSBMR):
 
                 # only look at blocks that do not go over the boundary
                 if block.shape[0] == block.shape[1]:
+                    
+                    rotated_block, degree = self.rotate_block(block, degrees)
 
-                    rotated_block = self.rotate_block(block, degrees)
+                    if (y, x) in self.preset_region:
+
+                        if y < self.Bz:
+                            if degree == 90:
+                                x = self.Bz - y - 1
+                                y = 0
+                            elif degree == 180:
+                                y = self.Bz - y - 1
+                                x = self.Bz - 1
+                            elif degree == 270:
+                                y = self.Bz - y - 1
+                                x = 0   
+
+                        else:
+
+                            if degree == 90:
+                                x = 2 * self.Bz - y - 1
+                                y = self.Bz
+                            elif degree == 180:
+                                y = 3 * self.Bz - y - 1
+                                x = self.Bz - 1
+                            elif degree == 270:
+                                x = y - self.Bz
+                                y = 2 * self.Bz - 1
+
+                        self.new_preset_region.append((y, x))
+
                     rotated_image[y : y + self.Bz][x : x + self.Bz] = rotated_block
 
         return rotated_image
@@ -61,7 +93,7 @@ class EA_LSBMR(LSBMR):
         else:
             rotated_block = block
 
-        return rotated_block
+        return rotated_block, degree
 
 
     # rearrange rotated image as row vector by raster scanning
@@ -74,9 +106,13 @@ class EA_LSBMR(LSBMR):
         for y in range(0, self.height):
             for x in range(0, self.width):
 
-                pixel = image[y][x]
-                V[index] = pixel
-                index += 1
+                # TODO: remove if in new preset region
+
+                if (y, x) not in self.new_preset_region:
+
+                    pixel = image[y][x]
+                    V[index] = pixel
+                    index += 1
 
         return V
 
@@ -144,6 +180,7 @@ class EA_LSBMR(LSBMR):
 
         # get image after dividing and rotating blocks of size Bz
         cover_image = self.divide_and_rotate(self.image, self.degrees)
+        print(self.Bz)
         cv2.imshow('cover', cover_image)
 
         # convert rotated image to row vector and calculate threshold based on embedding units
