@@ -2,6 +2,7 @@ import cv2
 import random
 import numpy as np
 from algorithms.LSBMR import LSBMR
+from utility import integer_to_binary
 
 class EA_LSBMR(LSBMR):
 
@@ -40,41 +41,44 @@ class EA_LSBMR(LSBMR):
         for x in range(0, self.width, self.Bz):
             for y in range(0, self.height, self.Bz):
 
-                block = self.image[y : y + self.Bz][x : x + self.Bz]
+                block = self.image[y : y + self.Bz, x : x + self.Bz]
 
                 # only look at blocks that do not go over the boundary
                 if block.shape[0] == block.shape[1]:
                     
                     rotated_block, degree = self.rotate_block(block, degrees)
 
+                    # calculate the new coordinates of the preset region for embedding parameters
                     if (y, x) in self.preset_region:
+
+                        new_y, new_x = y, x
 
                         if y < self.Bz:
                             if degree == 90:
-                                x = self.Bz - y - 1
-                                y = 0
+                                new_x = self.Bz - y - 1
+                                new_y = 0
                             elif degree == 180:
-                                y = self.Bz - y - 1
-                                x = self.Bz - 1
+                                new_y = self.Bz - y - 1
+                                new_x = self.Bz - 1
                             elif degree == 270:
-                                y = self.Bz - y - 1
-                                x = 0   
+                                new_y = self.Bz - y - 1
+                                new_x = 0   
 
                         else:
 
                             if degree == 90:
-                                x = 2 * self.Bz - y - 1
-                                y = self.Bz
+                                new_x = 2 * self.Bz - y - 1
+                                new_y = self.Bz
                             elif degree == 180:
-                                y = 3 * self.Bz - y - 1
-                                x = self.Bz - 1
+                                new_y = 3 * self.Bz - y - 1
+                                new_x = self.Bz - 1
                             elif degree == 270:
-                                x = y - self.Bz
-                                y = 2 * self.Bz - 1
+                                new_x = y - self.Bz
+                                new_y = 2 * self.Bz - 1
 
-                        self.new_preset_region.append((y, x))
+                        self.new_preset_region.append((new_y, new_x))
 
-                    rotated_image[y : y + self.Bz][x : x + self.Bz] = rotated_block
+                    rotated_image[y : y + self.Bz, x : x + self.Bz] = rotated_block
 
         return rotated_image
 
@@ -106,8 +110,7 @@ class EA_LSBMR(LSBMR):
         for y in range(0, self.height):
             for x in range(0, self.width):
 
-                # TODO: remove if in new preset region
-
+                # remove if in new preset region reserved for parameters
                 if (y, x) not in self.new_preset_region:
 
                     pixel = image[y][x]
@@ -161,13 +164,32 @@ class EA_LSBMR(LSBMR):
 
 
     # embeds Bz and T in a preset region where data has not been hidden
-    def embed_parameters(self, T):
+    def embed_parameters(self, stego_image, T):
 
-        # convert parameters to binary
+        # convert parameters to binary with leading zeroes
         Bz_index = self.Bz_list.index(self.Bz)
-        Bz_binary = bin(Bz_index)[2:]
-        T_binary = bin(T)[2:]
+        Bz_binary = format(Bz_index, '02b')
+        T_binary = format(T, '05b')
 
+        # reset message to be concatenated binary parameters and reset index
+        self.message = Bz_binary + T_binary + integer_to_binary(stego_image[7][0])
+        message_index = 0
+
+        # loop through preset region and embed using LSBMR embedding
+        for (y, x) in self.preset_region[::2]:
+
+            first_pixel = stego_image[y][x]
+            second_pixel = stego_image[y + 1][x]
+
+            first_stego_pixel, second_stego_pixel =\
+                self.embed_pixels(first_pixel, second_pixel, message_index)
+
+            stego_image[y][x] = first_stego_pixel
+            stego_image[y + 1][x] = second_stego_pixel
+
+            message_index += 2
+        
+        return stego_image
 
 
     def embed_image(self):
@@ -180,7 +202,6 @@ class EA_LSBMR(LSBMR):
 
         # get image after dividing and rotating blocks of size Bz
         cover_image = self.divide_and_rotate(self.image, self.degrees)
-        print(self.Bz)
         cv2.imshow('cover', cover_image)
 
         # convert rotated image to row vector and calculate threshold based on embedding units
@@ -232,6 +253,6 @@ class EA_LSBMR(LSBMR):
         stego_image = self.divide_and_rotate(cover_image, self.opposite_degrees)
 
         # embeds Bz and T
-        self.embed_parameters(T)
+        stego_image = self.embed_parameters(stego_image, T)
 
         cv2.imshow('stego', stego_image)
