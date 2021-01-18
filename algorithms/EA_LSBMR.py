@@ -2,7 +2,7 @@ import cv2
 import random
 import numpy as np
 from algorithms.LSBMR import LSBMR
-from utility import integer_to_binary, save_image
+from utility import integer_to_binary, binary_to_string, save_image, save_message
 
 class EA_LSBMR(LSBMR):
 
@@ -216,6 +216,7 @@ class EA_LSBMR(LSBMR):
         # loop through all embedding units and embed using LSBMR
         for index in EU_T:
 
+            # get current and next pixel coordinates in image
             x = index % self.width
             y = index // self.width
 
@@ -231,6 +232,8 @@ class EA_LSBMR(LSBMR):
             # get stego pixels using LSBMR embedding
             first_stego_pixel, second_stego_pixel =\
                 self.embed_pixels(first_pixel, second_pixel, message_index)
+
+            print(first_stego_pixel, second_stego_pixel)
 
             # check if readjustment is needed if stego pixels out of bounds or threshold    
             if not 0 < first_stego_pixel < 255 or not 0 < second_stego_pixel < 255\
@@ -293,3 +296,36 @@ class EA_LSBMR(LSBMR):
         # calculate new embedding units based on final threshold T and randomise the embedding order
         EU_T = self.divide_into_embedding_units(row_vector, T)
         random.shuffle(EU_T)
+
+        # loop through all embedding units and embed using LSBMR
+        for index in EU_T:
+
+            # get current and next pixel coordinates in image
+            x = index % self.width
+            y = index // self.width
+
+            if self.width % 2 == 0 and y % 2 != 0:
+                next_x, next_y = self.get_next_pixel(x, y)
+            else:
+                next_x, next_y = x + 1, y
+
+            # get stego pixels
+            first_stego_pixel = stego_image[y][x]
+            second_stego_pixel = stego_image[next_y][next_x]
+
+            print(first_stego_pixel, second_stego_pixel)
+
+            # extract both bits from the pixel pair
+            first_binary_pixel = integer_to_binary(first_stego_pixel)
+            first_msg_bit = first_binary_pixel[-1]
+            second_msg_bit = self.binary_function(first_stego_pixel, second_stego_pixel)
+
+            binary_message += first_msg_bit + second_msg_bit
+
+        # extract the original message, save to file, and return
+        extracted_message = binary_to_string(binary_message, self.delimiter)
+        print(binary_message[:88])
+        print(extracted_message)
+        #save_message(self.save_path, self.time_string, extracted_message)
+
+        return extracted_message
