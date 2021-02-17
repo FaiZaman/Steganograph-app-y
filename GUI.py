@@ -12,6 +12,8 @@ class GraphicalUserInterface(object):
 
         self.app_name = "Steganograph-App-y"
         self.algorithm_list = ["LSB", "LSBM", "LSBMR", "PVD", "EA-LSBMR"]
+        self.edge_detector_list = ["Canny", "Sobel", "LoG"]
+        self.combinator_list = ["OR", "AND"]
         self.instantiators = {
             "LSB": LSB,
             "LSBM": LSBM,
@@ -77,6 +79,16 @@ class GraphicalUserInterface(object):
             [gui.Text('Hybrid Embedding', font=('Helvetica', 15), justification='center')],
             [gui.Text('_'  * 70)],
             [gui.Text('')],
+            [gui.Text('Edge Detector 1', size=(16, 1)),
+                gui.Combo(self.edge_detector_list, size=(10, 1), key="input_detector_1"),
+                gui.Button('Detector Information')],
+            [gui.Text('Edge Detector 2', size=(16, 1)),
+                gui.Combo(self.edge_detector_list, size=(10, 1), key="input_detector_2"),
+                gui.Button('Detector Information')],
+            [gui.Text('Hybrid Technique', size=(16, 1)),
+                gui.Combo(self.combinator_list, size=(10, 1), key="comb_technique"),
+                gui.Button('Hybrid Information')],
+            [gui.Text('_' * 55)],
             [gui.Text('Image file', size=(16, 1)),
                 gui.In(size=(40, 1), enable_events=True, key="cover_image"), 
                 gui.FileBrowse(initial_folder=
@@ -93,7 +105,7 @@ class GraphicalUserInterface(object):
                 gui.FolderBrowse(initial_folder=
                 'C:/Users/faizz/University Work/Year 4/Advanced Project/Images/Stego')],
             [gui.Text('')],
-            [gui.Button('Embed'), gui.Button('Back to Main Menu')]
+            [gui.Button('Hybrid Embed'), gui.Button('Back to Main Menu')]
         ]
 
         hybrid_embed_window = gui.Window('{0} - Hybrid Embedding'.format(self.app_name),\
@@ -123,6 +135,38 @@ class GraphicalUserInterface(object):
 
         extract_window = gui.Window('{0} - Extracting'.format(self.app_name), extracting_screen)
         return extract_window
+
+
+    def create_hybrid_extracting_window(self):
+
+        hybrid_extracting_screen = [
+            [gui.Text('Hybrid Extracting', font=('Helvetica', 15), justification='center')],
+            [gui.Text('_'  * 70)],
+            [gui.Text('')],
+            [gui.Text('Edge Detector 1', size=(16, 1)),
+                gui.Combo(self.edge_detector_list, size=(10, 1), key="input_detector_1"),
+                gui.Button('Detector Information')],
+            [gui.Text('Edge Detector 2', size=(16, 1)),
+                gui.Combo(self.edge_detector_list, size=(10, 1), key="input_detector_2"),
+                gui.Button('Detector Information')],
+            [gui.Text('Hybrid Technique', size=(16, 1)),
+                gui.Combo(self.combinator_list, size=(10, 1), key="comb_technique"),
+                gui.Button('Hybrid Information')],
+            [gui.Text('_' * 55)],
+            [gui.Text('Image file', size=(16, 1)),
+                gui.In(size=(40, 1), enable_events=True, key="cover_image"), 
+                gui.FileBrowse(file_types=(("Image Files", "*.png")))],
+            [gui.Text('Secret key', size=(16, 1)), gui.Input(size=(40, 1), key="input_key")],
+            [gui.Text('Save Folder', size=(16, 1)),
+                gui.In(size=(40, 1), enable_events=True, key="save_folder"),
+                gui.FolderBrowse()],
+            [gui.Text('')],
+            [gui.Button('Hybrid Extract'), gui.Button('Back to Main Menu')]
+        ]
+
+        hybrid_extract_window = gui.Window('{0} - Hybrid Extracting'.format(self.app_name),\
+                                            hybrid_extracting_screen)
+        return hybrid_extract_window
     
 
     def create_info_window(self, algorithm):
@@ -212,6 +256,10 @@ class GraphicalUserInterface(object):
                     event, values = window.read()
                     if event is None:
                         sys.exit()
+                    if event == 'Back to Main Menu':
+                        break
+
+                window.close()
 
 
             if extracting:
@@ -232,6 +280,19 @@ class GraphicalUserInterface(object):
                         return [self.instantiators[algorithm_name],\
                             stego_file, key, save_path, embedding]
 
+                    if event == 'Back to Main Menu':
+                        break
+
+                window.close()
+
+
+            if hybrid_extracting:
+
+                window = self.create_hybrid_extracting_window()
+                while True:
+                    event, values = window.read()
+                    if event is None:
+                        sys.exit()
                     if event == 'Back to Main Menu':
                         break
 
