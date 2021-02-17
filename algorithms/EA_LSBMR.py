@@ -48,7 +48,7 @@ class EA_LSBMR(LSBMR):
                     
                     rotated_block, degree = self.rotate_block(block, degrees)
 
-                    # calculate the new coordinates of the preset region for embedding parameters
+                    # calculate the new coordinates of preset region for embedding parameters
                     if (y, x) in self.preset_region:
 
                         new_y, new_x = y, x
@@ -152,6 +152,7 @@ class EA_LSBMR(LSBMR):
 
             # add index to embedding units if greater than threshold t
             if difference >= threshold:
+                print(unit, difference, threshold, i)
                 EU.append(i)
 
         return EU
@@ -209,7 +210,7 @@ class EA_LSBMR(LSBMR):
         row_vector = self.convert_to_row_vector(cover_image)
         T = self.calculate_threshold(row_vector, message_length, cover_image)
 
-        # calculate new embedding units based on final threshold T and randomise the embedding order
+        # calculate new embedding units based on final T and randomise the embedding order
         EU_T = self.divide_into_embedding_units(row_vector, T)
         random.shuffle(EU_T)
 
@@ -232,8 +233,6 @@ class EA_LSBMR(LSBMR):
             # get stego pixels using LSBMR embedding
             first_stego_pixel, second_stego_pixel =\
                 self.embed_pixels(first_pixel, second_pixel, message_index)
-
-            print(first_stego_pixel, second_stego_pixel)
 
             # check if readjustment is needed if stego pixels out of bounds or threshold    
             if not 0 < first_stego_pixel < 255 or not 0 < second_stego_pixel < 255\
@@ -293,7 +292,7 @@ class EA_LSBMR(LSBMR):
         stego_image = self.divide_and_rotate(self.image, self.degrees)
         row_vector = self.convert_to_row_vector(stego_image)
 
-        # calculate new embedding units based on final threshold T and randomise the embedding order
+        # calculate new embedding units based on final T and randomise the embedding order
         EU_T = self.divide_into_embedding_units(row_vector, T)
         random.shuffle(EU_T)
 
@@ -312,8 +311,6 @@ class EA_LSBMR(LSBMR):
             # get stego pixels
             first_stego_pixel = stego_image[y][x]
             second_stego_pixel = stego_image[next_y][next_x]
-
-            print(first_stego_pixel, second_stego_pixel)
 
             # extract both bits from the pixel pair
             first_binary_pixel = integer_to_binary(first_stego_pixel)

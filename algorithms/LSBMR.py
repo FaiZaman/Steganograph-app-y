@@ -2,7 +2,8 @@ import math
 import random
 from algorithms.LSBM import LSBM
 from algorithms.PVD import PVD
-from utility import message_to_binary, integer_to_binary, binary_to_string, save_image, save_message
+from utility import message_to_binary, integer_to_binary, binary_to_string,\
+                    save_image, save_message
 
 class LSBMR(LSBM, PVD):
 
@@ -12,7 +13,7 @@ class LSBMR(LSBM, PVD):
         self.pixels = [i for i in range(0, self.num_bytes - 1)]     # [0, 1, 2, ..., num_pixels]
 
 
-    # satisfies condition such that the LSB of the second message bit is the result of the function
+    # satisfies condition such that the LSB of the second message bit is result of the function
     def binary_function(self, a, b):
 
         value = math.floor(a/2) + b

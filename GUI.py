@@ -26,7 +26,7 @@ class GraphicalUserInterface(object):
         home_screen = [
             [gui.Text('Welcome to {0}!'.format(self.app_name), font=('Helvetica', 16), 
                 justification='center')],
-            [gui.Text('Please select whether you would like to embed or extract a secret message.', 
+            [gui.Text('Please select whether you want to embed or extract a secret message.', 
                 font=('Helvetica', 11))],
             [gui.Button('Embed'), gui.Button('Extract'), gui.Button('Exit')]
         ]
