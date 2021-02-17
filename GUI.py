@@ -28,10 +28,14 @@ class GraphicalUserInterface(object):
                 justification='center')],
             [gui.Text('Please select whether you want to embed or extract a secret message.', 
                 font=('Helvetica', 11))],
-            [gui.Button('Embed'), gui.Button('Extract'), gui.Button('Exit')]
+            [gui.Button('Embed', size=(16, 1)), gui.Button('Extract', size=(16, 1))],
+            [gui.Button('Hybrid Embed', size=(16, 1)),\
+                gui.Button('Hybrid Extract', size=(16, 1))],
+            [gui.Button('Exit', font=('Helvetica', 10, 'bold'))]
         ]
 
-        home_window = gui.Window('{}'.format(self.app_name), home_screen)
+        home_window = gui.Window('{}'.format(self.app_name),\
+                                    home_screen, element_justification='c')
         return home_window
 
 
@@ -48,7 +52,7 @@ class GraphicalUserInterface(object):
                 gui.In(size=(40, 1), enable_events=True, key="cover_image"), 
                 gui.FileBrowse(initial_folder=
                 'C:/Users/faizz/University Work/Year 4/Advanced Project/Images/Cover', 
-                file_types=(("Image Files", "*.png"),))],
+                file_types=(("Image Files", "*.png")))],
             [gui.Text('Text file', size=(16, 1)),
                 gui.In(size=(40, 1), enable_events=True, key="message"),
                 gui.FileBrowse(initial_folder=
@@ -65,6 +69,36 @@ class GraphicalUserInterface(object):
 
         embed_window = gui.Window('{0} - Embedding'.format(self.app_name), embedding_screen)
         return embed_window
+    
+
+    def create_hybrid_embedding_window(self):
+
+        hybrid_embedding_screen = [
+            [gui.Text('Hybrid Embedding', font=('Helvetica', 15), justification='center')],
+            [gui.Text('_'  * 70)],
+            [gui.Text('')],
+            [gui.Text('Image file', size=(16, 1)),
+                gui.In(size=(40, 1), enable_events=True, key="cover_image"), 
+                gui.FileBrowse(initial_folder=
+                'C:/Users/faizz/University Work/Year 4/Advanced Project/Images/Cover', 
+                file_types=(("Image Files", "*.png")))],
+            [gui.Text('Text file', size=(16, 1)),
+                gui.In(size=(40, 1), enable_events=True, key="message"),
+                gui.FileBrowse(initial_folder=
+                'C:/Users/faizz/University Work/Year 4/Advanced Project/Messages/Embedding', 
+                file_types=(("Text Files", "*.txt")))],
+            [gui.Text('Secret key', size=(16, 1)), gui.Input(size=(40, 1), key="input_key")],
+            [gui.Text('Save Folder', size=(16, 1)),
+                gui.In(size=(40, 1), enable_events=True, key="save_folder"),
+                gui.FolderBrowse(initial_folder=
+                'C:/Users/faizz/University Work/Year 4/Advanced Project/Images/Stego')],
+            [gui.Text('')],
+            [gui.Button('Embed'), gui.Button('Back to Main Menu')]
+        ]
+
+        hybrid_embed_window = gui.Window('{0} - Hybrid Embedding'.format(self.app_name),\
+                                            hybrid_embedding_screen)
+        return hybrid_embed_window
 
 
     def create_extracting_window(self):
@@ -125,7 +159,7 @@ class GraphicalUserInterface(object):
         while selecting:
 
             window = self.create_home_window()
-            embedding = extracting = False
+            embedding = hybrid_embedding = extracting = hybrid_extracting = False
 
             while True:
                 event, values = window.read()
@@ -135,8 +169,14 @@ class GraphicalUserInterface(object):
                 if event == 'Embed':
                     embedding = True
                     break
+                if event == 'Hybrid Embed':
+                    hybrid_embedding = True
+                    break
                 if event == 'Extract':
                     extracting = True
+                    break
+                if event == 'Hybrid Extract':
+                    hybrid_extracting = True
                     break
 
             window.close()
@@ -163,6 +203,15 @@ class GraphicalUserInterface(object):
                         break
 
                 window.close()
+
+
+            if hybrid_embedding:
+
+                window = self.create_hybrid_embedding_window()
+                while True:
+                    event, values = window.read()
+                    if event is None:
+                        sys.exit()
 
 
             if extracting:
