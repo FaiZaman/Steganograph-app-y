@@ -25,7 +25,7 @@ Note that your system must be running Python 3.7 or a later version for the appl
 
 Click `Embed` or `Extract` for the respective actions.
 
-For embedding:
+## Embedding
 
 1) Select an embedding algorithm from the dropdown list.
 2) Select the cover image file to embed your message into.
@@ -34,7 +34,7 @@ For embedding:
 5) Select the folder where the stego image will be saved.
 6) Click `Embed`.
 
-For extraction:
+## Extraction
 
 1) Select an embedding algorithm from the dropdown list. This must be the same algorithm you used to embed the message.
 2) Select the stego image file to extract your message from.

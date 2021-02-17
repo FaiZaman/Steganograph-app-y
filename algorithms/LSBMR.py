@@ -2,7 +2,8 @@ import math
 import random
 from algorithms.LSBM import LSBM
 from algorithms.PVD import PVD
-from utility import message_to_binary, integer_to_binary, binary_to_string, save_image, save_message
+from utility import message_to_binary, integer_to_binary, binary_to_string,\
+                    save_image, save_message
 
 class LSBMR(LSBM, PVD):
 
@@ -12,12 +13,43 @@ class LSBMR(LSBM, PVD):
         self.pixels = [i for i in range(0, self.num_bytes - 1)]     # [0, 1, 2, ..., num_pixels]
 
 
-    # satisfies condition such that the LSB of the second message bit is the result of the function
+    # satisfies condition such that the LSB of the second message bit is result of the function
     def binary_function(self, a, b):
 
         value = math.floor(a/2) + b
         binary_value = integer_to_binary(value)
         return binary_value[-1]
+
+
+    def embed_pixels(self, first_pixel, second_pixel, message_index):
+
+        # get inputs and convert
+        first_msg_bit = self.message[message_index]
+        second_msg_bit = self.message[message_index + 1]
+
+        first_pixel_binary = integer_to_binary(first_pixel)
+        second_pixel_binary = integer_to_binary(second_pixel)
+
+         # LSBMR algorithm
+        if first_msg_bit == first_pixel_binary[-1]:
+
+            if second_msg_bit != self.binary_function(first_pixel, second_pixel):
+                second_stego_pixel = self.random_increment_or_decrement(second_pixel)
+            else:
+                second_stego_pixel = second_pixel
+
+            first_stego_pixel = first_pixel
+
+        else:
+
+            if second_msg_bit == self.binary_function(first_pixel - 1, second_pixel):
+                first_stego_pixel = first_pixel - 1
+            else:
+                first_stego_pixel = first_pixel + 1
+
+            second_stego_pixel = second_pixel
+        
+        return first_stego_pixel, second_stego_pixel
 
 
     # generates pixel path through image and sends pixels to be embedded with message data
@@ -51,31 +83,9 @@ class LSBMR(LSBM, PVD):
             # check if not 0 or 255 as embedding cannot be performed otherwise
             if 0 < first_pixel < 255 and 0 < second_pixel < 255:
 
-                # get inputs and convert
-                first_msg_bit = self.message[message_index]
-                second_msg_bit = self.message[message_index + 1]
-
-                first_pixel_binary = integer_to_binary(first_pixel)
-                second_pixel_binary = integer_to_binary(second_pixel)
-
-                # LSBMR algorithm
-                if first_msg_bit == first_pixel_binary[-1]:
-
-                    if second_msg_bit != self.binary_function(first_pixel, second_pixel):
-                        second_stego_pixel = self.random_increment_or_decrement(second_pixel)
-                    else:
-                        second_stego_pixel = second_pixel
-
-                    first_stego_pixel = first_pixel
-
-                else:
-
-                    if second_msg_bit == self.binary_function(first_pixel - 1, second_pixel):
-                        first_stego_pixel = first_pixel - 1
-                    else:
-                        first_stego_pixel = first_pixel + 1
-
-                    second_stego_pixel = second_pixel
+                # use LSBMR embedding and output stego pixels
+                first_stego_pixel, second_stego_pixel =\
+                    self.embed_pixels(first_pixel, second_pixel, message_index)
 
                 # reassign new stego pixels and increment message index
                 cover_image[y][x] = first_stego_pixel

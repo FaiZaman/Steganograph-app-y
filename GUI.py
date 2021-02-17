@@ -4,18 +4,20 @@ from algorithms.LSB import LSB
 from algorithms.LSBM import LSBM
 from algorithms.LSBMR import LSBMR
 from algorithms.PVD import PVD
+from algorithms.EA_LSBMR import EA_LSBMR
 
 class GraphicalUserInterface(object):
 
     def __init__(self):
 
         self.app_name = "Steganograph-App-y"
-        self.algorithm_list = ["LSB", "LSBM", "LSBMR", "PVD"]
+        self.algorithm_list = ["LSB", "LSBM", "LSBMR", "PVD", "EA-LSBMR"]
         self.instantiators = {
             "LSB": LSB,
             "LSBM": LSBM,
             "LSBMR": LSBMR,
-            "PVD": PVD
+            "PVD": PVD,
+            "EA-LSBMR": EA_LSBMR
         }
 
 
@@ -24,7 +26,7 @@ class GraphicalUserInterface(object):
         home_screen = [
             [gui.Text('Welcome to {0}!'.format(self.app_name), font=('Helvetica', 16), 
                 justification='center')],
-            [gui.Text('Please select whether you would like to embed or extract a secret message.', 
+            [gui.Text('Please select whether you want to embed or extract a secret message.', 
                 font=('Helvetica', 11))],
             [gui.Button('Embed'), gui.Button('Extract'), gui.Button('Exit')]
         ]
@@ -44,14 +46,19 @@ class GraphicalUserInterface(object):
                 gui.Button('Algorithm Information')],
             [gui.Text('Image file', size=(16, 1)),
                 gui.In(size=(40, 1), enable_events=True, key="cover_image"), 
-                gui.FileBrowse(file_types=(("Image Files", "*.png"),))],
+                gui.FileBrowse(initial_folder=
+                'C:/Users/faizz/University Work/Year 4/Advanced Project/Images/Cover', 
+                file_types=(("Image Files", "*.png"),))],
             [gui.Text('Text file', size=(16, 1)),
                 gui.In(size=(40, 1), enable_events=True, key="message"),
-                gui.FileBrowse(file_types=(("Text Files", "*.txt"),))],
+                gui.FileBrowse(initial_folder=
+                'C:/Users/faizz/University Work/Year 4/Advanced Project/Messages/Embedding', 
+                file_types=(("Text Files", "*.txt"),))],
             [gui.Text('Secret key', size=(16, 1)), gui.Input(size=(40, 1), key="input_key")],
             [gui.Text('Save Folder', size=(16, 1)),
                 gui.In(size=(40, 1), enable_events=True, key="save_folder"),
-                gui.FolderBrowse()],
+                gui.FolderBrowse(initial_folder=
+                'C:/Users/faizz/University Work/Year 4/Advanced Project/Images/Stego')],
             [gui.Text('')],
             [gui.Button('Embed'), gui.Button('Back to Main Menu')]
         ]
