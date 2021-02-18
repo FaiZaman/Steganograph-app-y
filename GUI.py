@@ -167,7 +167,7 @@ class GraphicalUserInterface(object):
         hybrid_extract_window = gui.Window('{0} - Hybrid Extracting'.format(self.app_name),\
                                             hybrid_extracting_screen)
         return hybrid_extract_window
-    
+
 
     def create_info_window(self, algorithm):
 
@@ -182,18 +182,22 @@ class GraphicalUserInterface(object):
 
         info_window = gui.Window('{0} - Information'.format(self.app_name), info_screen)
         return info_window
-    
 
-    def check_algorithm_information(self, event, values, embedding):
 
-        if event == 'Algorithm Information':
-            algorithm = values['input_algorithm'] if embedding else values['output_algorithm']
-            info_window = self.create_info_window(algorithm)
-            while True:
-                event, values = info_window.read()
-                if event in (None, 'Close'):
-                    info_window.close()
-                    break
+    def check_algorithm_information(self, event, values, operation):
+
+        if operation == "embedding":
+            algorithm = values['input_algorithm']
+        else:
+            algorithm = values['output_algorithm']
+
+        info_window = self.create_info_window(algorithm)
+
+        while True:
+            event, values = info_window.read()
+            if event in (None, 'Close'):
+                info_window.close()
+                break
 
 
     def display(self):
@@ -203,7 +207,7 @@ class GraphicalUserInterface(object):
         while selecting:
 
             window = self.create_home_window()
-            embedding = hybrid_embedding = extracting = hybrid_extracting = False
+            operation = ""
 
             while True:
                 event, values = window.read()
@@ -211,21 +215,21 @@ class GraphicalUserInterface(object):
                     sys.exit()
                     break
                 if event == 'Embed':
-                    embedding = True
+                    operation = "embedding"
                     break
                 if event == 'Hybrid Embed':
-                    hybrid_embedding = True
+                    operation = "hybrid_embedding"
                     break
                 if event == 'Extract':
-                    extracting = True
+                    operation = "extracting"
                     break
                 if event == 'Hybrid Extract':
-                    hybrid_extracting = True
+                    operation = "hybrid_extracting"
                     break
 
             window.close()
 
-            if embedding:
+            if operation == "embedding":
 
                 window = self.create_embedding_window()
 
@@ -233,7 +237,8 @@ class GraphicalUserInterface(object):
                     event, values = window.read()
                     if event is None:
                         sys.exit()
-                    self.check_algorithm_information(event, values, embedding=True)
+                    if event == 'Algorithm Information':
+                        self.check_algorithm_information(event, values, operation)
                     if event == 'Embed':
                         algorithm_name, cover_file, message_file, key, save_path =\
                             values['input_algorithm'], values['cover_image'],\
@@ -241,7 +246,7 @@ class GraphicalUserInterface(object):
 
                         window.close()
                         return [self.instantiators[algorithm_name],\
-                            cover_file, message_file, key, save_path, embedding]
+                            cover_file, message_file, key, save_path, operation]
 
                     if event == 'Back to Main Menu':
                         break
@@ -249,7 +254,7 @@ class GraphicalUserInterface(object):
                 window.close()
 
 
-            if hybrid_embedding:
+            if operation == "hybrid_embedding":
 
                 window = self.create_hybrid_embedding_window()
                 while True:
@@ -262,7 +267,7 @@ class GraphicalUserInterface(object):
                 window.close()
 
 
-            if extracting:
+            if operation == "extracting":
 
                 window = self.create_extracting_window()
 
@@ -270,15 +275,16 @@ class GraphicalUserInterface(object):
                     event, values = window.read()
                     if event is None:
                         sys.exit()
-                    self.check_algorithm_information(event, values, embedding=False)
+                    if event == 'Algorithm Information':
+                        self.check_algorithm_information(event, values, operation)
                     if event == 'Extract':
                         algorithm_name, stego_file, key, save_path =\
                             values['output_algorithm'], values['stego_image'],\
                                 values['output_key'], values['save_folder']
-                        
+
                         window.close()
                         return [self.instantiators[algorithm_name],\
-                            stego_file, key, save_path, embedding]
+                            stego_file, key, save_path, operation]
 
                     if event == 'Back to Main Menu':
                         break
@@ -286,7 +292,7 @@ class GraphicalUserInterface(object):
                 window.close()
 
 
-            if hybrid_extracting:
+            if operation == "hybrid_extracting":
 
                 window = self.create_hybrid_extracting_window()
                 while True:

@@ -30,9 +30,9 @@ if __name__ == '__main__':
     while True:
 
         data = GUI.display()
-        embedding = data[-1]
+        operation = data[-1]
 
-        if embedding:
+        if operation == "embedding":
 
             # retrieve embedding data from GUI embedding screen
             algorithm_name, cover_file, message_file, key, save_path =\
