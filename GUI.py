@@ -1,4 +1,5 @@
 import sys
+import json
 import PySimpleGUI as gui
 from algorithms.LSB import LSB
 from algorithms.LSBM import LSBM
@@ -11,7 +12,15 @@ class GraphicalUserInterface(object):
     def __init__(self):
 
         self.app_name = "Steganograph-App-y"
-        self.algorithm_list = ["LSB", "LSBM", "LSBMR", "PVD", "EA-LSBMR"]
+
+        with open('data/algorithm_information.json') as f:
+            data = json.load(f)
+
+        self.algorithm_data = {}
+        for datum in data['algorithms']:
+            self.algorithm_data[datum['name']] = datum['description']
+
+        #self.algorithm_list = ["LSB", "LSBM", "LSBMR", "PVD", "EA-LSBMR"]
         self.edge_detector_list = ["Canny", "Sobel", "LoG"]
         self.combinator_list = ["OR", "AND"]
         self.instantiators = {
@@ -48,7 +57,7 @@ class GraphicalUserInterface(object):
             [gui.Text('_'  * 70)],
             [gui.Text('')],
             [gui.Text('Embedding algorithm', size=(16, 1)), 
-                gui.Combo(self.algorithm_list, size=(10, 1), key="input_algorithm"),
+                gui.Combo(list(self.algorithm_data.keys()), size=(10, 1), key="input_algorithm"),
                 gui.Button('Algorithm Information')],
             [gui.Text('Image file', size=(16, 1)),
                 gui.In(size=(40, 1), enable_events=True, key="cover_image"), 
@@ -120,7 +129,7 @@ class GraphicalUserInterface(object):
             [gui.Text('_'  * 70)],
             [gui.Text('')],
             [gui.Text('Extracting algorithm', size=(16, 1)),
-                gui.Combo(self.algorithm_list, size=(10, 1), key="output_algorithm"),
+               gui.Combo(list(self.algorithm_data.keys()), size=(10, 1), key="output_algorithm"),
                 gui.Button('Algorithm Information')],
             [gui.Text('Image file', size=(16, 1)),
                 gui.In(size=(40, 1), enable_events=True, key="stego_image"),
@@ -175,7 +184,7 @@ class GraphicalUserInterface(object):
             [gui.Text('Information', font=('Helvetica', 15), justification='center')],
             [gui.Text('_'  * 70)],
             [gui.Text('')],
-            [gui.Text('Description of ' + algorithm)],
+            [gui.Text(self.algorithm_data[algorithm])],
             [gui.Text('')],
             [gui.Button('Close')]
         ]
