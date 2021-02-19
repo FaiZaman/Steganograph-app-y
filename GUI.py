@@ -13,16 +13,20 @@ class GraphicalUserInterface(object):
 
         self.app_name = "Steganograph-App-y"
 
-        with open('data/algorithm_information.json') as f:
-            data = json.load(f)
+        with open('data/algorithms.json') as f:
+            a_data = json.load(f)
+        with open('data/combinators.json') as g:
+            c_data = json.load(g)
 
         self.algorithm_data = {}
-        for datum in data['algorithms']:
-            self.algorithm_data[datum['name']] = datum['description']
+        self.combinator_data = {}
 
-        #self.algorithm_list = ["LSB", "LSBM", "LSBMR", "PVD", "EA-LSBMR"]
+        for datum in a_data['algorithms']:
+            self.algorithm_data[datum['name']] = datum['description']
+        for datum in c_data['combinators']:
+            self.combinator_data[datum['name']] = datum['description']
+
         self.edge_detector_list = ["Canny", "Sobel", "LoG"]
-        self.combinator_list = ["OR", "AND"]
         self.instantiators = {
             "LSB": LSB,
             "LSBM": LSBM,
@@ -95,7 +99,7 @@ class GraphicalUserInterface(object):
                 gui.Combo(self.edge_detector_list, size=(10, 1), key="input_detector_2"),
                 gui.Button('Detector Information')],
             [gui.Text('Hybrid Technique', size=(16, 1)),
-                gui.Combo(self.combinator_list, size=(10, 1), key="comb_technique"),
+                gui.Combo(list(self.combinator_data.keys()), size=(10, 1), key="comb_technique"),
                 gui.Button('Hybrid Information')],
             [gui.Text('_' * 55)],
             [gui.Text('Image file', size=(16, 1)),
@@ -159,7 +163,7 @@ class GraphicalUserInterface(object):
                 gui.Combo(self.edge_detector_list, size=(10, 1), key="input_detector_2"),
                 gui.Button('Detector Information')],
             [gui.Text('Hybrid Technique', size=(16, 1)),
-                gui.Combo(self.combinator_list, size=(10, 1), key="comb_technique"),
+                gui.Combo(list(self.combinator_data.keys()), size=(10, 1), key="comb_technique"),
                 gui.Button('Hybrid Information')],
             [gui.Text('_' * 55)],
             [gui.Text('Image file', size=(16, 1)),
@@ -184,7 +188,7 @@ class GraphicalUserInterface(object):
             [gui.Text('Information', font=('Helvetica', 15), justification='center')],
             [gui.Text('_'  * 70)],
             [gui.Text('')],
-            [gui.Text(self.algorithm_data[algorithm])],
+            [gui.Text(self.algorithm_data[algorithm], size=(60, 4))],
             [gui.Text('')],
             [gui.Button('Close')]
         ]
@@ -193,7 +197,7 @@ class GraphicalUserInterface(object):
         return info_window
 
 
-    def check_algorithm_information(self, event, values, operation):
+    def display_information(self, event, values, operation):
 
         if operation == "embedding":
             algorithm = values['input_algorithm']
@@ -247,7 +251,7 @@ class GraphicalUserInterface(object):
                     if event is None:
                         sys.exit()
                     if event == 'Algorithm Information':
-                        self.check_algorithm_information(event, values, operation)
+                        self.display_information(event, values, operation)
                     if event == 'Embed':
                         algorithm_name, cover_file, message_file, key, save_path =\
                             values['input_algorithm'], values['cover_image'],\

@@ -1,0 +1,12 @@
+{
+    "combinators": [
+        {
+            "name": "OR",
+            "description": "Based upon the logical OR operator, this takes the union of the edge areas found by the selected edge detectors for the maximum edge area."
+        },
+        {
+            "name": "AND",
+            "description": "Based upon the logical AND operator, this takes the intersection of the edge areas found by the selected edge detectors for the strongest edge areas."
+        }
+    ]
+}

@@ -14,11 +14,11 @@
         },
         {
             "name": "PVD",
-            "description": "Pixel Value Differencing divides the image into two-pixel blocks and uses the difference between the pixels to determine the number of bits from the  binary representation of the secret message to embed."
+            "description": "Pixel Value Differencing divides the image into two-pixel blocks and uses the difference between the pixels to determine the number of bits from the binary representation of the secret message to embed."
         },
         {
             "name": "EA-LSBMR",
-            "description": "Edge Adaptive Least Significant Bit Matching Revisited is an  edge-adaptive steganographic technique that makes use of thresholds and takes into account edge strength when embedding bits."
+            "description": "Edge Adaptive Least Significant Bit Matching Revisited is an edge-adaptive steganographic technique that makes use of thresholds and takes into account edge strength when embedding bits."
         }
     ]
 }
