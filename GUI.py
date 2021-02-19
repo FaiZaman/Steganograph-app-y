@@ -99,7 +99,7 @@ class GraphicalUserInterface(object):
                 gui.Combo(self.edge_detector_list, size=(10, 1), key="input_detector_2"),
                 gui.Button('Detector Information')],
             [gui.Text('Hybrid Technique', size=(16, 1)),
-                gui.Combo(list(self.combinator_data.keys()), size=(10, 1), key="comb_technique"),
+                gui.Combo(list(self.combinator_data.keys()), size=(10, 1), key="input_hybrid"),
                 gui.Button('Hybrid Information')],
             [gui.Text('_' * 55)],
             [gui.Text('Image file', size=(16, 1)),
@@ -163,7 +163,7 @@ class GraphicalUserInterface(object):
                 gui.Combo(self.edge_detector_list, size=(10, 1), key="input_detector_2"),
                 gui.Button('Detector Information')],
             [gui.Text('Hybrid Technique', size=(16, 1)),
-                gui.Combo(list(self.combinator_data.keys()), size=(10, 1), key="comb_technique"),
+                gui.Combo(list(self.combinator_data.keys()), size=(10, 1), key="output_hybrid"),
                 gui.Button('Hybrid Information')],
             [gui.Text('_' * 55)],
             [gui.Text('Image file', size=(16, 1)),
@@ -182,13 +182,13 @@ class GraphicalUserInterface(object):
         return hybrid_extract_window
 
 
-    def create_info_window(self, algorithm):
+    def create_info_window(self, data, name):
 
         info_screen = [
             [gui.Text('Information', font=('Helvetica', 15), justification='center')],
             [gui.Text('_'  * 70)],
             [gui.Text('')],
-            [gui.Text(self.algorithm_data[algorithm], size=(60, 4))],
+            [gui.Text(data[name], size=(60, 4))],
             [gui.Text('')],
             [gui.Button('Close')]
         ]
@@ -197,20 +197,40 @@ class GraphicalUserInterface(object):
         return info_window
 
 
-    def display_information(self, event, values, operation):
+    def display_algorithm_information(self, values, operation):
 
         if operation == "embedding":
             algorithm = values['input_algorithm']
         else:
             algorithm = values['output_algorithm']
 
-        info_window = self.create_info_window(algorithm)
+        if algorithm:
 
-        while True:
-            event, values = info_window.read()
-            if event in (None, 'Close'):
-                info_window.close()
-                break
+            info_window = self.create_info_window(self.algorithm_data, algorithm)
+
+            while True:
+                event, values = info_window.read()
+                if event in (None, 'Close'):
+                    info_window.close()
+                    break
+    
+
+    def display_combinator_information(self, values, operation):
+
+        if operation == "hybrid_embedding":
+            combinator = values['input_hybrid']
+        else:
+            combinator = values['output_hybrid']
+
+        if combinator:
+
+            info_window = self.create_info_window(self.combinator_data, combinator)
+
+            while True:
+                event, values = info_window.read()
+                if event in (None, 'Close'):
+                    info_window.close()
+                    break
 
 
     def display(self):
@@ -251,7 +271,7 @@ class GraphicalUserInterface(object):
                     if event is None:
                         sys.exit()
                     if event == 'Algorithm Information':
-                        self.display_information(event, values, operation)
+                        self.display_algorithm_information(values, operation)
                     if event == 'Embed':
                         algorithm_name, cover_file, message_file, key, save_path =\
                             values['input_algorithm'], values['cover_image'],\
@@ -274,6 +294,8 @@ class GraphicalUserInterface(object):
                     event, values = window.read()
                     if event is None:
                         sys.exit()
+                    if event == 'Hybrid Information':
+                        self.display_combinator_information(values, operation)
                     if event == 'Back to Main Menu':
                         break
 
@@ -312,6 +334,8 @@ class GraphicalUserInterface(object):
                     event, values = window.read()
                     if event is None:
                         sys.exit()
+                    if event == 'Hybrid Information':
+                        self.display_combinator_information(values, operation)
                     if event == 'Back to Main Menu':
                         break
 
