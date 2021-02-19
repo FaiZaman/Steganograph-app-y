@@ -17,14 +17,19 @@ class GraphicalUserInterface(object):
             a_data = json.load(f)
         with open('data/combinators.json') as g:
             c_data = json.load(g)
+        with open('data/detectors.json') as h:
+            d_data = json.load(h)
 
         self.algorithm_data = {}
         self.combinator_data = {}
+        self.detector_data = {}
 
-        for datum in a_data['algorithms']:
-            self.algorithm_data[datum['name']] = datum['description']
-        for datum in c_data['combinators']:
-            self.combinator_data[datum['name']] = datum['description']
+        for a_datum in a_data['algorithms']:
+            self.algorithm_data[a_datum['name']] = a_datum['description']
+        for c_datum in c_data['combinators']:
+            self.combinator_data[c_datum['name']] = c_datum['description']
+        for d_datum in d_data['detectors']:
+            self.detector_data[d_datum['name']] = d_datum['description']
 
         self.edge_detector_list = ["Canny", "Sobel", "LoG"]
         self.instantiators = {
@@ -67,7 +72,7 @@ class GraphicalUserInterface(object):
                 gui.In(size=(40, 1), enable_events=True, key="cover_image"), 
                 gui.FileBrowse(initial_folder=
                 'C:/Users/faizz/University Work/Year 4/Advanced Project/Images/Cover', 
-                file_types=(("Image Files", "*.png")))],
+                file_types=(("Image Files", "*.png"),))],
             [gui.Text('Text file', size=(16, 1)),
                 gui.In(size=(40, 1), enable_events=True, key="message"),
                 gui.FileBrowse(initial_folder=
@@ -93,11 +98,11 @@ class GraphicalUserInterface(object):
             [gui.Text('_'  * 70)],
             [gui.Text('')],
             [gui.Text('Edge Detector 1', size=(16, 1)),
-                gui.Combo(self.edge_detector_list, size=(10, 1), key="input_detector_1"),
-                gui.Button('Detector Information')],
+                gui.Combo(self.edge_detector_list, size=(10, 1), key="First_input_detector"),
+                gui.Button('First Detector Information')],
             [gui.Text('Edge Detector 2', size=(16, 1)),
-                gui.Combo(self.edge_detector_list, size=(10, 1), key="input_detector_2"),
-                gui.Button('Detector Information')],
+                gui.Combo(self.edge_detector_list, size=(10, 1), key="Second_input_detector"),
+                gui.Button('Second Detector Information')],
             [gui.Text('Hybrid Technique', size=(16, 1)),
                 gui.Combo(list(self.combinator_data.keys()), size=(10, 1), key="input_hybrid"),
                 gui.Button('Hybrid Information')],
@@ -106,12 +111,12 @@ class GraphicalUserInterface(object):
                 gui.In(size=(40, 1), enable_events=True, key="cover_image"), 
                 gui.FileBrowse(initial_folder=
                 'C:/Users/faizz/University Work/Year 4/Advanced Project/Images/Cover', 
-                file_types=(("Image Files", "*.png")))],
+                file_types=(("Image Files", "*.png"),))],
             [gui.Text('Text file', size=(16, 1)),
                 gui.In(size=(40, 1), enable_events=True, key="message"),
                 gui.FileBrowse(initial_folder=
                 'C:/Users/faizz/University Work/Year 4/Advanced Project/Messages/Embedding', 
-                file_types=(("Text Files", "*.txt")))],
+                file_types=(("Text Files", "*.txt"),))],
             [gui.Text('Secret key', size=(16, 1)), gui.Input(size=(40, 1), key="input_key")],
             [gui.Text('Save Folder', size=(16, 1)),
                 gui.In(size=(40, 1), enable_events=True, key="save_folder"),
@@ -157,18 +162,18 @@ class GraphicalUserInterface(object):
             [gui.Text('_'  * 70)],
             [gui.Text('')],
             [gui.Text('Edge Detector 1', size=(16, 1)),
-                gui.Combo(self.edge_detector_list, size=(10, 1), key="input_detector_1"),
-                gui.Button('Detector Information')],
+                gui.Combo(self.edge_detector_list, size=(10, 1), key="First_output_detector"),
+                gui.Button('First Detector Information')],
             [gui.Text('Edge Detector 2', size=(16, 1)),
-                gui.Combo(self.edge_detector_list, size=(10, 1), key="input_detector_2"),
-                gui.Button('Detector Information')],
+                gui.Combo(self.edge_detector_list, size=(10, 1), key="Second_output_detector"),
+                gui.Button('Second Detector Information')],
             [gui.Text('Hybrid Technique', size=(16, 1)),
                 gui.Combo(list(self.combinator_data.keys()), size=(10, 1), key="output_hybrid"),
                 gui.Button('Hybrid Information')],
             [gui.Text('_' * 55)],
             [gui.Text('Image file', size=(16, 1)),
                 gui.In(size=(40, 1), enable_events=True, key="cover_image"), 
-                gui.FileBrowse(file_types=(("Image Files", "*.png")))],
+                gui.FileBrowse(file_types=(("Image Files", "*.png"),))],
             [gui.Text('Secret key', size=(16, 1)), gui.Input(size=(40, 1), key="input_key")],
             [gui.Text('Save Folder', size=(16, 1)),
                 gui.In(size=(40, 1), enable_events=True, key="save_folder"),
@@ -213,7 +218,25 @@ class GraphicalUserInterface(object):
                 if event in (None, 'Close'):
                     info_window.close()
                     break
-    
+
+
+    def display_detector_information(self, values, operation, position):
+
+        if operation == "hybrid_embedding":
+            detector = values[position + "_input_detector"]
+        else:
+            detector = values[position + '_output_detector']
+        
+        if detector:
+
+            info_window = self.create_info_window(self.detector_data, detector)
+
+            while True:
+                event, values = info_window.read()
+                if event in (None, 'Close'):
+                    info_window.close()
+                    break
+
 
     def display_combinator_information(self, values, operation):
 
@@ -294,6 +317,10 @@ class GraphicalUserInterface(object):
                     event, values = window.read()
                     if event is None:
                         sys.exit()
+                    if event == 'First Detector Information':
+                        self.display_detector_information(values, operation, 'First')
+                    if event == 'Second Detector Information':
+                        self.display_detector_information(values, operation, 'Second')
                     if event == 'Hybrid Information':
                         self.display_combinator_information(values, operation)
                     if event == 'Back to Main Menu':
@@ -334,6 +361,10 @@ class GraphicalUserInterface(object):
                     event, values = window.read()
                     if event is None:
                         sys.exit()
+                    if event == 'First Detector Information':
+                        self.display_detector_information(values, operation, 'First')
+                    if event == 'Second Detector Information':
+                        self.display_detector_information(values, operation, 'Second')
                     if event == 'Hybrid Information':
                         self.display_combinator_information(values, operation)
                     if event == 'Back to Main Menu':
