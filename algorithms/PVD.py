@@ -2,7 +2,8 @@ import math
 import random
 import numpy as np
 from datetime import datetime
-from utility import message_to_binary, integer_to_binary, binary_to_string, save_image, save_message
+from utility import message_to_binary, integer_to_binary, binary_to_string, save_image,\
+                    save_message
 
 class PVD():
 
@@ -28,14 +29,14 @@ class PVD():
             128: 255
         }
 
-        # set PseudoRandom Number Generator seed as the secret key and generate list of pixel indices
+        # set PseudoRandom Number Generator seed as secret key + generate list of pixel indices
         random.seed(key)
         self.pixels = [i for i in range(0, self.num_bytes - 1)]     # [0, 1, 2, ..., num_pixels]
 
         self.time_string = "{:%Y_%m_%d_%H;%M}".format(datetime.now())
 
 
-    # takes the coordinates of current pixel and returns a two-pixel block based on PVD img traversal
+    # takes the coordinates of current pixel and returns two-pixel block based on PVD traversal
     def get_pixel_block(self, x, y):
 
         current_pixel = self.image[y][x]
@@ -157,12 +158,13 @@ class PVD():
 
                 message_bits = self.message[message_index : new_message_index]
 
-                # compute new difference as m & get the embedded block based off inverse calculation
+                # compute new difference as m & get embedded block based off inverse calculation
                 new_difference = lower + int(message_bits, 2)
                 m = abs(new_difference - difference_value)
 
                 # calculate new embedded block values and reassign to stego image
-                embedded_block = self.inverse_calculation(block, m, difference_value, new_difference)
+                embedded_block = self.inverse_calculation\
+                    (block, m, difference_value, new_difference)
                 cover_image[y][x] = embedded_block[0]
                 cover_image[next_y][next_x] = embedded_block[1]
 

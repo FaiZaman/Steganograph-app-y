@@ -43,6 +43,16 @@ if __name__ == '__main__':
             algorithm = algorithm_name(cover_data, message, key, save_path)
             algorithm.embed_image()
 
+        elif operation == "hybrid_embedding":
+
+            # retrieve hybrid_embedding data from GUI
+            detector_1_name, detector_2_name, hybrid, cover_file, message_file, key, save_path =\
+                data[0], data[1], data[2], data[3], data[4], data[5], data[6]
+
+            detector_1 = detector_1_name(1, 0, 3)   # x order, y order, k size
+            detector_2 = detector_2_name(1, 0, 3)
+            cover_data, message = read_files(cover_file, message_file)
+
         else:
 
             # retrieve extracting data from GUI embedding screen and convert into proper formats
