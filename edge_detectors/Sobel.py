@@ -1,4 +1,5 @@
 import cv2
+import numpy as np
 
 class Sobel(object):
 
@@ -8,8 +9,10 @@ class Sobel(object):
         self.y_order = y_order
         self.ksize = ksize
 
-    
+
     def detect(self, image):
 
-        edges = cv2.Sobel(image, cv2.CV64F, self.x_order, self.y_order, self.ksize)
+        edges_unscaled = cv2.Sobel(image, cv2.CV_64F, self.x_order, self.y_order, self.ksize)
+        edges = cv2.convertScaleAbs(edges_unscaled)
+
         return edges

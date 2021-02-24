@@ -46,12 +46,20 @@ if __name__ == '__main__':
         elif operation == "hybrid_embedding":
 
             # retrieve hybrid_embedding data from GUI
-            detector_1_name, detector_2_name, hybrid, cover_file, message_file, key, save_path =\
-                data[0], data[1], data[2], data[3], data[4], data[5], data[6]
+            detector_1_name, detector_2_name, hybrid_type, cover_file, message_file, key, \
+                save_path = data[0], data[1], data[2], data[3], data[4], data[5], data[6]
 
-            detector_1 = detector_1_name(1, 0, 3)   # x order, y order, k size
-            detector_2 = detector_2_name(1, 0, 3)
+            # convert into proper formats and initalise detectors to detect edges
             cover_data, message = read_files(cover_file, message_file)
+            detector_1 = detector_1_name(1, 0, 3)   # x order, y order, k size
+            detector_2 = detector_2_name(0, 1, 3)
+
+            # get the edge areas from each detector
+            edges_1 = detector_1.detect(cover_data[1])
+            edges_2 = detector_2.detect(cover_data[1])
+
+            cv2.imshow('Sobel x filter', edges_1)
+            cv2.imshow('Sobel y filter', edges_2)
 
         else:
 
