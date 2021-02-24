@@ -1,12 +1,15 @@
 import sys
 import json
 import PySimpleGUI as gui
+
 from algorithms.LSB import LSB
 from algorithms.LSBM import LSBM
 from algorithms.LSBMR import LSBMR
 from algorithms.PVD import PVD
 from algorithms.EA_LSBMR import EA_LSBMR
+
 from edge_detectors.Sobel import Sobel
+from edge_detectors.LoG import LoG
 
 class GraphicalUserInterface(object):
 
@@ -41,7 +44,8 @@ class GraphicalUserInterface(object):
         }
 
         self.detector_instantiators = {
-            "Sobel": Sobel
+            "Sobel": Sobel,
+            "LoG": LoG
         }
 
 
