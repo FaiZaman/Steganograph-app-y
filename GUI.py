@@ -8,6 +8,7 @@ from algorithms.LSBMR import LSBMR
 from algorithms.PVD import PVD
 from algorithms.EA_LSBMR import EA_LSBMR
 
+from edge_detectors.Canny import Canny
 from edge_detectors.Sobel import Sobel
 from edge_detectors.LoG import LoG
 
@@ -44,6 +45,7 @@ class GraphicalUserInterface(object):
         }
 
         self.detector_instantiators = {
+            "Canny": Canny,
             "Sobel": Sobel,
             "LoG": LoG
         }
@@ -103,19 +105,21 @@ class GraphicalUserInterface(object):
 
         hybrid_embedding_screen = [
             [gui.Text('Hybrid Embedding', font=('Helvetica', 15), justification='center')],
-            [gui.Text('_'  * 70)],
+            [gui.Text('_'  * 80)],
             [gui.Text('')],
             [gui.Text('Edge Detector 1', size=(16, 1)),
                 gui.Combo(list(self.detector_data.keys()), size=(10, 1),
                 key="First_input_detector"),
-                gui.Button('First Detector Information')],
+                gui.Button('Detector 1 Information', size=(18, 1)),
+                gui.Button('Detector 1 Parameters', size=(18, 1))],
             [gui.Text('Edge Detector 2', size=(16, 1)),
                 gui.Combo(list(self.detector_data.keys()), size=(10, 1),
                 key="Second_input_detector"),
-                gui.Button('Second Detector Information')],
+                gui.Button('Detector 2 Information', size=(18, 1)),
+                gui.Button('Detector 2 Parameters', size=(18, 1))],
             [gui.Text('Hybrid Technique', size=(16, 1)),
                 gui.Combo(list(self.combinator_data.keys()), size=(10, 1), key="input_hybrid"),
-                gui.Button('Hybrid Information')],
+                gui.Button('Hybrid Information', size=(18, 1))],
             [gui.Text('_' * 55)],
             [gui.Text('Image file', size=(16, 1)),
                 gui.In(size=(40, 1), enable_events=True, key="hybrid_cover_image"), 
@@ -174,14 +178,16 @@ class GraphicalUserInterface(object):
             [gui.Text('Edge Detector 1', size=(16, 1)),
                 gui.Combo(list(self.detector_data.keys()), size=(10, 1),
                 key="First_output_detector"),
-                gui.Button('First Detector Information')],
+                gui.Button('Detector 1 Information', size=(18, 1)),
+                gui.Button('Detector 1 Parameters', size=(18, 1))],
             [gui.Text('Edge Detector 2', size=(16, 1)),
                 gui.Combo(list(self.detector_data.keys()), size=(10, 1),
                 key="Second_output_detector"),
-                gui.Button('Second Detector Information')],
+                gui.Button('Detector 2 Information', size=(18, 1)),
+                gui.Button('Detector 2 Parameters', size=(18, 1))],
             [gui.Text('Hybrid Technique', size=(16, 1)),
                 gui.Combo(list(self.combinator_data.keys()), size=(10, 1), key="output_hybrid"),
-                gui.Button('Hybrid Information')],
+                gui.Button('Hybrid Information', size=(18, 1))],
             [gui.Text('_' * 55)],
             [gui.Text('Image file', size=(16, 1)),
                 gui.In(size=(40, 1), enable_events=True, key="cover_image"), 
@@ -329,9 +335,9 @@ class GraphicalUserInterface(object):
                     event, values = window.read()
                     if event is None:
                         sys.exit()
-                    if event == 'First Detector Information':
+                    if event == 'Detector 1 Information':
                         self.display_detector_information(values, operation, 'First')
-                    if event == 'Second Detector Information':
+                    if event == 'Detector 2 Information':
                         self.display_detector_information(values, operation, 'Second')
                     if event == 'Hybrid Information':
                         self.display_combinator_information(values, operation)
@@ -385,9 +391,9 @@ class GraphicalUserInterface(object):
                     event, values = window.read()
                     if event is None:
                         sys.exit()
-                    if event == 'First Detector Information':
+                    if event == 'Detector 1 Information':
                         self.display_detector_information(values, operation, 'First')
-                    if event == 'Second Detector Information':
+                    if event == 'Detector 2 Information':
                         self.display_detector_information(values, operation, 'Second')
                     if event == 'Hybrid Information':
                         self.display_combinator_information(values, operation)
