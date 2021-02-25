@@ -208,7 +208,7 @@ class GraphicalUserInterface(object):
     def create_info_window(self, data, name):
 
         info_screen = [
-            [gui.Text('Information', font=('Helvetica', 15), justification='center')],
+            [gui.Text(name, font=('Helvetica', 15), justification='center')],
             [gui.Text('_'  * 70)],
             [gui.Text('')],
             [gui.Text(data[name], size=(60, 4))],
@@ -218,6 +218,22 @@ class GraphicalUserInterface(object):
 
         info_window = gui.Window('{0} - Information'.format(self.app_name), info_screen)
         return info_window
+
+
+    def create_parameters_window(self, name):
+
+        parameter_screen = [
+            [gui.Text('View/Change ' + name + ' Edge Detector Parameters',
+                font=('Helvetica', 15), justification='center')],
+            [gui.Text('_' * 70)],
+            [gui.Text('')],
+            [gui.Text('Real shit goes here')],
+            [gui.Text('')],
+            [gui.Button('Close')]
+        ]
+
+        parameter_window = gui.Window('{0} - Parameters'.format(self.app_name), parameter_screen)
+        return parameter_window
 
 
     def display_algorithm_information(self, values, operation):
@@ -244,7 +260,7 @@ class GraphicalUserInterface(object):
             detector = values[position + "_input_detector"]
         else:
             detector = values[position + '_output_detector']
-        
+
         if detector:
 
             info_window = self.create_info_window(self.detector_data, detector)
@@ -253,6 +269,24 @@ class GraphicalUserInterface(object):
                 event, values = info_window.read()
                 if event in (None, 'Close'):
                     info_window.close()
+                    break
+
+
+    def display_detector_parameters(self, values, operation, position):
+
+        if operation == "hybrid_embedding":
+            detector = values[position + "_input_detector"]
+        else:
+            detector = values[position + '_output_detector']
+
+        if detector:
+
+            parameters_window = self.create_parameters_window(detector)
+
+            while True:
+                event, values = parameters_window.read()
+                if event in (None, 'Close'):
+                    parameters_window.close()
                     break
 
 
@@ -339,6 +373,10 @@ class GraphicalUserInterface(object):
                         self.display_detector_information(values, operation, 'First')
                     if event == 'Detector 2 Information':
                         self.display_detector_information(values, operation, 'Second')
+                    if event == 'Detector 1 Parameters':
+                        self.display_detector_parameters(values, operation, 'First')
+                    if event == 'Detector 2 Parameters':
+                        self.display_detector_parameters(values, operation, 'Second')
                     if event == 'Hybrid Information':
                         self.display_combinator_information(values, operation)
                     if event == 'Hybrid Embed':
@@ -395,6 +433,10 @@ class GraphicalUserInterface(object):
                         self.display_detector_information(values, operation, 'First')
                     if event == 'Detector 2 Information':
                         self.display_detector_information(values, operation, 'Second')
+                    if event == 'Detector 1 Parameters':
+                        self.display_detector_parameters(values, operation, 'First')
+                    if event == 'Detector 2 Parameters':
+                        self.display_detector_parameters(values, operation, 'Second')
                     if event == 'Hybrid Information':
                         self.display_combinator_information(values, operation)
                     if event == 'Back to Main Menu':
