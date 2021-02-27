@@ -4,6 +4,7 @@ class LoG(object):
 
     def __init__(self, x, y, ksize):    # x and y necessary as same parameters for all detectors
 
+        self.name = "Laplacian of Gaussian Edge Detector"
         self.ksize = ksize
     
 

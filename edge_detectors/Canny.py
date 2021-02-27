@@ -4,6 +4,7 @@ class Canny(object):
 
     def __init__(self, lower_threshold, upper_threshold, ksize):
 
+        self.name = "Canny Edge Detector"
         self.lower_threshold = 100
         self.upper_threshold = 200
 

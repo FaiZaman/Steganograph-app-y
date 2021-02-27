@@ -23,7 +23,7 @@ class GraphicalUserInterface(object):
         with open('data/combinators.json') as g:
             c_data = json.load(g)
         with open('data/detectors.json') as h:
-            d_data = json.load(h)
+            self.d_data = json.load(h)
 
         self.algorithm_data = {}
         self.combinator_data = {}
@@ -33,7 +33,7 @@ class GraphicalUserInterface(object):
             self.algorithm_data[a_datum['name']] = (a_datum['description'], 0)
         for c_datum in c_data['combinators']:
             self.combinator_data[c_datum['name']] = (c_datum['description'], 0)
-        for d_datum in d_data['detectors']:
+        for d_datum in self.d_data['detectors']:
             self.detector_data[d_datum['name']] = (d_datum['description'], d_datum['parameters'])
 
         self.algorithm_instantiators = {
@@ -223,10 +223,13 @@ class GraphicalUserInterface(object):
     def create_parameters_window(self, name):
 
         parameter_rows = []
+        key_counter = 0
+
         for parameter, value in self.detector_data[name][1].items():
             parameter_rows.append(\
                 [gui.Text(parameter.replace("_", " ").title(), size=(12, 1)),\
-                    gui.In(value, size=(16, 1))])
+                    gui.In(value, size=(16, 1), key=key_counter)])
+            key_counter += 1
 
         parameter_screen = [
             [gui.Text('View/Change ' + name + ' Edge Detector Parameters',
@@ -293,7 +296,21 @@ class GraphicalUserInterface(object):
                     parameters_window.close()
                     break
                 if event == 'Save':
-                    print(self.detector_data)
+                    parameter_values = []
+                    try:
+                        for key in range(0, 3):
+                            parameter_values.append(values[key])
+                    except:
+                        pass
+
+                    parameter_index = 0
+                    for index in range(0, len(self.d_data['detectors'])):
+                        if self.d_data['detectors'][index]['name'] == detector:
+                            for parameter, value in \
+                                self.d_data['detectors'][index]['parameters'].items():
+                                self.d_data['detectors'][index]['parameters'][parameter] =\
+                                    parameter_values[parameter_index]
+                                parameter_index += 1
 
 
     def display_combinator_information(self, values, operation):

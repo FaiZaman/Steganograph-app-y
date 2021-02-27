@@ -58,8 +58,8 @@ if __name__ == '__main__':
             edges_1 = detector_1.detect(cover_data[1])
             edges_2 = detector_2.detect(cover_data[1])
 
-            cv2.imshow(str(detector_1_name) + ' filter', edges_1)
-            cv2.imshow(str(detector_2_name) + ' filter', edges_2)
+            cv2.imshow(detector_1.name + ' filter', edges_1)
+            cv2.imshow(detector_2.name + ' filter', edges_2)
 
         else:
 
