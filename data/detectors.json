@@ -2,15 +2,27 @@
     "detectors": [
         {
             "name": "Canny",
-            "description": "The Canny edge detector is a state of the art technique for detecting edges consisting of four stages: Noise Reduction, Image Intensity Gradient Retrieval, Non-Maximum Suppression, and Hysteresis Thresholding."
+            "description": "The Canny edge detector is a state of the art technique for detecting edges consisting of four stages: Noise Reduction, Image Intensity Gradient Retrieval, Non-Maximum Suppression, and Hysteresis Thresholding.",
+            "parameters": {
+                "lower_threshold": 100,
+                "upper_threshold": 300
+            }
         },
         {
             "name": "Sobel",
-            "description": "The Sobel edge detector applies a convolution to the image with a kernel to separately calculate edges in both the x and the y directions of the image."
+            "description": "The Sobel edge detector applies a convolution to the image with a kernel to separately calculate edges in both the x and the y directions of the image.",
+            "parameters": {
+                "x": 0,
+                "y": 1,
+                "kernel_size": 3
+            }
         },
         {
             "name": "LoG",
-            "description": "The Laplacian of Gaussian edge detector applies a convolution to the image with a kernel and is based on the second derivative of the image."
+            "description": "The Laplacian of Gaussian edge detector applies a convolution to the image with a kernel and is based on the second derivative of the image.",
+            "parameters": {
+                "kernel_size": 3
+            }
         }
     ]
 }

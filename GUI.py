@@ -30,11 +30,11 @@ class GraphicalUserInterface(object):
         self.detector_data = {}
 
         for a_datum in a_data['algorithms']:
-            self.algorithm_data[a_datum['name']] = a_datum['description']
+            self.algorithm_data[a_datum['name']] = (a_datum['description'], 0)
         for c_datum in c_data['combinators']:
-            self.combinator_data[c_datum['name']] = c_datum['description']
+            self.combinator_data[c_datum['name']] = (c_datum['description'], 0)
         for d_datum in d_data['detectors']:
-            self.detector_data[d_datum['name']] = d_datum['description']
+            self.detector_data[d_datum['name']] = (d_datum['description'], d_datum['parameters'])
 
         self.algorithm_instantiators = {
             "LSB": LSB,
@@ -211,7 +211,7 @@ class GraphicalUserInterface(object):
             [gui.Text(name, font=('Helvetica', 15), justification='center')],
             [gui.Text('_'  * 70)],
             [gui.Text('')],
-            [gui.Text(data[name], size=(60, 4))],
+            [gui.Text(data[name][0], size=(60, 4))],
             [gui.Text('')],
             [gui.Button('Close')]
         ]
@@ -222,14 +222,18 @@ class GraphicalUserInterface(object):
 
     def create_parameters_window(self, name):
 
+        parameter_rows = []
+        for parameter, value in self.detector_data[name][1].items():
+            parameter_rows.append(\
+                [gui.Text(parameter.replace("_", " ").title(), size=(12, 1)),\
+                    gui.In(value, size=(16, 1))])
+
         parameter_screen = [
             [gui.Text('View/Change ' + name + ' Edge Detector Parameters',
                 font=('Helvetica', 15), justification='center')],
             [gui.Text('_' * 70)],
-            [gui.Text('')],
-            [gui.Text('Real shit goes here')],
-            [gui.Text('')],
-            [gui.Button('Close')]
+            [gui.Text('')]] + parameter_rows + [[gui.Text('')],
+            [gui.Button('Save'), gui.Button('Close')]
         ]
 
         parameter_window = gui.Window('{0} - Parameters'.format(self.app_name), parameter_screen)
@@ -288,6 +292,8 @@ class GraphicalUserInterface(object):
                 if event in (None, 'Close'):
                     parameters_window.close()
                     break
+                if event == 'Save':
+                    print(self.detector_data)
 
 
     def display_combinator_information(self, values, operation):
