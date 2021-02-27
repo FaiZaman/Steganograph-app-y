@@ -312,6 +312,9 @@ class GraphicalUserInterface(object):
                                     parameter_values[parameter_index]
                                 parameter_index += 1
 
+                    with open('data/detectors.json', 'w') as outfile:
+                        json.dump(self.d_data, outfile)
+
 
     def display_combinator_information(self, values, operation):
 

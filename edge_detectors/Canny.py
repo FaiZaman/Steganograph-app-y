@@ -1,12 +1,24 @@
 import cv2
+import json
 
 class Canny(object):
 
     def __init__(self, lower_threshold, upper_threshold, ksize):
 
         self.name = "Canny Edge Detector"
-        self.lower_threshold = 100
-        self.upper_threshold = 200
+
+        with open('data/detectors.json') as f:
+            data = json.load(f)
+
+        self.lower_threshold = self.upper_threshold = 0
+
+        for index in range(0, len(data['detectors'])):
+            if data['detectors'][index]['name'] == 'Canny':
+
+                self.lower_threshold =\
+                    int(data['detectors'][index]['parameters']['lower_threshold'])
+                self.upper_threshold =\
+                    int(data['detectors'][index]['parameters']['upper_threshold'])
 
 
     def detect(self, image):
