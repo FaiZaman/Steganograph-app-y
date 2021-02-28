@@ -3,13 +3,13 @@ import json
 
 class LoG(object):
 
-    def __init__(self, x, y, ksize):    # x and y necessary as same parameters for all detectors
+    def __init__(self):    # x and y necessary as same parameters for all detectors
 
         self.name = "Laplacian of Gaussian Edge Detector"
 
         with open('data/detectors.json') as f:
             data = json.load(f)
-        
+
         self.k_size = 0
 
         for index in range(0, len(data['detectors'])):

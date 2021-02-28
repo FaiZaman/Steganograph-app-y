@@ -3,7 +3,7 @@ import json
 
 class Canny(object):
 
-    def __init__(self, lower_threshold, upper_threshold, ksize):
+    def __init__(self):
 
         self.name = "Canny Edge Detector"
 
