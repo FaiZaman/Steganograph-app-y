@@ -16,7 +16,7 @@ cd Steganograph-app-y
 To run the application, navigate to the root directory and run the following command:
 
 ```
-python Main.py
+python app.py
 ```
 
 Note that your system must be running Python 3.7 or a later version for the application to function properly.

@@ -12,6 +12,8 @@ from edge_detectors.Canny import Canny
 from edge_detectors.Sobel import Sobel
 from edge_detectors.LoG import LoG
 
+from hybridisation.OR import OR
+
 class GraphicalUserInterface(object):
 
     def __init__(self):
@@ -48,6 +50,10 @@ class GraphicalUserInterface(object):
             "Canny": Canny,
             "Sobel": Sobel,
             "LoG": LoG
+        }
+
+        self.combinator_instantiators = {
+            "OR": OR
         }
 
 
@@ -414,7 +420,8 @@ class GraphicalUserInterface(object):
                         
                         window.close()
                         return [self.detector_instantiators[detector_1],\
-                            self.detector_instantiators[detector_2], combinator, cover_file,\
+                            self.detector_instantiators[detector_2],\
+                            self.combinator_instantiators[combinator], cover_file,\
                             message_file, key, save_path, operation]
 
                     if event == 'Back to Main Menu':

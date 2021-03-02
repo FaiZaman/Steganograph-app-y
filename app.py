@@ -61,6 +61,11 @@ if __name__ == '__main__':
             cv2.imshow(detector_1.name, edges_1)
             cv2.imshow(detector_2.name, edges_2)
 
+            # combine the edge areas based on the hybrid type
+            combinator = hybrid_type()
+            combinator.merge(edges_1, edges_2)
+
+
         else:
 
             # retrieve extracting data from GUI embedding screen and convert into proper formats
