@@ -1,0 +1,24 @@
+{
+    "algorithms": [
+        {
+            "name": "LSB",
+            "description": "Least Significant Bit is a basic steganographic technique that replaces the least significant bit of the binary representation of a pixel in the image with a bit of the binary representation of the secret message."
+        },
+        {
+            "name": "LSBM",
+            "description": "Least Sigificant Bit Matching is an extension of Least Significant Bit, whereby if the least significant bit of the binary representation of a pixel in the image is not equal to a bit of the binary representation of the secret message, the pixel value is randomly incremented or decremented by 1."
+        },
+        {
+            "name": "LSBMR",
+            "description": "Least Significant Bit Matching Revisited uses a pair of pixels as an embedding unit, whereby a binary function of the input bits are used to calculate appropriate output values for each bit."
+        },
+        {
+            "name": "PVD",
+            "description": "Pixel Value Differencing divides the image into two-pixel blocks and uses the difference between the pixels to determine the number of bits from the binary representation of the secret message to embed."
+        },
+        {
+            "name": "EA-LSBMR",
+            "description": "Edge Adaptive Least Significant Bit Matching Revisited is an edge-adaptive steganographic technique that makes use of thresholds and takes into account edge strength when embedding bits."
+        }
+    ]
+}

@@ -1,7 +1,8 @@
 import random
 import numpy as np
 from datetime import datetime
-from utility import message_to_binary, integer_to_binary, binary_to_string, save_image, save_message
+from utility import message_to_binary, integer_to_binary, binary_to_string, save_image,\
+                    save_message
 
 class LSB():
 
@@ -19,7 +20,7 @@ class LSB():
         self.height = np.size(self.image, 0)
         self.num_bytes = self.width * self.height   # total number of pixels in image
 
-        # set PseudoRandom Number Generator seed as the secret key and generate list of pixel indices
+        # set PseudoRandom Number Generator seed as secret key + generate list of pixel indices
         random.seed(key)
         self.pixels = [i for i in range(0, self.num_bytes)]     # [0, 1, 2, ..., num_pixels]
 

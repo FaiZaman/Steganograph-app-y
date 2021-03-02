@@ -30,9 +30,9 @@ if __name__ == '__main__':
     while True:
 
         data = GUI.display()
-        embedding = data[-1]
+        operation = data[-1]
 
-        if embedding:
+        if operation == "embedding":
 
             # retrieve embedding data from GUI embedding screen
             algorithm_name, cover_file, message_file, key, save_path =\
@@ -42,6 +42,24 @@ if __name__ == '__main__':
             cover_data, message = read_files(cover_file, message_file)
             algorithm = algorithm_name(cover_data, message, key, save_path)
             algorithm.embed_image()
+
+        elif operation == "hybrid_embedding":
+
+            # retrieve hybrid_embedding data from GUI
+            detector_1_name, detector_2_name, hybrid_type, cover_file, message_file, key, \
+                save_path = data[0], data[1], data[2], data[3], data[4], data[5], data[6]
+
+            # convert into proper formats and initalise detectors to detect edges
+            cover_data, message = read_files(cover_file, message_file)
+            detector_1 = detector_1_name()
+            detector_2 = detector_2_name()
+
+            # get the edge areas from each detector
+            edges_1 = detector_1.detect(cover_data[1])
+            edges_2 = detector_2.detect(cover_data[1])
+
+            cv2.imshow(detector_1.name, edges_1)
+            cv2.imshow(detector_2.name, edges_2)
 
         else:
 
