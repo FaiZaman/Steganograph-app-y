@@ -61,12 +61,6 @@ if __name__ == '__main__':
             cv2.imshow(detector_1.name, edges_1)
             cv2.imshow(detector_2.name, edges_2)
 
-            #for y in range(0, edges_2.shape[0]):
-            #    for x in range(0, edges_2.shape[1]):
-            #        
-            #        if edges_2[y][x] > 128:
-            #            print(edges_2[y][x])
-
         else:
 
             # retrieve extracting data from GUI embedding screen and convert into proper formats
