@@ -13,6 +13,7 @@ from edge_detectors.Sobel import Sobel
 from edge_detectors.LoG import LoG
 
 from hybridisation.OR import OR
+from hybridisation.AND import AND
 
 class GraphicalUserInterface(object):
 
@@ -53,7 +54,8 @@ class GraphicalUserInterface(object):
         }
 
         self.combinator_instantiators = {
-            "OR": OR
+            "OR": OR,
+            "AND": AND
         }
 
 
