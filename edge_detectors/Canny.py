@@ -21,6 +21,7 @@ class Canny(object):
                     int(data['detectors'][index]['parameters']['upper_threshold'])
 
 
+    # detects edges in the input image
     def detect(self, image):
 
         edges = cv2.Canny(image, self.lower_threshold, self.upper_threshold)

@@ -18,6 +18,7 @@ class Sobel(object):
                 self.k_size = int(data['detectors'][index]['parameters']['kernel_size'])
 
 
+    # detects edges in the input image
     def detect(self, image):
 
         # calculate gradients in both x and y directions and get image dimensions

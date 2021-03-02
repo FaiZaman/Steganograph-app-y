@@ -63,7 +63,9 @@ if __name__ == '__main__':
 
             # combine the edge areas based on the hybrid type
             combinator = hybrid_type()
-            combinator.merge(edges_1, edges_2)
+            hybrid_edges = combinator.merge(edges_1, edges_2)
+
+            cv2.imshow(combinator.name, hybrid_edges)
 
 
         else:

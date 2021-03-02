@@ -20,6 +20,7 @@ class LoG(object):
                 self.k_size = int(data['detectors'][index]['parameters']['kernel_size'])
 
 
+    # detects edges in the input image
     def detect(self, image):
 
         height, width = image.shape[0], image.shape[1]
