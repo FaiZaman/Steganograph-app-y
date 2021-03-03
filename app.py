@@ -76,7 +76,7 @@ if __name__ == '__main__':
             Hybrid_LSBMR_algorithm = Hybrid_LSBMR(cover_data, hybrid_edges, message, key, save_path)
             Hybrid_LSBMR_algorithm.embed_image()
 
-        else:
+        elif operation == "extracting":
 
             # retrieve extracting data from GUI embedding screen and convert into proper formats
             algorithm_name, stego_file, key, save_path = data[0], data[1], data[2], data[3]
@@ -86,3 +86,7 @@ if __name__ == '__main__':
             # initalise algorithm and decode message
             algorithm = algorithm_name(stego_data, message, key, save_path)
             extracted_message = algorithm.extract()
+
+        else:
+
+            pass

@@ -33,6 +33,7 @@ class Hybrid_LSBMR(LSBMR):
         message_index = 0
         message_length = len(self.message)
 
+        # get the edge coordinates from the hybrid edge areas
         edge_coordinates = self.get_edge_coordinates()
         num_edge_coordinates = len(edge_coordinates)
 
@@ -73,3 +74,33 @@ class Hybrid_LSBMR(LSBMR):
         save_image(self.save_path, self.image_name, self.time_string, stego_image)
 
         return stego_image
+
+
+    # loops through edge pixels in same order as when encoding and extracts message bits
+    def extract(self):
+
+        binary_message = ""  # initialise message
+
+        # get the edge coordinates from the hybrid edge areas and pseudorandom embedding path
+        edge_coordinates = self.get_edge_coordinates()
+        num_edge_coordinates = len(edge_coordinates)
+        path = random.sample(edge_coordinates, num_edge_coordinates)
+
+        for (y, x) in path:
+
+            # compute the two-pixel block and the coordinates of the next pixel
+            next_coordinates, stego_block = self.get_pixel_block(x, y)
+            first_stego_pixel, second_stego_pixel = stego_block[0], stego_block[1]
+
+            # extract both bits from the pixel pair
+            first_binary_pixel = integer_to_binary(first_stego_pixel)
+            first_msg_bit = first_binary_pixel[-1]
+            second_msg_bit = self.binary_function(first_stego_pixel, second_stego_pixel)
+
+            binary_message += first_msg_bit + second_msg_bit
+
+        # extract the original message, save to file, and return
+        extracted_message = binary_to_string(binary_message, self.delimiter)
+        save_message(self.save_path, self.time_string, extracted_message)
+
+        return extracted_message
