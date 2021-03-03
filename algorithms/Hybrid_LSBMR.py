@@ -1,6 +1,6 @@
 import random
 from algorithms.LSBMR import LSBMR
-from utility import message_to_binary, save_image
+from utility import integer_to_binary, message_to_binary, binary_to_string, save_image, save_message
 
 class Hybrid_LSBMR(LSBMR):
 
