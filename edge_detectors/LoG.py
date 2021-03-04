@@ -1,7 +1,7 @@
 import cv2
 import json
 import numpy as np
-from utility import integer_to_binary
+from utility import integer_to_binary, mask_LSB
 
 class LoG(object):
 
@@ -22,6 +22,9 @@ class LoG(object):
 
     # detects edges in the input image
     def detect(self, image):
+
+        # mask the LSBs
+        masked_image = mask_LSB(image)
 
         height, width = image.shape[0], image.shape[1]
         MSB_image = image.copy()

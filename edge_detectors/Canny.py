@@ -1,5 +1,6 @@
 import cv2
 import json
+from utility import mask_LSB
 
 class Canny(object):
 
@@ -24,5 +25,8 @@ class Canny(object):
     # detects edges in the input image
     def detect(self, image):
 
-        edges = cv2.Canny(image, self.lower_threshold, self.upper_threshold)
+        # mask the LSBs and run Canny edge detector on masked image
+        masked_image = mask_LSB(image)
+        edges = cv2.Canny(masked_image, self.lower_threshold, self.upper_threshold)
+
         return edges
