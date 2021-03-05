@@ -30,7 +30,7 @@ class LSBMR(LSBM, PVD):
         first_pixel_binary = integer_to_binary(first_pixel)
         second_pixel_binary = integer_to_binary(second_pixel)
 
-         # LSBMR algorithm
+        # LSBMR algorithm
         if first_msg_bit == first_pixel_binary[-1]:
 
             if second_msg_bit != self.binary_function(first_pixel, second_pixel):
