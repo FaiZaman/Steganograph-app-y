@@ -41,8 +41,8 @@ def binary_to_string(binary_message, delimiter):
 # set all the LSBs to zero before detecting edges so same edges are detected in embedding and extraction
 def mask_LSB(image):
 
-    # uses binary 1111110 to AND all pixels in image to reset image LSBs to 0
-    mask = np.full(image.shape, 254, np.uint8)
+    # uses binary 1111100 to AND all pixels in image to reset 2 LSBs to 0
+    mask = np.full(image.shape, 252, np.uint8)
     masked_image = cv2.bitwise_and(image, mask)
 
     return masked_image

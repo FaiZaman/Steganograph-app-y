@@ -38,7 +38,7 @@ class Hybrid_LSBMR(LSBMR):
         num_edge_coordinates = len(edge_coordinates)
         embedded_coordinates = []
 
-        if message_length > num_edge_coordinates:
+        if message_length > num_edge_coordinates * 2:
             raise ValueError("The message is too large for the image.")
 
         # get a random path based on seed through the edge pixels
@@ -57,7 +57,9 @@ class Hybrid_LSBMR(LSBMR):
             # check if not 0 or 255 as embedding cannot be performed otherwise
             if 0 < first_pixel < 255 and 0 < second_pixel < 255:
 
-                if (y, x) not in embedded_coordinates and (next_y, next_x) not in embedded_coordinates:
+                if (y, x) not in embedded_coordinates and (next_y, next_x) not in embedded_coordinates\
+                    and not(y == self.height - 1 and x == 0)\
+                    and not(y == self.height - 1 and x == self.width - 1):
 
                     # use LSBMR embedding and output stego pixels
                     first_stego_pixel, second_stego_pixel =\
