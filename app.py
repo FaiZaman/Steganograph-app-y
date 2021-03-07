@@ -113,24 +113,3 @@ if __name__ == '__main__':
             # initialise LSBMR algorithm and decode message
             Hybrid_LSBMR_algorithm = Hybrid_LSBMR(stego_data, hybrid_edges, message, key, save_path)
             Hybrid_LSBMR_algorithm.extract()
-
-"""
-
-embed = cv2.imread('C:/Users/faizz/University Work/Year 4/Advanced Project/Images/Cover/Lena.png',\
-    cv2.IMREAD_GRAYSCALE)
-embed_mask_image = mask_LSB(embed)
-
-extract = cv2.imread\
-    ('C:/Users/faizz/University Work/Year 4/Advanced Project/Images/Stego/2021_03_06_11;24_Lena.png',\
-        cv2.IMREAD_GRAYSCALE)
-extra_mask_image = mask_LSB(extract)
-
-print((68, 157), embed[68][157], extract[68][157], embed_mask_image[68][157], extra_mask_image[68][157])
-for y in range(0, embed_mask_image.shape[0]):
-    for x in range(0, embed_mask_image.shape[1]):
-
-        if embed_mask_image[y][x] != extra_mask_image[y][x]:
-            print((y, x), embed[y][x], extract[y][x], embed_mask_image[y][x], extra_mask_image[y][x])
-        if abs(embed[y][x] - extract[y][x]) == 1:
-            print((y, x), embed[y][x], extract[y][x], embed_mask_image[y][x], extra_mask_image[y][x])
-"""

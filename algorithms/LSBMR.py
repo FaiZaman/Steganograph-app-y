@@ -10,7 +10,20 @@ class LSBMR(LSBM, PVD):
     def __init__(self, image, message, key, save_path):
 
         super().__init__(image, message, key, save_path)
-        self.pixels = [i for i in range(0, self.num_bytes - 1)]     # [0, 1, 2, ..., num_pixels]
+
+        # initialise pixels = [0, 1, 2, ..., num_pixels] and outliers for masking
+        self.pixels = [i for i in range(0, self.num_bytes - 1)]
+        self.outliers = {}
+
+        # generate the cases where masking the 2 LSBs does not give the same result
+        # for two adjacent values, and value is value to add to fix this
+        for j in range(1, 254):
+
+            if 252 & j != 252 & (j + 1):
+                self.outliers[j] = -1
+
+            elif 252 & j != 252 & (j - 1):
+                self.outliers[j] = 1
 
 
     # satisfies condition such that the LSB of the second message bit is result of the function
@@ -21,6 +34,19 @@ class LSBMR(LSBM, PVD):
         return binary_value[-1]
 
 
+    # computes the first stego pixel from LSBMR embedding
+    def first_pixel_change(self, first_pixel, first_stego_pixel, value):
+
+        # if pixel is outlier do the operation as defined in outliers dict
+        if first_pixel in self.outliers:
+            first_stego_pixel += self.outliers[first_pixel]
+        else:
+            first_stego_pixel = first_pixel + value
+
+        return first_stego_pixel
+
+
+    # embeds message bits in pair of pixels as per LSBMR embedding
     def embed_pixels(self, first_pixel, second_pixel, message_index):
 
         # get inputs and convert
@@ -28,14 +54,21 @@ class LSBMR(LSBM, PVD):
         second_msg_bit = self.message[message_index + 1]
 
         first_pixel_binary = integer_to_binary(first_pixel)
-        second_pixel_binary = integer_to_binary(second_pixel)
+        first_stego_pixel, second_stego_pixel = first_pixel, second_pixel
 
         # LSBMR algorithm
         if first_msg_bit == first_pixel_binary[-1]:
 
             if second_msg_bit != self.binary_function(first_pixel, second_pixel):
-                second_stego_pixel = self.random_increment_or_decrement(second_pixel)
+
+                # if pixel is outlier do the operation as defined in outliers dict
+                if second_pixel in self.outliers:
+                    second_stego_pixel += self.outliers[second_pixel]
+                else:
+                    second_stego_pixel = self.random_increment_or_decrement(second_pixel)
+
             else:
+
                 second_stego_pixel = second_pixel
 
             first_stego_pixel = first_pixel
@@ -43,11 +76,19 @@ class LSBMR(LSBM, PVD):
         else:
 
             if second_msg_bit == self.binary_function(first_pixel - 1, second_pixel):
-                first_stego_pixel = first_pixel - 1
+                first_stego_pixel = self.first_pixel_change(first_pixel, first_stego_pixel, -1)
             else:
-                first_stego_pixel = first_pixel + 1
+                first_stego_pixel = self.first_pixel_change(first_pixel, first_stego_pixel, 1)
 
             second_stego_pixel = second_pixel
+
+        # LSBMR adjustment for masking edges - if the adjustment offsets binary function
+        # add or subtract 3 from first stego pixel to conserve this; keeping 6 MSBs same for masking
+        if second_msg_bit != self.binary_function(first_stego_pixel, second_stego_pixel):
+            if first_stego_pixel > first_pixel:
+                first_stego_pixel = first_pixel + 3
+            else:
+                first_stego_pixel = first_pixel - 3
 
         return first_stego_pixel, second_stego_pixel
 
