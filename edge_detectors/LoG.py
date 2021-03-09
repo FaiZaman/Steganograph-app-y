@@ -18,6 +18,7 @@ class LoG(object):
             if data['detectors'][index]['name'] == 'LoG':
 
                 self.k_size = int(data['detectors'][index]['parameters']['kernel_size'])
+                self.threshold = int(data['detectors'][index]['parameters']['threshold'])
 
 
     # detects edges in the input image
@@ -26,8 +27,22 @@ class LoG(object):
         # mask the LSBs
         masked_image = mask_LSB(image)
 
+        # get image height and width and initialise variables
         height, width = image.shape[0], image.shape[1]
         MSB_image = masked_image.copy()
+        LSBs = '0000000'
+
+        # loop through image
+        for y in range(0, height):
+            for x in range(0, width):
+
+                # get pixel and convert to binary
+                pixel = image[y][x]
+                binary_pixel = integer_to_binary(pixel)
+
+                # set 7 LSBs to 0 to get the MSB image
+                new_binary_pixel = binary_pixel[0] + LSBs
+                MSB_image[y][x] = int(new_binary_pixel, 2)
 
         # blur the image with Gaussian Blur before detecting edges
         blurred_image = cv2.GaussianBlur(MSB_image, (self.k_size, self.k_size), 0)
@@ -39,7 +54,7 @@ class LoG(object):
             for x in range(0, width):
 
                 pixel = edges[y][x]
-                if pixel < 128:
+                if pixel < self.threshold:
                     edges[y][x] = 0
                 else:
                     edges[y][x] = 255

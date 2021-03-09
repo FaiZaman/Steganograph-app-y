@@ -17,6 +17,7 @@ class Sobel(object):
             if data['detectors'][index]['name'] == 'Sobel':
 
                 self.k_size = int(data['detectors'][index]['parameters']['kernel_size'])
+                self.threshold = int(data['detectors'][index]['parameters']['gradient_threshold'])
 
 
     # detects edges in the input image
@@ -41,7 +42,7 @@ class Sobel(object):
                 edges[y][x] = x_gradients[y][x] + y_gradients[y][x]
 
                 # set binary values depending on threshold = 400
-                if edges[y][x] > 400:
+                if edges[y][x] > self.threshold:
                     edges[y][x] = 1
                 else:
                     edges[y][x] = 0
