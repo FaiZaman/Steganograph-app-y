@@ -38,6 +38,16 @@ def binary_to_string(binary_message, delimiter):
     return message
 
 
+# set all the LSBs to zero before detecting edges so same edges are detected in embedding and extraction
+def mask_LSB(image):
+
+    # uses binary 1111100 to AND all pixels in image to reset 2 LSBs to 0
+    mask = np.full(image.shape, 252, np.uint8)
+    masked_image = cv2.bitwise_and(image, mask)
+
+    return masked_image
+
+
 def save_image(save_path, image_name, time_string, stego):
 
     cv2.imwrite(os.path.join(save_path, '{0}_{1}'.format(time_string, image_name)), stego)

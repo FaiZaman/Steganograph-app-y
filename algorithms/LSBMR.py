@@ -10,7 +10,20 @@ class LSBMR(LSBM, PVD):
     def __init__(self, image, message, key, save_path):
 
         super().__init__(image, message, key, save_path)
-        self.pixels = [i for i in range(0, self.num_bytes - 1)]     # [0, 1, 2, ..., num_pixels]
+
+        # initialise pixels = [0, 1, 2, ..., num_pixels] and outliers for masking
+        self.pixels = [i for i in range(0, self.num_bytes - 1)]
+        self.outliers = {}
+
+        # generate the cases where masking the 2 LSBs does not give the same result
+        # for two adjacent values, and value is value to add to fix this
+        for j in range(1, 254):
+
+            if 252 & j != 252 & (j + 1):
+                self.outliers[j] = -1
+
+            elif 252 & j != 252 & (j - 1):
+                self.outliers[j] = 1
 
 
     # satisfies condition such that the LSB of the second message bit is result of the function
@@ -21,6 +34,19 @@ class LSBMR(LSBM, PVD):
         return binary_value[-1]
 
 
+    # computes the first stego pixel from LSBMR embedding
+    def first_pixel_change(self, first_pixel, first_stego_pixel, value):
+
+        # if pixel is outlier do the operation as defined in outliers dict
+        if first_pixel in self.outliers:
+            first_stego_pixel += self.outliers[first_pixel]
+        else:
+            first_stego_pixel = first_pixel + value
+
+        return first_stego_pixel
+
+
+    # embeds message bits in pair of pixels as per LSBMR embedding
     def embed_pixels(self, first_pixel, second_pixel, message_index):
 
         # get inputs and convert
@@ -28,14 +54,21 @@ class LSBMR(LSBM, PVD):
         second_msg_bit = self.message[message_index + 1]
 
         first_pixel_binary = integer_to_binary(first_pixel)
-        second_pixel_binary = integer_to_binary(second_pixel)
+        first_stego_pixel, second_stego_pixel = first_pixel, second_pixel
 
-         # LSBMR algorithm
+        # LSBMR algorithm
         if first_msg_bit == first_pixel_binary[-1]:
 
             if second_msg_bit != self.binary_function(first_pixel, second_pixel):
-                second_stego_pixel = self.random_increment_or_decrement(second_pixel)
+
+                # if pixel is outlier do the operation as defined in outliers dict
+                if second_pixel in self.outliers:
+                    second_stego_pixel += self.outliers[second_pixel]
+                else:
+                    second_stego_pixel = self.random_increment_or_decrement(second_pixel)
+
             else:
+
                 second_stego_pixel = second_pixel
 
             first_stego_pixel = first_pixel
@@ -43,12 +76,20 @@ class LSBMR(LSBM, PVD):
         else:
 
             if second_msg_bit == self.binary_function(first_pixel - 1, second_pixel):
-                first_stego_pixel = first_pixel - 1
+                first_stego_pixel = self.first_pixel_change(first_pixel, first_stego_pixel, -1)
             else:
-                first_stego_pixel = first_pixel + 1
+                first_stego_pixel = self.first_pixel_change(first_pixel, first_stego_pixel, 1)
 
             second_stego_pixel = second_pixel
-        
+
+        # LSBMR adjustment for masking edges - if the adjustment offsets binary function
+        # add or subtract 3 from first stego pixel to conserve this; keeping 6 MSBs same for masking
+        if second_msg_bit != self.binary_function(first_stego_pixel, second_stego_pixel):
+            if first_stego_pixel > first_pixel:
+                first_stego_pixel = first_pixel + 3
+            else:
+                first_stego_pixel = first_pixel - 3
+
         return first_stego_pixel, second_stego_pixel
 
 
@@ -73,28 +114,30 @@ class LSBMR(LSBM, PVD):
             x = index % self.width
             y = index // self.width
 
-            # compute the two-pixel block and the coordinates of the next pixel
-            next_coordinates, block = self.get_pixel_block(x, y)
+            if not(y == self.height - 1 and x == 0) and not(y == self.height - 1 and x == self.width - 1):
 
-            # assigning
-            first_pixel, second_pixel = block[0], block[1]
-            next_x, next_y = next_coordinates[0], next_coordinates[1]
+                # compute the two-pixel block and the coordinates of the next pixel
+                next_coordinates, block = self.get_pixel_block(x, y)
 
-            # check if not 0 or 255 as embedding cannot be performed otherwise
-            if 0 < first_pixel < 255 and 0 < second_pixel < 255:
+                # assigning
+                first_pixel, second_pixel = block[0], block[1]
+                next_x, next_y = next_coordinates[0], next_coordinates[1]
 
-                # use LSBMR embedding and output stego pixels
-                first_stego_pixel, second_stego_pixel =\
-                    self.embed_pixels(first_pixel, second_pixel, message_index)
+                # check if not 0 or 255 as embedding cannot be performed otherwise
+                if 0 < first_pixel < 255 and 0 < second_pixel < 255:
 
-                # reassign new stego pixels and increment message index
-                cover_image[y][x] = first_stego_pixel
-                cover_image[next_y][next_x] = second_stego_pixel
+                    # use LSBMR embedding and output stego pixels
+                    first_stego_pixel, second_stego_pixel =\
+                        self.embed_pixels(first_pixel, second_pixel, message_index)
 
-                message_index += 2
+                    # reassign new stego pixels and increment message index
+                    cover_image[y][x] = first_stego_pixel
+                    cover_image[next_y][next_x] = second_stego_pixel
 
-                if message_index == message_length:
-                    break
+                    message_index += 2
+
+                    if message_index == message_length:
+                        break
 
         # reassign, save, and return stego image
         stego_image = cover_image
@@ -117,17 +160,19 @@ class LSBMR(LSBM, PVD):
             x = index % self.width
             y = index // self.width
 
-            # compute the two-pixel block and the coordinates of the next pixel
-            next_coordinates, stego_block = self.get_pixel_block(x, y)
-            first_stego_pixel, second_stego_pixel = stego_block[0], stego_block[1]
+            if not(y == self.height - 1 and x == 0):
 
-            # extract both bits from the pixel pair
-            first_binary_pixel = integer_to_binary(first_stego_pixel)
-            first_msg_bit = first_binary_pixel[-1]
-            second_msg_bit = self.binary_function(first_stego_pixel, second_stego_pixel)
+                # compute the two-pixel block and the coordinates of the next pixel
+                next_coordinates, stego_block = self.get_pixel_block(x, y)
+                first_stego_pixel, second_stego_pixel = stego_block[0], stego_block[1]
 
-            binary_message += first_msg_bit + second_msg_bit
-        
+                # extract both bits from the pixel pair
+                first_binary_pixel = integer_to_binary(first_stego_pixel)
+                first_msg_bit = first_binary_pixel[-1]
+                second_msg_bit = self.binary_function(first_stego_pixel, second_stego_pixel)
+
+                binary_message += first_msg_bit + second_msg_bit
+
         # extract the original message, save to file, and return
         extracted_message = binary_to_string(binary_message, self.delimiter)
         save_message(self.save_path, self.time_string, extracted_message)

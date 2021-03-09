@@ -12,6 +12,9 @@ from edge_detectors.Canny import Canny
 from edge_detectors.Sobel import Sobel
 from edge_detectors.LoG import LoG
 
+from hybridisation.OR import OR
+from hybridisation.AND import AND
+
 class GraphicalUserInterface(object):
 
     def __init__(self):
@@ -48,6 +51,11 @@ class GraphicalUserInterface(object):
             "Canny": Canny,
             "Sobel": Sobel,
             "LoG": LoG
+        }
+
+        self.combinator_instantiators = {
+            "OR": OR,
+            "AND": AND
         }
 
 
@@ -190,11 +198,11 @@ class GraphicalUserInterface(object):
                 gui.Button('Hybrid Information', size=(18, 1))],
             [gui.Text('_' * 55)],
             [gui.Text('Image file', size=(16, 1)),
-                gui.In(size=(40, 1), enable_events=True, key="cover_image"), 
+                gui.In(size=(40, 1), enable_events=True, key="hybrid_stego_image"), 
                 gui.FileBrowse(file_types=(("Image Files", "*.png"),))],
-            [gui.Text('Secret key', size=(16, 1)), gui.Input(size=(40, 1), key="input_key")],
+            [gui.Text('Secret key', size=(16, 1)), gui.Input(size=(40, 1), key="hybrid_out_key")],
             [gui.Text('Save Folder', size=(16, 1)),
-                gui.In(size=(40, 1), enable_events=True, key="save_folder"),
+                gui.In(size=(40, 1), enable_events=True, key="hybrid_save_folder"),
                 gui.FolderBrowse()],
             [gui.Text('')],
             [gui.Button('Hybrid Extract'), gui.Button('Back to Main Menu')]
@@ -414,7 +422,8 @@ class GraphicalUserInterface(object):
                         
                         window.close()
                         return [self.detector_instantiators[detector_1],\
-                            self.detector_instantiators[detector_2], combinator, cover_file,\
+                            self.detector_instantiators[detector_2],\
+                            self.combinator_instantiators[combinator], cover_file,\
                             message_file, key, save_path, operation]
 
                     if event == 'Back to Main Menu':
@@ -465,6 +474,19 @@ class GraphicalUserInterface(object):
                         self.display_detector_parameters(values, operation, 'Second')
                     if event == 'Hybrid Information':
                         self.display_combinator_information(values, operation)
+                    if event == 'Hybrid Extract':
+                        detector_1, detector_2, combinator, stego_file, key,\
+                            save_path = values['First_output_detector'],\
+                                values['Second_output_detector'], values['output_hybrid'],\
+                                values['hybrid_stego_image'], values['hybrid_out_key'],\
+                                values['hybrid_save_folder']
+
+                        window.close()
+                        return [self.detector_instantiators[detector_1],\
+                            self.detector_instantiators[detector_2],\
+                            self.combinator_instantiators[combinator],\
+                            stego_file, key, save_path, operation]
+
                     if event == 'Back to Main Menu':
                         break
 
