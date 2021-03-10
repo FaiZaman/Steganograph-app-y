@@ -5,10 +5,18 @@ class MSE(object):
     def __init__(self):
 
         self.name = 'Mean Squared Error'
-        self.mean_squared_error = 0
+        self.error = 0
 
 
-    def calculate_error(self, cover_image, stego_image):
+    # calculates the mean squared error between cover and stego pixel
+    def calculate_pixel_error(self, cover_pixel, stego_pixel):
+
+        pixel_error = (abs(stego_pixel - cover_pixel)) ** 2
+        return pixel_error
+
+
+    # calculates the mean squared error between cover and stego images
+    def calculate_image_error(self, cover_image, stego_image):
 
         # initalise dimensions
         height, width = cover_image.shape[0], cover_image.shape[1]
@@ -23,20 +31,21 @@ class MSE(object):
                 stego_pixel = stego_image[y][x]
 
                 # calculate error for current pixel
-                pixel_error = (abs(int(stego_pixel) - int(cover_pixel))) ** 2
-                self.mean_squared_error += pixel_error
+                pixel_error = self.calculate_pixel_error(int(cover_pixel), int(stego_pixel))
+                self.error += pixel_error
 
         # normalise the error and return
-        normalised_error = self.mean_squared_error / normalisation_factor
+        normalised_error = self.error / normalisation_factor
         return normalised_error
 
-"""
+
 MSE = MSE()
 cover_path = 'C:/Users/faizz/University Work/Year 4/Advanced Project/Images/Cover/Lena.png'
+stego_path = 'C:/Users/faizz/University Work/Year 4/Advanced Project/Images/Stego/2021_03_09_13;55_Lena.png'
 
 cover = cv2.imread(cover_path, cv2.IMREAD_GRAYSCALE)
 stego = cv2.imread(stego_path, cv2.IMREAD_GRAYSCALE)
 
-error = MSE.calculate_error(cover, stego)
+error = MSE.calculate_image_error(cover, stego)
 print(error)
-"""
+
