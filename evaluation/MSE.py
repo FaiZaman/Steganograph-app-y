@@ -1,6 +1,6 @@
 import cv2
 
-class MSE(object):
+class MSE():
 
     def __init__(self):
 
@@ -37,8 +37,15 @@ class MSE(object):
         # normalise the error and return
         normalised_error = self.error / normalisation_factor
         return normalised_error
+    
 
+    # gets the MSE
+    def get_error(self, cover_image, stego_image):
 
+        mean_squared_error = self.calculate_image_error(cover_image, stego_image)
+        return mean_squared_error
+
+"""
 MSE = MSE()
 cover_path = 'C:/Users/faizz/University Work/Year 4/Advanced Project/Images/Cover/Lena.png'
 stego_path = 'C:/Users/faizz/University Work/Year 4/Advanced Project/Images/Stego/2021_03_09_13;55_Lena.png'
@@ -46,6 +53,6 @@ stego_path = 'C:/Users/faizz/University Work/Year 4/Advanced Project/Images/Steg
 cover = cv2.imread(cover_path, cv2.IMREAD_GRAYSCALE)
 stego = cv2.imread(stego_path, cv2.IMREAD_GRAYSCALE)
 
-error = MSE.calculate_image_error(cover, stego)
+error = MSE.get_error(cover, stego)
 print(error)
-
+"""

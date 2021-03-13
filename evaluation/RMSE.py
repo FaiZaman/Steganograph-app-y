@@ -1,5 +1,6 @@
+import cv2
 import math
-from evaluation.MSE import MSE
+from MSE import MSE
 
 class RMSE(MSE):
 
@@ -9,13 +10,12 @@ class RMSE(MSE):
         self.name = "Root Mean Squared Error"
 
 
-    # calculates the root mean squared error between cover and stego pixel
-    def calculate_pixel_error(self, cover_pixel, stego_pixel):
+    def get_error(self, cover_image, stego_image):
 
-        pixel_error = (abs(stego_pixel - cover_pixel)) ** 2
-        root_pixel_error = math.floor(pixel_error)
+        mean_squared_error = self.calculate_image_error(cover_image, stego_image)
+        root_mean_squared_error = math.sqrt(mean_squared_error)
+        return root_mean_squared_error
 
-        return root_pixel_error
 
 RMSE = RMSE()
 cover_path = 'C:/Users/faizz/University Work/Year 4/Advanced Project/Images/Cover/Lena.png'
@@ -24,5 +24,5 @@ stego_path = 'C:/Users/faizz/University Work/Year 4/Advanced Project/Images/Steg
 cover = cv2.imread(cover_path, cv2.IMREAD_GRAYSCALE)
 stego = cv2.imread(stego_path, cv2.IMREAD_GRAYSCALE)
 
-error = RMSE.calculate_image_error(cover, stego)
+error = RMSE.get_error(cover, stego)
 print(error)
