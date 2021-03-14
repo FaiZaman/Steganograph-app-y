@@ -1,11 +1,13 @@
 import os
 import cv2
 import numpy as np
+from unidecode import unidecode
 
 # convert any message to a binary string
 def message_to_binary(message):
 
-    binary_message = ''.join(format(ord(char), '08b') for char in message)
+    ascii_message = unidecode(message)
+    binary_message = ''.join(format(ord(char), '08b') for char in ascii_message)
     return binary_message
 
 

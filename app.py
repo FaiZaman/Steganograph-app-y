@@ -21,7 +21,7 @@ def read_files(image_file, message_file):
 
     image_data = read_image(image_file)
 
-    message_file = open(message_file, "r")
+    message_file = open(message_file, "r", encoding='utf-8')
     message = message_file.read()
     message_file.close()
 

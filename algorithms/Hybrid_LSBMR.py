@@ -102,7 +102,9 @@ class Hybrid_LSBMR(LSBMR):
             first_stego_pixel, second_stego_pixel = stego_block[0], stego_block[1]
             next_x, next_y = next_coordinates[0], next_coordinates[1]
 
-            if (y, x) not in embedded_coordinates and (next_y, next_x) not in embedded_coordinates:
+            if (y, x) not in embedded_coordinates and (next_y, next_x) not in embedded_coordinates\
+                and not(y == self.height - 1 and x == 0)\
+                and not(y == self.height - 1 and x == self.width - 1):
 
                 # extract both bits from the pixel pair
                 first_binary_pixel = integer_to_binary(first_stego_pixel)
