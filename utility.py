@@ -40,6 +40,24 @@ def binary_to_string(binary_message, delimiter):
     return message
 
 
+def is_message_complete(binary_message, delimiter):
+
+    # split into bytes
+    message_bytes = [binary_message[i : i + 8] for i in range(0, len(binary_message), 8)]
+    message = ""
+
+    # convert each byte and append to message
+    for byte in message_bytes:
+
+        char = chr(int(byte, 2))
+        message += char
+
+    # if delimiter is in message then it is complete
+    if delimiter in message:
+        return True
+    return False
+
+
 # set all the LSBs to zero before detecting edges so same edges are detected in embedding and extraction
 def mask_LSB(image):
 

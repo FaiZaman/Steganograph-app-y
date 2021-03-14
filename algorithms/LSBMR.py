@@ -2,8 +2,8 @@ import math
 import random
 from algorithms.LSBM import LSBM
 from algorithms.PVD import PVD
-from utility import message_to_binary, integer_to_binary, binary_to_string,\
-                    save_image, save_message
+from utility import message_to_binary, is_message_complete, integer_to_binary,\
+                    binary_to_string, save_image, save_message
 
 class LSBMR(LSBM, PVD):
 
@@ -168,10 +168,6 @@ class LSBMR(LSBM, PVD):
             x = index % self.width
             y = index // self.width
 
-            counter += 1
-            if counter % 1000 == 0:
-                print(counter)
-
             # compute the two-pixel block and the coordinates of the next pixel
             next_coordinates, stego_block = self.get_pixel_block(x, y)
             first_stego_pixel, second_stego_pixel = stego_block[0], stego_block[1]
@@ -190,6 +186,11 @@ class LSBMR(LSBM, PVD):
 
                 embedded_coordinates.append((y, x))
                 embedded_coordinates.append((next_y, next_x))
+
+                if counter % 5000 == 0:
+                    if is_message_complete(binary_message, self.delimiter):
+                        break
+                counter += 1
 
         # extract the original message, save to file, and return
         extracted_message = binary_to_string(binary_message, self.delimiter)

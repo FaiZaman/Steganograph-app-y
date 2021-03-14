@@ -1,6 +1,7 @@
 import random
 from algorithms.LSBMR import LSBMR
-from utility import integer_to_binary, message_to_binary, binary_to_string, save_image, save_message
+from utility import integer_to_binary, message_to_binary, is_message_complete,\
+                    binary_to_string, save_image, save_message
 
 class Hybrid_LSBMR(LSBMR):
 
@@ -89,6 +90,7 @@ class Hybrid_LSBMR(LSBMR):
         # initialise message and embedded coordinates list
         binary_message = ""
         embedded_coordinates = []
+        counter = 0
 
         # get the edge coordinates from the hybrid edge areas and pseudorandom embedding path
         edge_coordinates = self.get_edge_coordinates()
@@ -115,6 +117,11 @@ class Hybrid_LSBMR(LSBMR):
 
                 embedded_coordinates.append((y, x))
                 embedded_coordinates.append((next_y, next_x))
+
+                if counter % 5000 == 0:
+                    if is_message_complete(binary_message, self.delimiter):
+                        break
+                counter += 1
 
         # extract the original message, save to file, and return
         extracted_message = binary_to_string(binary_message, self.delimiter)
