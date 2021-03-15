@@ -131,9 +131,6 @@ class LSBMR(LSBM, PVD):
                     first_stego_pixel, second_stego_pixel =\
                         self.embed_pixels(first_pixel, second_pixel, message_index)
 
-                    if first_stego_pixel == 128 and second_stego_pixel == 144:
-                        print(y, x, next_y, next_x)
-
                     # reassign new stego pixels and increment message index
                     cover_image[y][x] = first_stego_pixel
                     cover_image[next_y][next_x] = second_stego_pixel
