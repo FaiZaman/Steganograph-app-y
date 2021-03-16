@@ -2,8 +2,8 @@ import math
 import random
 import numpy as np
 from datetime import datetime
-from utility import message_to_binary, integer_to_binary, binary_to_string, save_image,\
-                    save_message
+from utility import message_to_binary, integer_to_binary, binary_to_string,\
+                    is_message_complete, save_image, save_message
 
 class PVD():
 
@@ -12,7 +12,7 @@ class PVD():
         self.image_name = image[0]
         self.image = image[1]
         self.delimiter = "-----"
-        self.message = message + self.delimiter
+        self.message = message + self.delimiter + '-'
         self.save_path = save_path
 
         # get dimensions of image
@@ -57,8 +57,10 @@ class PVD():
             else:       # go down a row
                 y += 1
 
+        # set return values
         next_pixel = self.image[y][x]
         block = (x, y), (current_pixel, next_pixel)
+
         return block
 
 
@@ -126,7 +128,10 @@ class PVD():
         cover_image = self.image  # so image is not modified
         x = y = 0
 
+        # keep track of the coordinates embedded in and whether all data has been embedded
         all_data_embedded = False
+        embedded_coordinates = []
+
         for index in path:
 
             # get pixel coordinates based on index
@@ -137,41 +142,48 @@ class PVD():
             next_coordinates, block = self.get_pixel_block(x, y)
             next_x, next_y = next_coordinates[0], next_coordinates[1]
 
-            # get difference value and compute 
-            difference_value = abs(int(block[1]) - int(block[0]))
-            lower, upper = self.get_range_bounds(difference_value)
+            # check if this is not the last pixel in the image and that it has not already been embedded
+            if (y, x) not in embedded_coordinates and (next_y, next_x) not in embedded_coordinates\
+                and not(y == self.height - 1 and x == 0)\
+                and not(y == self.height - 1 and x == self.width - 1):
 
-            # calculate range width and check if the block causes fall off
-            range_width = upper - lower + 1
-            fall_off = self.check_fall_off(block, upper, difference_value)
+                # get difference value and compute 
+                difference_value = abs(int(block[1]) - int(block[0]))
+                lower, upper = self.get_range_bounds(difference_value)
 
-            if not fall_off:
+                # calculate range width and check if the block causes fall off
+                range_width = upper - lower + 1
+                fall_off = self.check_fall_off(block, upper, difference_value)
 
-                # get the number of bits that can be embedded in this block based on range width
-                num_bits = int(math.log(range_width, 2))
-                new_message_index = message_index + num_bits
+                if not fall_off:
 
-                # check for the index surpassing the whole message: if so, everything embedded
-                if new_message_index > message_length:
-                    all_data_embedded = True
-                    new_message_index = message_length
+                    # get the number of bits that can be embedded in this block based on range width
+                    num_bits = int(math.log(range_width, 2))
+                    new_message_index = message_index + num_bits
 
-                message_bits = self.message[message_index : new_message_index]
+                    # check for the index surpassing the whole message: if so, everything embedded
+                    if new_message_index > message_length:
 
-                # compute new difference as m & get embedded block based off inverse calculation
-                new_difference = lower + int(message_bits, 2)
-                m = abs(new_difference - difference_value)
+                        all_data_embedded = True
+                        new_message_index = message_length
 
-                # calculate new embedded block values and reassign to stego image
-                embedded_block = self.inverse_calculation\
-                    (block, m, difference_value, new_difference)
-                cover_image[y][x] = embedded_block[0]
-                cover_image[next_y][next_x] = embedded_block[1]
+                    # compute new difference as m & get embedded block based off inverse calculation
+                    message_bits = self.message[message_index : new_message_index]
+                    new_difference = lower + int(message_bits, 2)
+                    m = abs(new_difference - difference_value)
 
-                message_index = new_message_index   # increment index by num_bits
+                    # calculate new embedded block values and reassign to stego image
+                    embedded_block = self.inverse_calculation(block, m, difference_value, new_difference)
+                    cover_image[y][x] = embedded_block[0]
+                    cover_image[next_y][next_x] = embedded_block[1]
 
-                if all_data_embedded or message_index == message_length:
-                    break
+                    # add current pair of coordinates to the embedded coordinates list
+                    embedded_coordinates.append((y, x))
+                    embedded_coordinates.append((next_y, next_x))
+                    message_index = new_message_index   # increment index by num_bits
+
+                    if all_data_embedded or message_index == message_length:
+                        break
 
         # reassign, save, and return stego image
         stego_image = cover_image
@@ -187,6 +199,10 @@ class PVD():
         binary_message = ""
         path = random.sample(self.pixels, self.num_bytes - 1)
 
+        # keep track of the coordinates embedded in and initialise a counter
+        embedded_coordinates = []
+        counter = 0
+
         # loop through image pixel blocks
         for index in path:
 
@@ -196,23 +212,40 @@ class PVD():
 
             # retrieve block and difference value between stego pixels in block
             next_coordinates, stego_block = self.get_pixel_block(x, y)
+            next_x, next_y = next_coordinates[0], next_coordinates[1]
             difference_value = abs(int(stego_block[1]) - int(stego_block[0]))
 
-            # get bounds and calculate range width within which difference falls into
-            lower, upper = self.get_range_bounds(difference_value)
-            range_width = upper - lower + 1
+            # check if this is not the last pixel in the image and that it has not already been embedded
+            if (y, x) not in embedded_coordinates and (next_y, next_x) not in embedded_coordinates\
+                and not(y == self.height - 1 and x == 0)\
+                and not(y == self.height - 1 and x == self.width - 1):
 
-            # check for fall off and extract if not
-            fall_off = self.check_fall_off(stego_block, upper, difference_value)
-            if not fall_off:
+                # get bounds and calculate range width within which difference falls into
+                lower, upper = self.get_range_bounds(difference_value)
+                range_width = upper - lower + 1
 
-                # compute the bits embedded into the difference value
-                message_integer_value = difference_value - lower
-                embedded_bits = integer_to_binary(message_integer_value)
+                # check for fall off and extract if not
+                fall_off = self.check_fall_off(stego_block, upper, difference_value)
+                if not fall_off:
 
-                # calculate the number of bits and retrieve from the bits embedded
-                num_bits = int(math.log(range_width, 2))
-                binary_message += embedded_bits[-num_bits:]
+                    # compute the bits embedded into the difference value
+                    message_integer_value = difference_value - lower
+                    embedded_bits = integer_to_binary(message_integer_value)
+
+                    # calculate the number of bits and retrieve from the bits embedded
+                    num_bits = int(math.log(range_width, 2))
+                    binary_message += embedded_bits[-num_bits:]
+
+                    # add current pair of coordinates to the embedded coordinates list
+                    embedded_coordinates.append((y, x))
+                    embedded_coordinates.append((next_y, next_x))
+
+                    # check every 5000 iterations if the message is in the extracted bits so far
+                    # in order to speed up the algorithm
+                    if counter % 5000 == 0:
+                        if is_message_complete(binary_message, self.delimiter):
+                            break
+                    counter += 1
 
         # extract the original message, save to file, and return
         extracted_message = binary_to_string(binary_message, self.delimiter)

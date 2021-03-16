@@ -21,8 +21,8 @@ class LSB():
         self.num_bytes = self.width * self.height   # total number of pixels in image
 
         # set PseudoRandom Number Generator seed as secret key + generate list of pixel indices
-        random.seed(key)
         self.pixels = [i for i in range(0, self.num_bytes)]     # [0, 1, 2, ..., num_pixels]
+        random.seed(key)
 
         self.time_string = "{:%Y_%m_%d_%H;%M}".format(datetime.now())
 
@@ -38,7 +38,7 @@ class LSB():
 
         return embedded_pixel
 
-    
+
     # generates pixel path through image and sends pixels to be embedded with message data
     def embed_image(self):
 
@@ -51,11 +51,13 @@ class LSB():
             raise ValueError("The message is too large for the image.")
 
         # get a random path based on seed through the pixels
-        path = random.sample(self.pixels, message_length)
+        path = random.sample(self.pixels, self.num_bytes)
         cover_image = self.image    # so image is not modified
 
         # loop through image pixels in pseudorandom order based on secret key
-        for index in path:
+        for i in range(0, len(path)):
+
+            index = path[i]
 
             # get pixel coordinates based on index
             x = index % self.width
@@ -73,6 +75,9 @@ class LSB():
             cover_image[y][x] = embedded_pixel
             message_index += 1
 
+            if message_index == message_length:
+                break
+
         # reassign and save image
         stego_image = cover_image
         save_image(self.save_path, self.image_name, self.time_string, stego_image)
@@ -87,9 +92,10 @@ class LSB():
         path = random.sample(self.pixels, self.num_bytes)
 
         # loop through image pixels
-        for index in path:
+        for i in range(0, len(path)):
 
             # get pixel coordinates based on index
+            index = path[i]
             x = index % self.width
             y = index // self.width
 

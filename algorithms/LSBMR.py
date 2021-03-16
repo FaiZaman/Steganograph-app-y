@@ -2,8 +2,8 @@ import math
 import random
 from algorithms.LSBM import LSBM
 from algorithms.PVD import PVD
-from utility import message_to_binary, integer_to_binary, binary_to_string,\
-                    save_image, save_message
+from utility import message_to_binary, is_message_complete, integer_to_binary,\
+                    binary_to_string, save_image, save_message
 
 class LSBMR(LSBM, PVD):
 
@@ -108,23 +108,27 @@ class LSBMR(LSBM, PVD):
         cover_image = self.image  # so image is not modified
         x = y = 0
 
+        # to keep track of the coordinates embedded in
+        embedded_coordinates = []
+
         for index in path:
 
             # get pixel coordinates based on index
             x = index % self.width
             y = index // self.width
 
-            if not(y == self.height - 1 and x == 0) and not(y == self.height - 1 and x == self.width - 1):
+            # compute the two-pixel block and the coordinates of the next pixel
+            next_coordinates, block = self.get_pixel_block(x, y)
+            first_pixel, second_pixel = block[0], block[1]
+            next_x, next_y = next_coordinates[0], next_coordinates[1]
 
-                # compute the two-pixel block and the coordinates of the next pixel
-                next_coordinates, block = self.get_pixel_block(x, y)
+            # check if not 0 or 255 as embedding cannot be performed otherwise
+            if 0 < first_pixel < 255 and 0 < second_pixel < 255:
 
-                # assigning
-                first_pixel, second_pixel = block[0], block[1]
-                next_x, next_y = next_coordinates[0], next_coordinates[1]
-
-                # check if not 0 or 255 as embedding cannot be performed otherwise
-                if 0 < first_pixel < 255 and 0 < second_pixel < 255:
+                # check if this is not the last pixel in the image and that it has not already been embedded
+                if (y, x) not in embedded_coordinates and (next_y, next_x) not in embedded_coordinates\
+                    and not(y == self.height - 1 and x == 0)\
+                    and not(y == self.height - 1 and x == self.width - 1):
 
                     # use LSBMR embedding and output stego pixels
                     first_stego_pixel, second_stego_pixel =\
@@ -134,6 +138,9 @@ class LSBMR(LSBM, PVD):
                     cover_image[y][x] = first_stego_pixel
                     cover_image[next_y][next_x] = second_stego_pixel
 
+                    # add current pair of coordinates to the embedded coordinates list and increment index
+                    embedded_coordinates.append((y, x))
+                    embedded_coordinates.append((next_y, next_x))
                     message_index += 2
 
                     if message_index == message_length:
@@ -151,7 +158,9 @@ class LSBMR(LSBM, PVD):
 
         # initialise message and same pseudorandom embedding path
         binary_message = ""
+        embedded_coordinates = []
         path = random.sample(self.pixels, self.num_bytes - 1)
+        counter = 0
 
         # loop through image pixel blocks
         for index in path:
@@ -160,18 +169,31 @@ class LSBMR(LSBM, PVD):
             x = index % self.width
             y = index // self.width
 
-            if not(y == self.height - 1 and x == 0):
+            # compute the two-pixel block and the coordinates of the next pixel
+            next_coordinates, stego_block = self.get_pixel_block(x, y)
+            first_stego_pixel, second_stego_pixel = stego_block[0], stego_block[1]
+            next_x, next_y = next_coordinates[0], next_coordinates[1]
 
-                # compute the two-pixel block and the coordinates of the next pixel
-                next_coordinates, stego_block = self.get_pixel_block(x, y)
-                first_stego_pixel, second_stego_pixel = stego_block[0], stego_block[1]
+            if (y, x) not in embedded_coordinates and (next_y, next_x) not in embedded_coordinates\
+                and not(y == self.height - 1 and x == 0)\
+                and not(y == self.height - 1 and x == self.width - 1):
 
                 # extract both bits from the pixel pair
                 first_binary_pixel = integer_to_binary(first_stego_pixel)
                 first_msg_bit = first_binary_pixel[-1]
                 second_msg_bit = self.binary_function(first_stego_pixel, second_stego_pixel)
 
+                # append to message and add current pair of coordinates to the embedded coordinates list
                 binary_message += first_msg_bit + second_msg_bit
+                embedded_coordinates.append((y, x))
+                embedded_coordinates.append((next_y, next_x))
+
+                # check every 5000 iterations if the message is in the extracted bits so far
+                # in order to speed up the algorithm
+                if counter % 5000 == 0:
+                    if is_message_complete(binary_message, self.delimiter):
+                        break
+                counter += 1
 
         # extract the original message, save to file, and return
         extracted_message = binary_to_string(binary_message, self.delimiter)

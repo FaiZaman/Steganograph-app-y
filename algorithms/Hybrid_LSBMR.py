@@ -1,6 +1,7 @@
 import random
 from algorithms.LSBMR import LSBMR
-from utility import integer_to_binary, message_to_binary, binary_to_string, save_image, save_message
+from utility import integer_to_binary, message_to_binary, is_message_complete,\
+                    binary_to_string, save_image, save_message
 
 class Hybrid_LSBMR(LSBMR):
 
@@ -69,6 +70,7 @@ class Hybrid_LSBMR(LSBMR):
                     cover_image[y][x] = first_stego_pixel
                     cover_image[next_y][next_x] = second_stego_pixel
 
+                    # add current pair of coordinates to the embedded coordinates list and increment index
                     embedded_coordinates.append((y, x))
                     embedded_coordinates.append((next_y, next_x))
                     message_index += 2
@@ -89,6 +91,7 @@ class Hybrid_LSBMR(LSBMR):
         # initialise message and embedded coordinates list
         binary_message = ""
         embedded_coordinates = []
+        counter = 0
 
         # get the edge coordinates from the hybrid edge areas and pseudorandom embedding path
         edge_coordinates = self.get_edge_coordinates()
@@ -102,17 +105,26 @@ class Hybrid_LSBMR(LSBMR):
             first_stego_pixel, second_stego_pixel = stego_block[0], stego_block[1]
             next_x, next_y = next_coordinates[0], next_coordinates[1]
 
-            if (y, x) not in embedded_coordinates and (next_y, next_x) not in embedded_coordinates:
+            if (y, x) not in embedded_coordinates and (next_y, next_x) not in embedded_coordinates\
+                and not(y == self.height - 1 and x == 0)\
+                and not(y == self.height - 1 and x == self.width - 1):
 
                 # extract both bits from the pixel pair
                 first_binary_pixel = integer_to_binary(first_stego_pixel)
                 first_msg_bit = first_binary_pixel[-1]
                 second_msg_bit = self.binary_function(first_stego_pixel, second_stego_pixel)
 
+                # append to message and add current pair of coordinates to the embedded coordinates list
                 binary_message += first_msg_bit + second_msg_bit
-
                 embedded_coordinates.append((y, x))
                 embedded_coordinates.append((next_y, next_x))
+
+                # check every 5000 iterations if the message is in the extracted bits so far
+                # in order to speed up the algorithm
+                if counter % 5000 == 0:
+                    if is_message_complete(binary_message, self.delimiter):
+                        break
+                counter += 1
 
         # extract the original message, save to file, and return
         extracted_message = binary_to_string(binary_message, self.delimiter)
