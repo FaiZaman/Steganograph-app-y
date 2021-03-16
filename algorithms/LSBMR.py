@@ -107,6 +107,8 @@ class LSBMR(LSBM, PVD):
         path = random.sample(self.pixels, self.num_bytes - 1)
         cover_image = self.image  # so image is not modified
         x = y = 0
+
+        # to keep track of the coordinates embedded in
         embedded_coordinates = []
 
         for index in path:
@@ -123,6 +125,7 @@ class LSBMR(LSBM, PVD):
             # check if not 0 or 255 as embedding cannot be performed otherwise
             if 0 < first_pixel < 255 and 0 < second_pixel < 255:
 
+                # check if this is not the last pixel in the image and that it has not already been embedded
                 if (y, x) not in embedded_coordinates and (next_y, next_x) not in embedded_coordinates\
                     and not(y == self.height - 1 and x == 0)\
                     and not(y == self.height - 1 and x == self.width - 1):
@@ -135,6 +138,7 @@ class LSBMR(LSBM, PVD):
                     cover_image[y][x] = first_stego_pixel
                     cover_image[next_y][next_x] = second_stego_pixel
 
+                    # add current pair of coordinates to the embedded coordinates list and increment index
                     embedded_coordinates.append((y, x))
                     embedded_coordinates.append((next_y, next_x))
                     message_index += 2
@@ -179,11 +183,13 @@ class LSBMR(LSBM, PVD):
                 first_msg_bit = first_binary_pixel[-1]
                 second_msg_bit = self.binary_function(first_stego_pixel, second_stego_pixel)
 
+                # append to message and add current pair of coordinates to the embedded coordinates list
                 binary_message += first_msg_bit + second_msg_bit
-
                 embedded_coordinates.append((y, x))
                 embedded_coordinates.append((next_y, next_x))
 
+                # check every 5000 iterations if the message is in the extracted bits so far
+                # in order to speed up the algorithm
                 if counter % 5000 == 0:
                     if is_message_complete(binary_message, self.delimiter):
                         break

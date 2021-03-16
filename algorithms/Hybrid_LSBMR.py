@@ -70,6 +70,7 @@ class Hybrid_LSBMR(LSBMR):
                     cover_image[y][x] = first_stego_pixel
                     cover_image[next_y][next_x] = second_stego_pixel
 
+                    # add current pair of coordinates to the embedded coordinates list and increment index
                     embedded_coordinates.append((y, x))
                     embedded_coordinates.append((next_y, next_x))
                     message_index += 2
@@ -113,11 +114,13 @@ class Hybrid_LSBMR(LSBMR):
                 first_msg_bit = first_binary_pixel[-1]
                 second_msg_bit = self.binary_function(first_stego_pixel, second_stego_pixel)
 
+                # append to message and add current pair of coordinates to the embedded coordinates list
                 binary_message += first_msg_bit + second_msg_bit
-
                 embedded_coordinates.append((y, x))
                 embedded_coordinates.append((next_y, next_x))
 
+                # check every 5000 iterations if the message is in the extracted bits so far
+                # in order to speed up the algorithm
                 if counter % 5000 == 0:
                     if is_message_complete(binary_message, self.delimiter):
                         break
