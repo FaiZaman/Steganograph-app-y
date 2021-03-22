@@ -70,7 +70,6 @@ def mask_LSB(image):
 
 def save_image(save_path, image_name, time_string, stego):
 
-    print(image_name)
     cv2.imwrite(os.path.join(save_path, image_name), stego)
 
 

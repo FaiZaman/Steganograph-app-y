@@ -1,13 +1,18 @@
 import cv2
 from MSE import MSE
+from PSNR import PSNR
 
-# initialise paths and error metrics
+# initialise paths
 cover_dataset_path = "C:/Users/faizz/University Work/Year 4/Advanced Project/Dataset/BOSSbase (Cover)/"
 stego_dataset_path = "C:/Users/faizz/University Work/Year 4/Advanced Project/Dataset/BOSSbase (Stego)/"
 extension = ".pgm"
 
+# initalise error metrics and parameters
 MSE = MSE()
-
+PSNR = PSNR()
+total_mse = 0
+total_psnr = 0
+num_images = 10000
 
 # loop through image files
 for filename in range(1, 10001):
@@ -21,5 +26,16 @@ for filename in range(1, 10001):
     stego_path = stego_dataset_path + filename_string
     stego = cv2.imread(stego_path, cv2.IMREAD_GRAYSCALE)
 
-    error = MSE.get_error(cover, stego)
-    print(error)
+    mean_squared_error = MSE.get_error(cover, stego)
+    psnr = PSNR.get_error(cover, stego, mean_squared_error)
+
+    total_mse += mean_squared_error
+    total_psnr += psnr
+
+    print(filename, mean_squared_error, psnr)
+
+average_mse = total_mse / num_images
+average_psnr = total_psnr / num_images
+
+print(average_mse)
+print(average_psnr)
