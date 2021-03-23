@@ -30,8 +30,9 @@ def generate():
         cover_image = cv2.imread(cover_path, cv2.IMREAD_GRAYSCALE)
         cover_data = (filename_string, cover_image)
 
-        LSB_algorithm = LSB(cover_data, message, key, save_path)
-        LSB_algorithm.embed_image()
+        # initialise algorithm and embed data
+        LSBM_algorithm = LSBM(cover_data, message, key, save_path)
+        LSBM_algorithm.embed_image()
 
         print(filename)
 
@@ -49,22 +50,10 @@ def validate():
         stego_image = cv2.imread(stego_path, cv2.IMREAD_GRAYSCALE)
         stego_data = (filename_string, stego_image)
 
-        LSB_algorithm = LSB(stego_data, message, key, save_path)
-        message = LSB_algorithm.extract()
+        # initialise algorithm and extract data
+        LSBM_algorithm = LSBM(stego_data, message, key, save_path)
+        message = LSBM_algorithm.extract()
 
         print(message)
 
 generate()
-
-"""
-PSNR = PSNR()
-cover_path = 'C:/Users/faizz/University Work/Year 4/Advanced Project/Images/Cover/Lena.png'
-stego_path = 
-'C:/Users/faizz/University Work/Year 4/Advanced Project/Images/Stego/2021_03_09_13;55_Lena.png'
-
-cover = cv2.imread(cover_path, cv2.IMREAD_GRAYSCALE)
-stego = cv2.imread(stego_path, cv2.IMREAD_GRAYSCALE)
-
-error = PSNR.get_error(cover, stego)
-print(error)
-"""
