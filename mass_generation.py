@@ -1,6 +1,7 @@
 import cv2
 from algorithms.LSB import LSB
 from algorithms.LSBM import LSBM
+from algorithms.LSBMR import LSBMR
 
 # initialise dataset strings
 dataset_path = "C:/Users/faizz/University Work/Year 4/Advanced Project/Dataset/BOSSbase (Cover)/"
@@ -31,8 +32,8 @@ def generate():
         cover_data = (filename_string, cover_image)
 
         # initialise algorithm and embed data
-        LSBM_algorithm = LSBM(cover_data, message, key, save_path)
-        LSBM_algorithm.embed_image()
+        LSBMR_algorithm = LSBMR(cover_data, message, key, save_path)
+        LSBMR_algorithm.embed_image()
 
         print(filename)
 

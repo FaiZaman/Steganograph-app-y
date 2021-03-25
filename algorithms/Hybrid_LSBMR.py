@@ -12,9 +12,11 @@ class Hybrid_LSBMR(LSBMR):
 
 
     # retrieves coordinates in image of locations where edges present based on hybrid edges map
-    def get_edge_coordinates(self):
+    def get_coordinates(self):
 
-        edge_coordinates = []   # initialise edge coordinates list
+        # initialise coordinate lists
+        edge_coordinates = []
+        non_edge_coordinates = []
 
         # loop through the image
         for y in range(0, self.height):
@@ -23,28 +25,15 @@ class Hybrid_LSBMR(LSBMR):
                 # add coordinate to list if there is edge present
                 if self.hybrid_edges[y][x] == 255:
                     edge_coordinates.append((y, x))
+                else:
+                    non_edge_coordinates.append((y, x))
 
-        return edge_coordinates
+        return edge_coordinates, non_edge_coordinates
 
 
-    # generates pixel path through edge coordinates
-    def embed_image(self):
+    def embed_path(self, path, message_length, cover_image, embedded):
 
-        self.message = message_to_binary(self.message)
         message_index = 0
-        message_length = len(self.message)
-
-        # get the edge coordinates from the hybrid edge areas and initialise embedded coordinates list
-        edge_coordinates = self.get_edge_coordinates()
-        num_edge_coordinates = len(edge_coordinates)
-        embedded_coordinates = []
-
-        if message_length > num_edge_coordinates * 2:
-            raise ValueError("The message is too large for the image.")
-
-        # get a random path based on seed through the edge pixels
-        path = random.sample(edge_coordinates, num_edge_coordinates)
-        cover_image = self.image  # so image is not modified
 
         for (y, x) in path:
 
@@ -58,7 +47,8 @@ class Hybrid_LSBMR(LSBMR):
             # check if not 0 or 255 as embedding cannot be performed otherwise
             if 0 < first_pixel < 255 and 0 < second_pixel < 255:
 
-                if (y, x) not in embedded_coordinates and (next_y, next_x) not in embedded_coordinates\
+                if (y, x) not in self.embedded_coordinates\
+                    and (next_y, next_x) not in self.embedded_coordinates\
                     and not(y == self.height - 1 and x == 0)\
                     and not(y == self.height - 1 and x == self.width - 1):
 
@@ -71,15 +61,41 @@ class Hybrid_LSBMR(LSBMR):
                     cover_image[next_y][next_x] = second_stego_pixel
 
                     # add current pair of coordinates to the embedded coordinates list and increment index
-                    embedded_coordinates.append((y, x))
-                    embedded_coordinates.append((next_y, next_x))
+                    self.embedded_coordinates.append((y, x))
+                    self.embedded_coordinates.append((next_y, next_x))
                     message_index += 2
 
+                    # if the whole message was embedded we can check this later
                     if message_index == message_length:
+                        embedded = True
                         break
+        
+        return cover_image, embedded
+
+
+    # generates pixel path through edge coordinates
+    def embed_image(self):
+
+        self.message = message_to_binary(self.message)
+        message_length = len(self.message)
+
+        # get the edge coordinates from the hybrid edge areas and initialise embedded coordinates list
+        edge_coordinates, non_edge_coordinates = self.get_coordinates()
+        num_edge_coordinates = len(edge_coordinates)
+        self.embedded_coordinates = []
+
+        if message_length > self.num_bytes:
+            raise ValueError("The message is too large for the image.")
+
+        # get a random path based on seed through the edge pixels
+        edge_path = random.sample(edge_coordinates, num_edge_coordinates)
+        cover_image = self.image  # so image is not modified
+
+        # embeds based on the edge path
+        embedded = False
+        cover_image, embedded = self.embed_path(path, message_length, cover_image, embedded)
 
         # reassign, save, and return stego image
-        stego_image = cover_image
         save_image(self.save_path, self.image_name, self.time_string, stego_image)
 
         return stego_image
@@ -94,7 +110,7 @@ class Hybrid_LSBMR(LSBMR):
         counter = 0
 
         # get the edge coordinates from the hybrid edge areas and pseudorandom embedding path
-        edge_coordinates = self.get_edge_coordinates()
+        edge_coordinates, non_edge_coordinates = self.get_coordinates()
         num_edge_coordinates = len(edge_coordinates)
         path = random.sample(edge_coordinates, num_edge_coordinates)
 
