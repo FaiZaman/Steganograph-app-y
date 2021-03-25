@@ -42,5 +42,6 @@ class MSE():
     # gets the MSE
     def get_error(self, cover_image, stego_image):
 
+        self.error = 0
         mean_squared_error = self.calculate_image_error(cover_image, stego_image)
         return mean_squared_error

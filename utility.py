@@ -22,6 +22,7 @@ def integer_to_binary(integer):
 def binary_to_string(binary_message, delimiter):
 
     delimiter_length = len(delimiter) * -1
+    delimiter_present = False
 
     # split into bytes
     message_bytes = [binary_message[i : i + 8] for i in range(0, len(binary_message), 8)]
@@ -35,9 +36,10 @@ def binary_to_string(binary_message, delimiter):
 
         if message[delimiter_length:] == delimiter:   # reached the delimiter
             message = message[:delimiter_length]
+            delimiter_present = True
             break
 
-    return message
+    return message, delimiter_present
 
 
 def is_message_complete(binary_message, delimiter):
@@ -70,6 +72,7 @@ def mask_LSB(image):
 
 def save_image(save_path, image_name, time_string, stego):
 
+    #cv2.imwrite(os.path.join(save_path, image_name), stego)
     cv2.imwrite(os.path.join(save_path, '{0}_{1}'.format(time_string, image_name)), stego)
 
 

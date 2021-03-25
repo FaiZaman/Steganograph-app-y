@@ -248,7 +248,7 @@ class PVD():
                     counter += 1
 
         # extract the original message, save to file, and return
-        extracted_message = binary_to_string(binary_message, self.delimiter)
+        extracted_message, _ = binary_to_string(binary_message, self.delimiter)
         save_message(self.save_path, self.time_string, extracted_message)
 
         return extracted_message

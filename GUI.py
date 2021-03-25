@@ -90,7 +90,7 @@ class GraphicalUserInterface(object):
                 gui.In(size=(40, 1), enable_events=True, key="cover_image"), 
                 gui.FileBrowse(initial_folder=
                 'C:/Users/faizz/University Work/Year 4/Advanced Project/Images/Cover', 
-                file_types=(("Image Files", "*.png"),))],
+                file_types=(("Image Files", "*.png *.pgm"),))],
             [gui.Text('Text file', size=(16, 1)),
                 gui.In(size=(40, 1), enable_events=True, key="message"),
                 gui.FileBrowse(initial_folder=
@@ -133,7 +133,7 @@ class GraphicalUserInterface(object):
                 gui.In(size=(40, 1), enable_events=True, key="hybrid_cover_image"), 
                 gui.FileBrowse(initial_folder=
                 'C:/Users/faizz/University Work/Year 4/Advanced Project/Images/Cover', 
-                file_types=(("Image Files", "*.png"),))],
+                file_types=(("Image Files", "*.png *.pgm"),))],
             [gui.Text('Text file', size=(16, 1)),
                 gui.In(size=(40, 1), enable_events=True, key="hybrid_message"),
                 gui.FileBrowse(initial_folder=
@@ -164,7 +164,7 @@ class GraphicalUserInterface(object):
                 gui.Button('Algorithm Information')],
             [gui.Text('Image file', size=(16, 1)),
                 gui.In(size=(40, 1), enable_events=True, key="stego_image"),
-                gui.FileBrowse(file_types=(("Image Files", "*.png"),))],
+                gui.FileBrowse(file_types=(("Image Files", "*.png *.pgm"),))],
             [gui.Text('Secret key', size=(16, 1)), gui.Input(size=(40, 1), key="output_key")],
             [gui.Text('Save Folder', size=(16, 1)),
                 gui.In(size=(40, 1), enable_events=True, key="save_folder"),
@@ -199,7 +199,7 @@ class GraphicalUserInterface(object):
             [gui.Text('_' * 55)],
             [gui.Text('Image file', size=(16, 1)),
                 gui.In(size=(40, 1), enable_events=True, key="hybrid_stego_image"), 
-                gui.FileBrowse(file_types=(("Image Files", "*.png"),))],
+                gui.FileBrowse(file_types=(("Image Files", "*.png *.pgm"),))],
             [gui.Text('Secret key', size=(16, 1)), gui.Input(size=(40, 1), key="hybrid_out_key")],
             [gui.Text('Save Folder', size=(16, 1)),
                 gui.In(size=(40, 1), enable_events=True, key="hybrid_save_folder"),

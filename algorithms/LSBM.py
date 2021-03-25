@@ -15,6 +15,12 @@ class LSBM(LSB):
         # generate random number and convert pixel value to integer for easier add/minus
         random_number = random.random()
 
+        # edge cases
+        if pixel == 255:
+            return 254
+        if pixel == 0:
+            return 1
+
         if random_number < 0.5:     # subtract
             pixel += 1
         else:
