@@ -320,7 +320,7 @@ class EA_LSBMR(LSBMR):
             binary_message += first_msg_bit + second_msg_bit
 
         # extract the original message, save to file, and return
-        extracted_message = binary_to_string(binary_message, self.delimiter)
+        extracted_message, delimiter_present = binary_to_string(binary_message, self.delimiter)
         print(binary_message[:88])
         print(extracted_message)
         #save_message(self.save_path, self.time_string, extracted_message)

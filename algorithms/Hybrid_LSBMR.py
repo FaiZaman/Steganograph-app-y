@@ -82,6 +82,7 @@ class Hybrid_LSBMR(LSBMR):
         # get the edge coordinates from the hybrid edge areas and initialise embedded coordinates list
         edge_coordinates, non_edge_coordinates = self.get_coordinates()
         num_edge_coordinates = len(edge_coordinates)
+        num_non_edge_coordinates = len(non_edge_coordinates)
         self.embedded_coordinates = []
 
         if message_length > self.num_bytes:
@@ -93,26 +94,23 @@ class Hybrid_LSBMR(LSBMR):
 
         # embeds based on the edge path
         embedded = False
-        cover_image, embedded = self.embed_path(path, message_length, cover_image, embedded)
+        cover_image, embedded = self.embed_path(edge_path, message_length, cover_image, embedded)
+
+        # embed based on non-edge pixels if the message was too big for edge pixels alone
+        if not embedded:
+            non_edge_path = random.sample(non_edge_coordinates, num_non_edge_coordinates)
+            cover_image, embedded = self.embed_path(non_edge_path, message_length, cover_image, embedded)
 
         # reassign, save, and return stego image
+        stego_image = cover_image
         save_image(self.save_path, self.image_name, self.time_string, stego_image)
 
         return stego_image
+    
 
+    def extract_path(self, path, binary_message):
 
-    # loops through edge pixels in same order as when encoding and extracts message bits
-    def extract(self):
-
-        # initialise message and embedded coordinates list
-        binary_message = ""
-        embedded_coordinates = []
         counter = 0
-
-        # get the edge coordinates from the hybrid edge areas and pseudorandom embedding path
-        edge_coordinates, non_edge_coordinates = self.get_coordinates()
-        num_edge_coordinates = len(edge_coordinates)
-        path = random.sample(edge_coordinates, num_edge_coordinates)
 
         for (y, x) in path:
 
@@ -121,7 +119,8 @@ class Hybrid_LSBMR(LSBMR):
             first_stego_pixel, second_stego_pixel = stego_block[0], stego_block[1]
             next_x, next_y = next_coordinates[0], next_coordinates[1]
 
-            if (y, x) not in embedded_coordinates and (next_y, next_x) not in embedded_coordinates\
+            if (y, x) not in self.embedded_coordinates\
+                and (next_y, next_x) not in self.embedded_coordinates\
                 and not(y == self.height - 1 and x == 0)\
                 and not(y == self.height - 1 and x == self.width - 1):
 
@@ -132,18 +131,46 @@ class Hybrid_LSBMR(LSBMR):
 
                 # append to message and add current pair of coordinates to the embedded coordinates list
                 binary_message += first_msg_bit + second_msg_bit
-                embedded_coordinates.append((y, x))
-                embedded_coordinates.append((next_y, next_x))
+                self.embedded_coordinates.append((y, x))
+                self.embedded_coordinates.append((next_y, next_x))
 
                 # check every 5000 iterations if the message is in the extracted bits so far
                 # in order to speed up the algorithm
                 if counter % 5000 == 0:
                     if is_message_complete(binary_message, self.delimiter):
                         break
+                    extracted_message, delimiter_present = binary_to_string(binary_message, self.delimiter)
+                    print(extracted_message)
                 counter += 1
 
-        # extract the original message, save to file, and return
-        extracted_message = binary_to_string(binary_message, self.delimiter)
-        save_message(self.save_path, self.time_string, extracted_message)
+        return binary_message
 
+
+    # loops through edge pixels in same order as when encoding and extracts message bits
+    def extract(self):
+
+        # initialise message and embedded coordinates list
+        binary_message = ""
+        self.embedded_coordinates = []
+
+        # get the coordinates from the hybrid edge areas and pseudorandom embedding path
+        edge_coordinates, non_edge_coordinates = self.get_coordinates()
+        num_edge_coordinates = len(edge_coordinates)
+        num_non_edge_coordinates = len(non_edge_coordinates)
+
+        # extracts based on the edge path
+        edge_path = random.sample(edge_coordinates, num_edge_coordinates)
+        binary_message = self.extract_path(edge_path, binary_message)
+
+        # attempt to extract original message
+        extracted_message, delimiter_present = binary_to_string(binary_message, self.delimiter)
+
+        # extract based on non-edge pixels if the message was too big for edge pixels alone
+        if not delimiter_present:
+            non_edge_path = random.sample(non_edge_coordinates, num_non_edge_coordinates)
+            binary_message = self.extract_path(non_edge_path, binary_message)
+            extracted_message, delimiter_present = binary_to_string(binary_message, self.delimiter)
+
+        # save to file, and return
+        save_message(self.save_path, self.time_string, extracted_message)
         return extracted_message

@@ -105,7 +105,7 @@ class LSB():
             binary_message += binary_pixel[-1]
 
         # extract the original message, save to file, and return
-        extracted_message = binary_to_string(binary_message, self.delimiter)
+        extracted_message, delimiter_present = binary_to_string(binary_message, self.delimiter)
         save_message(self.save_path, self.time_string, extracted_message)
 
         return extracted_message
