@@ -31,9 +31,8 @@ class Hybrid_LSBMR(LSBMR):
         return edge_coordinates, non_edge_coordinates
 
 
-    def embed_path(self, path, message_length, cover_image, embedded):
-
-        message_index = 0
+    # traverses edge or non-edge path and embeds data using LSBMR
+    def embed_path(self, path, message_length, message_index, cover_image, embedded):
 
         for (y, x) in path:
 
@@ -69,8 +68,8 @@ class Hybrid_LSBMR(LSBMR):
                     if message_index == message_length:
                         embedded = True
                         break
-        
-        return cover_image, embedded
+
+        return cover_image, message_index, embedded
 
 
     # generates pixel path through edge coordinates
@@ -78,6 +77,7 @@ class Hybrid_LSBMR(LSBMR):
 
         self.message = message_to_binary(self.message)
         message_length = len(self.message)
+        message_index = 0
 
         # get the edge coordinates from the hybrid edge areas and initialise embedded coordinates list
         edge_coordinates, non_edge_coordinates = self.get_coordinates()
@@ -94,20 +94,24 @@ class Hybrid_LSBMR(LSBMR):
 
         # embeds based on the edge path
         embedded = False
-        cover_image, embedded = self.embed_path(edge_path, message_length, cover_image, embedded)
+        cover_image, message_index, embedded =\
+            self.embed_path(edge_path, message_length, message_index, cover_image, embedded)
 
         # embed based on non-edge pixels if the message was too big for edge pixels alone
         if not embedded:
+            random.seed(self.key)
             non_edge_path = random.sample(non_edge_coordinates, num_non_edge_coordinates)
-            cover_image, embedded = self.embed_path(non_edge_path, message_length, cover_image, embedded)
+            cover_image, message_index, embedded =\
+                self.embed_path(non_edge_path, message_length, message_index, cover_image, embedded)
 
         # reassign, save, and return stego image
         stego_image = cover_image
         save_image(self.save_path, self.image_name, self.time_string, stego_image)
 
         return stego_image
-    
 
+
+    # traverses edge or non-edge path and extracts data using LSBMR
     def extract_path(self, path, binary_message):
 
         counter = 0
@@ -139,8 +143,7 @@ class Hybrid_LSBMR(LSBMR):
                 if counter % 5000 == 0:
                     if is_message_complete(binary_message, self.delimiter):
                         break
-                    extracted_message, delimiter_present = binary_to_string(binary_message, self.delimiter)
-                    print(extracted_message)
+                    extracted_message, _ = binary_to_string(binary_message, self.delimiter)
                 counter += 1
 
         return binary_message
@@ -167,7 +170,12 @@ class Hybrid_LSBMR(LSBMR):
 
         # extract based on non-edge pixels if the message was too big for edge pixels alone
         if not delimiter_present:
+
+            # re-seed and sample path of non edge pixels
+            random.seed(self.key)
             non_edge_path = random.sample(non_edge_coordinates, num_non_edge_coordinates)
+
+            # extract the message and convert back from binary
             binary_message = self.extract_path(non_edge_path, binary_message)
             extracted_message, delimiter_present = binary_to_string(binary_message, self.delimiter)
 
