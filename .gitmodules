@@ -1,0 +1,3 @@
+[submodule "aletheia"]
+	path = aletheia
+	url = https://github.com/daniellerch/aletheia.git
