@@ -39,10 +39,8 @@ class Hybrid_LSBMR(LSBMR):
 
         for (y, x) in path:
 
-            # compute the two-pixel block and the coordinates of the next pixel
+            # compute the two-pixel block and the coordinates of the next pixel and assign values
             next_coordinates, block = self.get_pixel_block(x, y)
-
-            # assigning
             first_pixel, second_pixel = block[0], block[1]
             next_x, next_y = next_coordinates[0], next_coordinates[1]
 
@@ -57,7 +55,6 @@ class Hybrid_LSBMR(LSBMR):
                 cover_image[y][x] = first_stego_pixel
                 cover_image[next_y][next_x] = second_stego_pixel
 
-                # add current pair of coordinates to the embedded coordinates list and increment index
                 message_index += 2
 
                 # if the whole message was embedded we can check this later
@@ -92,7 +89,7 @@ class Hybrid_LSBMR(LSBMR):
         cover_image, message_index, embedded =\
             self.embed_path(edge_path, message_length, message_index, cover_image, embedded)
 
-        # embed based on non-edge pixels if the message was too big for edge pixels alone
+        # re-seed and embed based on non-edge pixels if the message was too big for edge pixels alone
         if not embedded:
             random.seed(self.key)
             non_edge_path = random.sample(non_edge_coordinates, num_non_edge_coordinates)
