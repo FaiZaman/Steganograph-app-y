@@ -1,4 +1,5 @@
 import cv2
+import time
 import ntpath
 
 from algorithms.LSBMR import LSBMR
@@ -40,6 +41,8 @@ if __name__ == '__main__':
 
         if operation == "embedding":
 
+            start = time.time()
+
             # retrieve embedding data from GUI embedding screen
             algorithm_name, cover_file, message_file, key, save_path =\
                 data[0], data[1], data[2], data[3], data[4]
@@ -49,7 +52,13 @@ if __name__ == '__main__':
             algorithm = algorithm_name(cover_data, message, key, save_path)
             algorithm.embed_image()
 
+            end = time.time()
+
+            print("Time taken:", end - start, "seconds")
+            
         elif operation == "hybrid_embedding":
+
+            start = time.time()
 
             # retrieve hybrid embedding data from GUI
             detector_1_name, detector_2_name, hybrid_type, cover_file, message_file, key, save_path =\
@@ -68,14 +77,13 @@ if __name__ == '__main__':
             combinator = hybrid_type()
             hybrid_edges = combinator.merge(edges_1, edges_2)
 
-            # display edge outputs
-            #cv2.imshow(detector_1.name, edges_1)
-            #cv2.imshow(detector_2.name, edges_2)
-            #cv2.imshow(combinator.name, hybrid_edges)
-
             # initialise LSBMR algorithm and embed within hybrid edge areas
             Hybrid_LSBMR_algorithm = Hybrid_LSBMR(cover_data, hybrid_edges, message, key, save_path)
             Hybrid_LSBMR_algorithm.embed_image()
+
+            end = time.time()
+
+            print("Time taken:", end - start, "seconds")
 
         elif operation == "extracting":
 

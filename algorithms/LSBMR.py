@@ -125,7 +125,7 @@ class LSBMR(LSBM, PVD):
             # check if not 0 or 255 as embedding cannot be performed otherwise
             if 0 < first_pixel < 255 and 0 < second_pixel < 255:
 
-                # check if this is not the last pixel in the image and that it has not already been embedded
+                # check if this is not the last pixel in the image and it hasn't already been embedded
                 if (y, x) not in embedded_coordinates and (next_y, next_x) not in embedded_coordinates\
                     and not(y == self.height - 1 and x == 0)\
                     and not(y == self.height - 1 and x == self.width - 1):
