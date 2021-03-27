@@ -7,6 +7,9 @@ cover_dataset_path = "C:/Users/faizz/University Work/Year 4/Advanced Project/Dat
 stego_dataset_path = "C:/Users/faizz/University Work/Year 4/Advanced Project/Dataset/BOSSbase (Stego)/"
 extension = ".pgm"
 
+# command to run ensemble classifier:
+# python aletheia.py e4s-predict models/e4s_srm_bossbase_lsbm0.10_gs.model srm sample_images/1_lsb.pgm
+
 # initalise error metrics and parameters
 MSE = MSE()
 PSNR = PSNR()

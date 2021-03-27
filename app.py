@@ -48,7 +48,7 @@ if __name__ == '__main__':
             cover_data, message = read_files(cover_file, message_file)
             algorithm = algorithm_name(cover_data, message, key, save_path)
             algorithm.embed_image()
-            
+
         elif operation == "hybrid_embedding":
 
             # retrieve hybrid embedding data from GUI
