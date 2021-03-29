@@ -45,22 +45,6 @@ class LSBMR(LSBM, PVD):
         return first_stego_pixel
 
 
-    # retrieves coordinates in image of first pixels in block
-    def get_coordinates(self):
-
-        pixels = []
-
-        # loop through the image
-        for y in range(0, self.height):
-            for x in range(0, self.width):
-
-                # either both odd or both even for first pixel in block
-                if (y % 2 == 0 and x % 2 == 0) or (y % 2 != 0 and x % 2 != 0):
-                    pixels.append((y, x))
-
-        return pixels
-
-
     # embeds message bits in pair of pixels as per LSBMR embedding
     def embed_pixels(self, first_pixel, second_pixel, message_index):
 
@@ -122,7 +106,7 @@ class LSBMR(LSBM, PVD):
         pixels = self.get_coordinates()
         num_pixels = len(pixels)
 
-        # generate random path of this based on seed
+        # generate random path of pixel blocks based on seed
         path = random.sample(pixels, num_pixels)
         cover_image = self.image  # so image is not modified
 
@@ -158,12 +142,13 @@ class LSBMR(LSBM, PVD):
     # loops through image in the same order as when encoding and extracts message bits
     def extract(self):
 
-        # initialise message and same pseudorandom embedding path
+        # initialise message and same pixel block pseudorandom embedding path
         binary_message = ""
 
         pixels = self.get_coordinates()
         num_pixels = len(pixels)
         path = random.sample(pixels, num_pixels)
+
         counter = 0
 
         # loop through image pixel blocks

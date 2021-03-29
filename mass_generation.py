@@ -2,6 +2,7 @@ import cv2
 from algorithms.LSB import LSB
 from algorithms.LSBM import LSBM
 from algorithms.LSBMR import LSBMR
+from algorithms.PVD import PVD
 
 # initialise dataset strings
 dataset_path = "C:/Users/faizz/University Work/Year 4/Advanced Project/Dataset/BOSSbase (Cover)/"
@@ -20,7 +21,9 @@ message_file.close()
 
 # loop through image files
 
-def generate():
+def generate(algorithm, algorithm_string, save_path):
+
+    save_path = save_path + algorithm_string + '/'
 
     for filename in range(1, 10001):
 
@@ -32,15 +35,16 @@ def generate():
         cover_data = (filename_string, cover_image)
 
         # initialise algorithm and embed data
-        LSBMR_algorithm = LSBMR(cover_data, message, key, save_path)
-        LSBMR_algorithm.embed_image()
+        alg = algorithm(cover_data, message, key, save_path)
+        alg.embed_image()
 
         print(filename)
 
 
-def validate():
+def validate(algorithm, algorithm_string, save_path):
 
     message = ""
+    save_path = save_path + algorithm_string + '/'
 
     for filename in range(1, 10001):
 
@@ -52,9 +56,10 @@ def validate():
         stego_data = (filename_string, stego_image)
 
         # initialise algorithm and extract data
-        LSBM_algorithm = LSBM(stego_data, message, key, save_path)
-        message = LSBM_algorithm.extract()
+        alg = algorithm(stego_data, message, key, save_path)
+        message = alg.extract()
 
         print(message)
 
-generate()
+generate(PVD, 'PVD', save_path)
+#validate(LSB, 'LSB', save_path)
