@@ -194,7 +194,7 @@ def validate_hybrid(detector_1, detector_2, detector_string_1, detector_string_2
         print(message)
 
 
-#generate_standalone(Sobel, 'Sobel', save_path)
-validate_standalone(Sobel, 'Sobel', save_path)
+generate_standalone(Sobel, 'Sobel', save_path)
+#validate_standalone(Sobel, 'Sobel', save_path)
 #generate_hybrid(Sobel, Sobel, 'Sobel', 'Sobel', AND, save_path)
 #validate_hybrid(Sobel, Sobel, 'Sobel', 'Sobel', AND, save_path)

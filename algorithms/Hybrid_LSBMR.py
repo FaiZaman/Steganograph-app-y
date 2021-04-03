@@ -25,11 +25,17 @@ class Hybrid_LSBMR(LSBMR):
                 # either both odd or both even for first pixel in block
                 if (y % 2 == 0 and x % 2 == 0) or (y % 2 != 0 and x % 2 != 0):
 
-                    # add coordinate to list if there is edge present
-                    if self.hybrid_edges[y][x] == 255:
-                        edge_coordinates.append((y, x))
-                    else:
-                        non_edge_coordinates.append((y, x))
+                    (next_x, next_y), _ = self.get_pixel_block(x, y)
+
+                    # remove out of bounds pixels
+                    if 0 < self.image[y][x] < 255 and 0 < self.image[next_y][next_x] < 255:
+
+                        # add coordinate to list if there is edge present
+                        if self.hybrid_edges[y][x] == 255:
+                            edge_coordinates.append((y, x))
+                        else:
+                            non_edge_coordinates.append((y, x))
+
 
         return edge_coordinates, non_edge_coordinates
 
@@ -61,6 +67,10 @@ class Hybrid_LSBMR(LSBMR):
                 if message_index == message_length:
                     embedded = True
                     break
+            
+            else:
+                print('out of bounds', first_pixel, second_pixel, (y, x), (next_y, next_x))
+                pass
 
         return cover_image, message_index, embedded
 
@@ -164,5 +174,6 @@ class Hybrid_LSBMR(LSBMR):
             extracted_message, delimiter_present = binary_to_string(binary_message, self.delimiter)
 
         # save to file, and return
+        print(extracted_message)
         save_message(self.save_path, self.time_string, extracted_message)
         return extracted_message
