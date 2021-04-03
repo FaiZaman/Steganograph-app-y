@@ -25,17 +25,16 @@ class Hybrid_LSBMR(LSBMR):
                 # either both odd or both even for first pixel in block
                 if (y % 2 == 0 and x % 2 == 0) or (y % 2 != 0 and x % 2 != 0):
 
-                    (next_x, next_y), _ = self.get_pixel_block(x, y)
+                    (next_x, next_y), _ = self.get_pixel_block(x, y)  # get next pixel coordinates
 
-                    # remove out of bounds pixels
-                    if 0 < self.image[y][x] < 255 and 0 < self.image[next_y][next_x] < 255:
+                    # remove out of bounds pixels (255-3 for masking)
+                    if 0 < self.image[y][x] < 252 and 0 < self.image[next_y][next_x] < 252:
 
                         # add coordinate to list if there is edge present
                         if self.hybrid_edges[y][x] == 255:
                             edge_coordinates.append((y, x))
                         else:
                             non_edge_coordinates.append((y, x))
-
 
         return edge_coordinates, non_edge_coordinates
 
@@ -50,27 +49,20 @@ class Hybrid_LSBMR(LSBMR):
             first_pixel, second_pixel = block[0], block[1]
             next_x, next_y = next_coordinates[0], next_coordinates[1]
 
-            # check if not 0 or 255 as embedding cannot be performed otherwise
-            if 0 < first_pixel < 255 and 0 < second_pixel < 255:
+            # use LSBMR embedding and output stego pixels
+            first_stego_pixel, second_stego_pixel =\
+                self.embed_pixels(first_pixel, second_pixel, message_index)
 
-                # use LSBMR embedding and output stego pixels
-                first_stego_pixel, second_stego_pixel =\
-                    self.embed_pixels(first_pixel, second_pixel, message_index)
+            # reassign new stego pixels and increment message index
+            cover_image[y][x] = first_stego_pixel
+            cover_image[next_y][next_x] = second_stego_pixel
 
-                # reassign new stego pixels and increment message index
-                cover_image[y][x] = first_stego_pixel
-                cover_image[next_y][next_x] = second_stego_pixel
+            message_index += 2
 
-                message_index += 2
-
-                # if the whole message was embedded we can check this later
-                if message_index == message_length:
-                    embedded = True
-                    break
-            
-            else:
-                print('out of bounds', first_pixel, second_pixel, (y, x), (next_y, next_x))
-                pass
+            # if the whole message was embedded we can check this later
+            if message_index == message_length:
+                embedded = True
+                break
 
         return cover_image, message_index, embedded
 
@@ -174,6 +166,5 @@ class Hybrid_LSBMR(LSBMR):
             extracted_message, delimiter_present = binary_to_string(binary_message, self.delimiter)
 
         # save to file, and return
-        print(extracted_message)
         save_message(self.save_path, self.time_string, extracted_message)
         return extracted_message

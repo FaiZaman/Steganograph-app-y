@@ -25,6 +25,27 @@ class LSBMR(LSBM, PVD):
                 self.outliers[j] = 1
 
 
+    # retrieves coordinates in image of first pixels in block
+    def get_coordinates(self):
+
+        pixels = []
+
+        # loop through the image
+        for y in range(0, self.height):
+            for x in range(0, self.width):
+
+                # either both odd or both even for first pixel in block
+                if (y % 2 == 0 and x % 2 == 0) or (y % 2 != 0 and x % 2 != 0):
+
+                    (next_x, next_y), _ = self.get_pixel_block(x, y)    # get next pixel coordinates
+
+                    # remove out of bounds pixels (255-3 for masking)
+                    if 0 < self.image[y][x] < 255 and 0 < self.image[next_y][next_x] < 255:
+                        pixels.append((y, x))
+
+        return pixels
+
+
     # satisfies condition such that the LSB of the second message bit is result of the function
     def binary_function(self, a, b):
 
@@ -117,20 +138,17 @@ class LSBMR(LSBM, PVD):
             first_pixel, second_pixel = block[0], block[1]
             next_x, next_y = next_coordinates[0], next_coordinates[1]
 
-            # check if not 0 or 255 as embedding cannot be performed otherwise
-            if 0 < first_pixel < 255 and 0 < second_pixel < 255:
+            # use LSBMR embedding and output stego pixels
+            first_stego_pixel, second_stego_pixel =\
+                self.embed_pixels(first_pixel, second_pixel, message_index)
 
-                # use LSBMR embedding and output stego pixels
-                first_stego_pixel, second_stego_pixel =\
-                    self.embed_pixels(first_pixel, second_pixel, message_index)
+            # reassign new stego pixels and increment message index
+            cover_image[y][x] = first_stego_pixel
+            cover_image[next_y][next_x] = second_stego_pixel
 
-                # reassign new stego pixels and increment message index
-                cover_image[y][x] = first_stego_pixel
-                cover_image[next_y][next_x] = second_stego_pixel
-
-                message_index += 2
-                if message_index == message_length:
-                    break
+            message_index += 2
+            if message_index == message_length:
+                break
 
         # reassign, save, and return stego image
         stego_image = cover_image
