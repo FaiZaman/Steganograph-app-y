@@ -68,6 +68,10 @@ if __name__ == '__main__':
             combinator = hybrid_type()
             hybrid_edges = combinator.merge(edges_1, edges_2)
 
+            cv2.imshow(detector_1.name, edges_1)
+            cv2.imshow(detector_2.name, edges_2)
+            cv2.imshow('Hybrid', hybrid_edges)
+
             # initialise LSBMR algorithm and embed within hybrid edge areas
             Hybrid_LSBMR_algorithm = Hybrid_LSBMR(cover_data, hybrid_edges, message, key, save_path)
             Hybrid_LSBMR_algorithm.embed_image()
