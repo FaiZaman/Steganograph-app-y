@@ -39,8 +39,8 @@ class LSBMR(LSBM, PVD):
 
                     (next_x, next_y), _ = self.get_pixel_block(x, y)    # get next pixel coordinates
 
-                    # remove out of bounds pixels (255-3 for masking)
-                    if 0 < self.image[y][x] < 255 and 0 < self.image[next_y][next_x] < 255:
+                    # remove out of bounds pixels (0+3, 255-3 for masking)
+                    if 3 < self.image[y][x] < 252 and 3 < self.image[next_y][next_x] < 252:
                         pixels.append((y, x))
 
         return pixels
@@ -67,7 +67,7 @@ class LSBMR(LSBM, PVD):
 
 
     # embeds message bits in pair of pixels as per LSBMR embedding
-    def embed_pixels(self, first_pixel, second_pixel, message_index):
+    def embed_pixels(self, first_pixel, second_pixel, message_index, hybrid):
 
         # get inputs and convert
         first_msg_bit = self.message[message_index]
@@ -140,7 +140,7 @@ class LSBMR(LSBM, PVD):
 
             # use LSBMR embedding and output stego pixels
             first_stego_pixel, second_stego_pixel =\
-                self.embed_pixels(first_pixel, second_pixel, message_index)
+                self.embed_pixels(first_pixel, second_pixel, message_index, hybrid=False)
 
             # reassign new stego pixels and increment message index
             cover_image[y][x] = first_stego_pixel

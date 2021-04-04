@@ -28,7 +28,7 @@ class Hybrid_LSBMR(LSBMR):
                     (next_x, next_y), _ = self.get_pixel_block(x, y)  # get next pixel coordinates
 
                     # remove out of bounds pixels (255-3 for masking)
-                    if 0 < self.image[y][x] < 252 and 0 < self.image[next_y][next_x] < 252:
+                    if 3 < self.image[y][x] < 252 and 3 < self.image[next_y][next_x] < 252:
 
                         # add coordinate to list if there is edge present
                         if self.hybrid_edges[y][x] == 255:
@@ -51,7 +51,7 @@ class Hybrid_LSBMR(LSBMR):
 
             # use LSBMR embedding and output stego pixels
             first_stego_pixel, second_stego_pixel =\
-                self.embed_pixels(first_pixel, second_pixel, message_index)
+                self.embed_pixels(first_pixel, second_pixel, message_index, hybrid=True)
 
             # reassign new stego pixels and increment message index
             cover_image[y][x] = first_stego_pixel

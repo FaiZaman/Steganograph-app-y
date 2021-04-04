@@ -127,7 +127,7 @@ def validate_basic(algorithm, algorithm_string, save_path):
         alg = algorithm(stego_data, message, key, save_path)
         message = alg.extract()
 
-        print(message)
+        print(message[:50])
 
 
 # validates the correct message was extracted
@@ -150,7 +150,6 @@ def validate_standalone(detector, detector_string, save_path):
         edge_detector = detector()
         edges = edge_detector.detect(stego_image)
         cv2.imwrite(os.path.join(save_path, 'stego_edges.png'), edges)
-
 
         # initialise algorithm and extract from edges
         Hybrid_LSBMR_algorithm = Hybrid_LSBMR(stego_data, edges, message, key, save_path)
