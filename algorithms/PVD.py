@@ -120,9 +120,12 @@ class PVD():
 
         m = upper - difference
         embedded_block = self.inverse_calculation(block, m, difference, new_difference=0)
+        new_embedded_block = self.inverse_calculation(block, m, difference, new_difference=254)
 
         if embedded_block[0] < 0 or embedded_block[0] > 255 or\
-            embedded_block[1] < 0 or embedded_block[1] > 255:
+            embedded_block[1] < 0 or embedded_block[1] > 255 or\
+            new_embedded_block[0] < 0 or new_embedded_block[0] > 255 or\
+            new_embedded_block[1] < 0 or new_embedded_block[1] > 255:
 
             return True
 
@@ -243,6 +246,6 @@ class PVD():
 
         # extract the original message, save to file, and return
         extracted_message, _ = binary_to_string(binary_message, self.delimiter)
-        save_message(self.save_path, self.time_string, extracted_message)
+        saved = save_message(self.save_path, self.time_string, extracted_message)
 
-        return extracted_message
+        return extracted_message, saved

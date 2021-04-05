@@ -1,5 +1,5 @@
-import cv2
 import os
+import cv2
 import numpy as np
 from algorithms.LSB import LSB
 from algorithms.LSBM import LSBM
@@ -125,9 +125,12 @@ def validate_basic(algorithm, algorithm_string, save_path):
 
         # initialise algorithm and extract data
         alg = algorithm(stego_data, message, key, save_path)
-        message = alg.extract()
+        message, saved = alg.extract()
 
-        print(message[:50])
+        if not saved:
+            os.remove(stego_path)
+        else:
+            print(filename)
 
 
 # validates the correct message was extracted
@@ -193,8 +196,8 @@ def validate_hybrid(detector_1, detector_2, detector_string_1, detector_string_2
         print(message)
 
 
-generate_basic(LSBMR, 'LSBMR', save_path)
-#validate_basic(LSBMR, 'LSBMR', save_path)
+generate_basic(PVD, 'PVD', save_path)
+#validate_basic(PVD, 'PVD', save_path)
 #generate_standalone(Sobel, 'Sobel', save_path)
 #validate_standalone(Sobel, 'Sobel', save_path)
 #generate_hybrid(Sobel, Sobel, 'Sobel', 'Sobel', AND, save_path)
