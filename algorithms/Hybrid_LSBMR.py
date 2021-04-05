@@ -22,11 +22,19 @@ class Hybrid_LSBMR(LSBMR):
         for y in range(0, self.height):
             for x in range(0, self.width):
 
-                # add coordinate to list if there is edge present
-                if self.hybrid_edges[y][x] == 255:
-                    edge_coordinates.append((y, x))
-                else:
-                    non_edge_coordinates.append((y, x))
+                # either both odd or both even for first pixel in block
+                if (y % 2 == 0 and x % 2 == 0) or (y % 2 != 0 and x % 2 != 0):
+
+                    (next_x, next_y), _ = self.get_pixel_block(x, y)  # get next pixel coordinates
+
+                    # remove out of bounds pixels (255-3 for masking)
+                    if 3 < self.image[y][x] < 252 and 3 < self.image[next_y][next_x] < 252:
+
+                        # add coordinate to list if there is edge present
+                        if self.hybrid_edges[y][x] == 255:
+                            edge_coordinates.append((y, x))
+                        else:
+                            non_edge_coordinates.append((y, x))
 
         return edge_coordinates, non_edge_coordinates
 
@@ -36,38 +44,25 @@ class Hybrid_LSBMR(LSBMR):
 
         for (y, x) in path:
 
-            # compute the two-pixel block and the coordinates of the next pixel
+            # compute the two-pixel block and the coordinates of the next pixel and assign values
             next_coordinates, block = self.get_pixel_block(x, y)
-
-            # assigning
             first_pixel, second_pixel = block[0], block[1]
             next_x, next_y = next_coordinates[0], next_coordinates[1]
 
-            # check if not 0 or 255 as embedding cannot be performed otherwise
-            if 0 < first_pixel < 255 and 0 < second_pixel < 255:
+            # use LSBMR embedding and output stego pixels
+            first_stego_pixel, second_stego_pixel =\
+                self.embed_pixels(first_pixel, second_pixel, message_index, hybrid=True)
 
-                if (y, x) not in self.embedded_coordinates\
-                    and (next_y, next_x) not in self.embedded_coordinates\
-                    and not(y == self.height - 1 and x == 0)\
-                    and not(y == self.height - 1 and x == self.width - 1):
+            # reassign new stego pixels and increment message index
+            cover_image[y][x] = first_stego_pixel
+            cover_image[next_y][next_x] = second_stego_pixel
 
-                    # use LSBMR embedding and output stego pixels
-                    first_stego_pixel, second_stego_pixel =\
-                        self.embed_pixels(first_pixel, second_pixel, message_index)
+            message_index += 2
 
-                    # reassign new stego pixels and increment message index
-                    cover_image[y][x] = first_stego_pixel
-                    cover_image[next_y][next_x] = second_stego_pixel
-
-                    # add current pair of coordinates to the embedded coordinates list and increment index
-                    self.embedded_coordinates.append((y, x))
-                    self.embedded_coordinates.append((next_y, next_x))
-                    message_index += 2
-
-                    # if the whole message was embedded we can check this later
-                    if message_index == message_length:
-                        embedded = True
-                        break
+            # if the whole message was embedded we can check this later
+            if message_index == message_length:
+                embedded = True
+                break
 
         return cover_image, message_index, embedded
 
@@ -83,7 +78,6 @@ class Hybrid_LSBMR(LSBMR):
         edge_coordinates, non_edge_coordinates = self.get_coordinates()
         num_edge_coordinates = len(edge_coordinates)
         num_non_edge_coordinates = len(non_edge_coordinates)
-        self.embedded_coordinates = []
 
         if message_length > self.num_bytes:
             raise ValueError("The message is too large for the image.")
@@ -97,7 +91,7 @@ class Hybrid_LSBMR(LSBMR):
         cover_image, message_index, embedded =\
             self.embed_path(edge_path, message_length, message_index, cover_image, embedded)
 
-        # embed based on non-edge pixels if the message was too big for edge pixels alone
+        # re-seed and embed based on non-edge pixels if the message was too big for edge pixels alone
         if not embedded:
             random.seed(self.key)
             non_edge_path = random.sample(non_edge_coordinates, num_non_edge_coordinates)
@@ -123,28 +117,21 @@ class Hybrid_LSBMR(LSBMR):
             first_stego_pixel, second_stego_pixel = stego_block[0], stego_block[1]
             next_x, next_y = next_coordinates[0], next_coordinates[1]
 
-            if (y, x) not in self.embedded_coordinates\
-                and (next_y, next_x) not in self.embedded_coordinates\
-                and not(y == self.height - 1 and x == 0)\
-                and not(y == self.height - 1 and x == self.width - 1):
+            # extract both bits from the pixel pair
+            first_binary_pixel = integer_to_binary(first_stego_pixel)
+            first_msg_bit = first_binary_pixel[-1]
+            second_msg_bit = self.binary_function(first_stego_pixel, second_stego_pixel)
 
-                # extract both bits from the pixel pair
-                first_binary_pixel = integer_to_binary(first_stego_pixel)
-                first_msg_bit = first_binary_pixel[-1]
-                second_msg_bit = self.binary_function(first_stego_pixel, second_stego_pixel)
+            # append to message and add current pair of coordinates to the embedded coordinates list
+            binary_message += first_msg_bit + second_msg_bit
 
-                # append to message and add current pair of coordinates to the embedded coordinates list
-                binary_message += first_msg_bit + second_msg_bit
-                self.embedded_coordinates.append((y, x))
-                self.embedded_coordinates.append((next_y, next_x))
-
-                # check every 5000 iterations if the message is in the extracted bits so far
-                # in order to speed up the algorithm
-                if counter % 5000 == 0:
-                    if is_message_complete(binary_message, self.delimiter):
-                        break
-                    extracted_message, _ = binary_to_string(binary_message, self.delimiter)
-                counter += 1
+            # check every 5000 iterations if the message is in the extracted bits so far
+            # in order to speed up the algorithm
+            if counter % 5000 == 0:
+                if is_message_complete(binary_message, self.delimiter):
+                    break
+                extracted_message, _ = binary_to_string(binary_message, self.delimiter)
+            counter += 1
 
         return binary_message
 
@@ -154,7 +141,6 @@ class Hybrid_LSBMR(LSBMR):
 
         # initialise message and embedded coordinates list
         binary_message = ""
-        self.embedded_coordinates = []
 
         # get the coordinates from the hybrid edge areas and pseudorandom embedding path
         edge_coordinates, non_edge_coordinates = self.get_coordinates()

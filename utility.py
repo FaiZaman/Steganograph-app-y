@@ -72,8 +72,8 @@ def mask_LSB(image):
 
 def save_image(save_path, image_name, time_string, stego):
 
-    #cv2.imwrite(os.path.join(save_path, image_name), stego)
-    cv2.imwrite(os.path.join(save_path, '{0}_{1}'.format(time_string, image_name)), stego)
+    cv2.imwrite(os.path.join(save_path, image_name), stego)
+    #cv2.imwrite(os.path.join(save_path, '{0}_{1}'.format(time_string, image_name)), stego)
 
 
 def save_message(save_path, time_string, message):
@@ -84,7 +84,9 @@ def save_message(save_path, time_string, message):
     try:
         message_file.write(message)
         message_file.close()
+        return True
     except UnicodeEncodeError:
         print("Incorrect secret key - your file was not saved. Please try again.")
         message_file.close()
         os.remove(file_path)
+        return False

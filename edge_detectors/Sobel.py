@@ -43,7 +43,7 @@ class Sobel(object):
 
                 # set binary values depending on threshold = 400
                 if edges[y][x] > self.threshold:
-                    edges[y][x] = 1
+                    edges[y][x] = 255
                 else:
                     edges[y][x] = 0
 
