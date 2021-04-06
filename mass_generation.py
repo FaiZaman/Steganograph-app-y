@@ -65,7 +65,6 @@ def generate_standalone(detector, detector_string, save_path):
         # initialise detector and detect edges
         edge_detector = detector()
         edges = edge_detector.detect(cover_image)
-        cv2.imwrite(os.path.join(save_path, 'cover_edges.png'), edges)
 
         # initialise algorithm and embed in edges
         Hybrid_LSBMR_algorithm = Hybrid_LSBMR(cover_data, edges, message, key, save_path)
@@ -114,7 +113,7 @@ def validate_basic(algorithm, algorithm_string, save_path):
     message = ""
     save_path = save_path + algorithm_string + '/'
 
-    for filename in range(1, 10001):
+    for filename in range(7741, 10001):  # 7736
 
         filename_string = str(filename) + extension
 
@@ -152,7 +151,6 @@ def validate_standalone(detector, detector_string, save_path):
         # initialise detector and detect edges
         edge_detector = detector()
         edges = edge_detector.detect(stego_image)
-        cv2.imwrite(os.path.join(save_path, 'stego_edges.png'), edges)
 
         # initialise algorithm and extract from edges
         Hybrid_LSBMR_algorithm = Hybrid_LSBMR(stego_data, edges, message, key, save_path)
@@ -196,9 +194,9 @@ def validate_hybrid(detector_1, detector_2, detector_string_1, detector_string_2
         print(message)
 
 
-generate_basic(PVD, 'PVD', save_path)
+#generate_basic(PVD, 'PVD', save_path)
 #validate_basic(PVD, 'PVD', save_path)
-#generate_standalone(Sobel, 'Sobel', save_path)
+generate_standalone(Sobel, 'Sobel', save_path)
 #validate_standalone(Sobel, 'Sobel', save_path)
 #generate_hybrid(Sobel, Sobel, 'Sobel', 'Sobel', AND, save_path)
 #validate_hybrid(Sobel, Sobel, 'Sobel', 'Sobel', AND, save_path)
