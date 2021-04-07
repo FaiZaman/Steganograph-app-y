@@ -7,7 +7,10 @@ from algorithms.LSBMR import LSBMR
 from algorithms.PVD import PVD
 from algorithms.Hybrid_LSBMR import Hybrid_LSBMR
 
+from edge_detectors.Canny import Canny
 from edge_detectors.Sobel import Sobel
+from edge_detectors.LoG import LoG
+
 from hybridisation.AND import AND
 
 # initialise dataset strings
@@ -53,7 +56,7 @@ def generate_standalone(detector, detector_string, save_path):
     save_path = save_path + detector_string + '/'
 
     # loop through image files
-    for filename in range(1, 10001):
+    for filename in range(307, 10001):
 
         filename_string = str(filename) + extension
 
@@ -196,7 +199,7 @@ def validate_hybrid(detector_1, detector_2, detector_string_1, detector_string_2
 
 #generate_basic(PVD, 'PVD', save_path)
 #validate_basic(PVD, 'PVD', save_path)
-generate_standalone(Sobel, 'Sobel', save_path)
-#validate_standalone(Sobel, 'Sobel', save_path)
+generate_standalone(LoG, 'LoG', save_path)
+#validate_standalone(LoG, 'LoG', save_path)
 #generate_hybrid(Sobel, Sobel, 'Sobel', 'Sobel', AND, save_path)
 #validate_hybrid(Sobel, Sobel, 'Sobel', 'Sobel', AND, save_path)

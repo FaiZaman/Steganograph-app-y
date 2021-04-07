@@ -1,4 +1,4 @@
-function tutorial()
+function ensemble_classifier()
 % -------------------------------------------------------------------------
 % Ensemble Classification | June 2013 | version 2.0 | TUTORIAL
 % -------------------------------------------------------------------------
