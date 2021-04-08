@@ -10,6 +10,7 @@ class LSBMR(LSBM, PVD):
     def __init__(self, image, message, key, save_path):
 
         super().__init__(image, message, key, save_path)
+        self.name = 'LSBMR'
 
         # initialise outliers for masking
         self.outliers = {}

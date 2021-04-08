@@ -6,7 +6,7 @@ class Canny(object):
 
     def __init__(self):
 
-        self.name = "Canny Edge Detector"
+        self.name = "Canny"
 
         with open('data/detectors.json') as f:
             data = json.load(f)

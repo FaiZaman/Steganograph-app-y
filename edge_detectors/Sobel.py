@@ -6,7 +6,7 @@ class Sobel(object):
 
     def __init__(self):
 
-        self.name = "Sobel Edge Detector"
+        self.name = "Sobel"
 
         with open('data/detectors.json') as f:
             data = json.load(f)

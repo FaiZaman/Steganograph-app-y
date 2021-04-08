@@ -9,6 +9,7 @@ class PVD():
 
     def __init__(self, image, message, key, save_path):
 
+        self.name = 'PVD'
         self.image_name = image[0]
         self.image = image[1]
         self.delimiter = "-----"

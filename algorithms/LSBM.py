@@ -7,6 +7,7 @@ class LSBM(LSB):
     def __init__(self, image, message, key, save_path):
 
         super().__init__(image, message, key, save_path)
+        self.name = 'LSBM'
 
 
     # randomly add or subtract 1 from pixel value as not equal
