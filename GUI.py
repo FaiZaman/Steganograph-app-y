@@ -181,7 +181,7 @@ class GraphicalUserInterface(object):
 
         hybrid_extracting_screen = [
             [gui.Text('Hybrid Extracting', font=('Helvetica', 15), justification='center')],
-            [gui.Text('_'  * 70)],
+            [gui.Text('_'  * 80)],
             [gui.Text('')],
             [gui.Text('Edge Detector 1', size=(16, 1)),
                 gui.Combo(list(self.detector_data.keys()), size=(10, 1),

@@ -1,6 +1,9 @@
 import os
 import cv2
+import string
+import random
 import numpy as np
+
 from algorithms.LSB import LSB
 from algorithms.LSBM import LSBM
 from algorithms.LSBMR import LSBMR
@@ -19,7 +22,9 @@ save_path = "C:/Users/faizz/University Work/Year 4/Advanced Project/Dataset/BOSS
 extension = ".pgm"
 
 # initialise parameters
-key = "hi"
+global_key = "hi"
+random.seed(global_key)
+letters = string.ascii_lowercase
 embedding_rate = 0.1
 
 # initialising secret message
@@ -37,6 +42,7 @@ def generate_basic(algorithm, algorithm_string, save_path):
     for filename in range(1, 10001):
 
         filename_string = str(filename) + extension
+        key = ''.join(random.choice(letters) for i in range(10))
 
         # load the cover image file
         cover_path = dataset_path + filename_string
@@ -47,7 +53,7 @@ def generate_basic(algorithm, algorithm_string, save_path):
         alg = algorithm(cover_data, message, key, save_path)
         alg.embed_image()
 
-        print(filename)
+        print(filename, key)
 
 
 # generates stego images for edge detector + LSBMR embedding
@@ -58,9 +64,10 @@ def generate_standalone(detector, save_path):
     save_path = save_path + edge_detector.name + '/'
 
     # loop through image files
-    for filename in range(6224, 10001):
+    for filename in range(1, 10001):
 
         filename_string = str(filename) + extension
+        key = ''.join(random.choice(letters) for i in range(10))
 
         # load the cover image file
         cover_path = dataset_path + filename_string
@@ -89,9 +96,10 @@ def generate_hybrid(detector_1, detector_2, hybrid_type, save_path):
     save_path = save_path + edge_detector_1.name + '-' + combinator.name + '-' + edge_detector_2.name + '/'
 
     # loop through image files
-    for filename in range(7096, 10001):
+    for filename in range(1, 10001):
 
         filename_string = str(filename) + extension
+        key = ''.join(random.choice(letters) for i in range(10))
 
         # load the cover image file
         cover_path = dataset_path + filename_string
@@ -109,7 +117,7 @@ def generate_hybrid(detector_1, detector_2, hybrid_type, save_path):
         Hybrid_LSBMR_algorithm = Hybrid_LSBMR(cover_data, hybrid_edges, message, key, save_path)
         Hybrid_LSBMR_algorithm.embed_image()
 
-        print(filename)
+        print(filename, key)
 
 
 # validates the correct message was extracted
@@ -118,9 +126,10 @@ def validate_basic(algorithm, algorithm_string, save_path):
     message = ""
     save_path = save_path + algorithm_string + '/'
 
-    for filename in range(7741, 10001):  # 7736
+    for filename in range(1, 10001):  # 7736
 
         filename_string = str(filename) + extension
+        key = ''.join(random.choice(letters) for i in range(10))
 
         # load the cover image file
         stego_path = save_path + filename_string
@@ -149,6 +158,7 @@ def validate_standalone(detector, save_path):
     for filename in range(1, 10001):
 
         filename_string = str(filename) + extension
+        key = ''.join(random.choice(letters) for i in range(10))
 
         # load the cover image file
         stego_path = save_path + filename_string
@@ -181,6 +191,7 @@ def validate_hybrid(detector_1, detector_2, hybrid_type, save_path):
     for filename in range(1, 10001):
 
         filename_string = str(filename) + extension
+        key = ''.join(random.choice(letters) for i in range(10))
 
         # load the cover image file
         stego_path = save_path + filename_string
@@ -199,9 +210,9 @@ def validate_hybrid(detector_1, detector_2, hybrid_type, save_path):
         print(message)
 
 
-#generate_basic(PVD, 'PVD', save_path)
+generate_basic(PVD, 'PVD', save_path)
 #validate_basic(PVD, 'PVD', save_path)
-#generate_standalone(Sobel, save_path)
+#generate_standalone(Canny, save_path)
 #validate_standalone(Sobel, save_path)
-generate_hybrid(Canny, Sobel, AND, save_path)
+#generate_hybrid(Canny, Sobel, AND, save_path)
 #validate_hybrid(Canny, Sobel, AND, save_path)
