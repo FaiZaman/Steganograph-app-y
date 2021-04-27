@@ -107,6 +107,6 @@ class LSB():
 
         # extract the original message, save to file, and return
         extracted_message, _ = binary_to_string(binary_message, self.delimiter)
-        save_message(self.save_path, self.time_string, extracted_message)
+        saved = save_message(self.save_path, self.time_string, extracted_message)
 
-        return extracted_message
+        return extracted_message, saved

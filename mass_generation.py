@@ -14,21 +14,25 @@ from edge_detectors.Canny import Canny
 from edge_detectors.Sobel import Sobel
 from edge_detectors.LoG import LoG
 
+from hybridisation.OR import OR
 from hybridisation.AND import AND
+
+embedding_rate = 5
 
 # initialise dataset strings
 dataset_path = "C:/Users/faizz/University Work/Year 4/Advanced Project/Dataset/BOSSbase (Cover)/"
-save_path = "C:/Users/faizz/University Work/Year 4/Advanced Project/Dataset/BOSSbase (Stego)/"
+save_path = "C:/Users/faizz/University Work/Year 4/Advanced Project/Dataset/BOSSbase (Stego)/"\
+            + str(embedding_rate) + "%/"
 extension = ".pgm"
 
 # initialise parameters
 global_key = "hi"
 random.seed(global_key)
 letters = string.ascii_lowercase
-embedding_rate = 0.1
 
 # initialising secret message
-message_file = "C:/Users/faizz/University Work/Year 4/Advanced Project/Messages/Embedding/10%.txt"
+message_file = "C:/Users/faizz/University Work/Year 4/Advanced Project/Messages/Embedding/"\
+                + str(embedding_rate) + "%.txt"
 message_file = open(message_file, "r", encoding='utf-8')
 message = message_file.read()
 message_file.close()
@@ -96,7 +100,7 @@ def generate_hybrid(detector_1, detector_2, hybrid_type, save_path):
     save_path = save_path + edge_detector_1.name + '-' + combinator.name + '-' + edge_detector_2.name + '/'
 
     # loop through image files
-    for filename in range(1, 10001):
+    for filename in range(1, 2756):
 
         filename_string = str(filename) + extension
         key = ''.join(random.choice(letters) for i in range(10))
@@ -210,9 +214,9 @@ def validate_hybrid(detector_1, detector_2, hybrid_type, save_path):
         print(message)
 
 
-generate_basic(PVD, 'PVD', save_path)
-#validate_basic(PVD, 'PVD', save_path)
-#generate_standalone(Canny, save_path)
+#generate_basic(PVD, 'PVD', save_path)
+#validate_basic(LSB, 'LSB', save_path)
+#generate_standalone(LoG, save_path)
 #validate_standalone(Sobel, save_path)
-#generate_hybrid(Canny, Sobel, AND, save_path)
+generate_hybrid(Sobel, LoG, OR, save_path)
 #validate_hybrid(Canny, Sobel, AND, save_path)
