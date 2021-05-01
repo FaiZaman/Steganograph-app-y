@@ -251,6 +251,14 @@ class GraphicalUserInterface(object):
         return parameter_window
 
 
+    def create_success_window(self):
+
+        success_window = [
+            gui.Text('')
+        ]
+
+
+
     def display_algorithm_information(self, values, operation):
 
         if operation == "embedding":
