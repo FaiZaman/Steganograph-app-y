@@ -153,9 +153,9 @@ class LSBMR(LSBM, PVD):
 
         # reassign, save, and return stego image
         stego_image = cover_image
-        save_image(self.save_path, self.image_name, self.time_string, stego_image)
+        is_saved = save_image(self.save_path, self.image_name, self.time_string, stego_image)
 
-        return stego_image
+        return is_saved
 
 
     # loops through image in the same order as when encoding and extracts message bits

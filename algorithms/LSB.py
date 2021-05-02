@@ -81,9 +81,9 @@ class LSB():
 
         # reassign and save image
         stego_image = cover_image
-        save_image(self.save_path, self.image_name, self.time_string, stego_image)
+        is_saved = save_image(self.save_path, self.image_name, self.time_string, stego_image)
 
-        return stego_image
+        return is_saved
 
 
     def extract(self):

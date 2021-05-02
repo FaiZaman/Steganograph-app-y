@@ -100,9 +100,9 @@ class Hybrid_LSBMR(LSBMR):
 
         # reassign, save, and return stego image
         stego_image = cover_image
-        saved_image = save_image(self.save_path, self.image_name, self.time_string, stego_image)
+        is_saved = save_image(self.save_path, self.image_name, self.time_string, stego_image)
 
-        return stego_image
+        return is_saved
 
 
     # traverses edge or non-edge path and extracts data using LSBMR

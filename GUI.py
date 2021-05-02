@@ -251,12 +251,21 @@ class GraphicalUserInterface(object):
         return parameter_window
 
 
-    def create_success_window(self):
+    def create_success_window(self, operation, save_path):
 
-        success_window = [
-            gui.Text('')
+        success_screen = [
+            [gui.Text('Status', font=('Helvetica', 15), justification='center')],
+            [gui.Text('_' * 80)],
+            [gui.Text('')],
+            [gui.Text(operation.title() + ' was successful!')],
+            [gui.Text('Stego image saved at ' + save_path)],
+            [gui.Text('')],
+            [gui.Button('Back to Main Menu'), gui.Button('Exit')]
         ]
 
+        success_window = gui.Window('{0} - {1} Status'.format(self.app_name, operation.title()),\
+                                     success_screen)
+        return success_window
 
 
     def display_algorithm_information(self, values, operation):
@@ -348,6 +357,24 @@ class GraphicalUserInterface(object):
                 if event in (None, 'Close'):
                     info_window.close()
                     break
+
+
+    def status(self, saved, operation, save_path):
+
+        if saved:
+
+            window = self.create_success_window(operation, save_path)
+            while True:
+                event, values = window.read()
+                if event in (None, 'Exit'):
+                    sys.exit()
+                    break
+                if event == 'Back to Main Menu':
+                    window.close()
+                    return True
+
+            window.close()
+            return False
 
 
     def display(self):

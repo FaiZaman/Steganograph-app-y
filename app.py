@@ -32,8 +32,9 @@ if __name__ == '__main__':
 
     # run GUI and retrieve img and txt files
     GUI = GraphicalUserInterface()
+    running = True
 
-    while True:
+    while running:
 
         data = GUI.display()
         operation = data[-1]
@@ -47,9 +48,10 @@ if __name__ == '__main__':
             # convert into proper formats and initialise algorithm to encode message
             cover_data, message = read_files(cover_file, message_file)
             algorithm = algorithm_name(cover_data, message, key, save_path)
+
+            # embed the message and display result of embedding
             saved = algorithm.embed_image()
-            if saved:
-                print('Was saved', saved)
+            running = GUI.status(saved, operation, save_path)
 
         elif operation == "hybrid_embedding":
 
@@ -70,11 +72,10 @@ if __name__ == '__main__':
             combinator = hybrid_type()
             hybrid_edges = combinator.merge(edges_1, edges_2)
 
-            # initialise LSBMR algorithm and embed within hybrid edge areas
+            # initialise LSBMR algorithm and embed within hybrid edge areas, then display status
             Hybrid_LSBMR_algorithm = Hybrid_LSBMR(cover_data, hybrid_edges, message, key, save_path)
-            saved_image = Hybrid_LSBMR_algorithm.embed_image()
-            if saved:
-                print('Was saved', saved)
+            saved = Hybrid_LSBMR_algorithm.embed_image()
+            running = GUI.status(saved, operation, save_path)
 
         elif operation == "extracting":
 
