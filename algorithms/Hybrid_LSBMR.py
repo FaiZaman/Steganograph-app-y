@@ -166,5 +166,5 @@ class Hybrid_LSBMR(LSBMR):
             extracted_message, delimiter_present = binary_to_string(binary_message, self.delimiter)
 
         # save to file, and return
-        save_message(self.save_path, self.time_string, extracted_message)
-        return extracted_message
+        is_saved = save_message(self.save_path, self.time_string, extracted_message)
+        return is_saved

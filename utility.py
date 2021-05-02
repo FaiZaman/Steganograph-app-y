@@ -87,7 +87,6 @@ def save_message(save_path, time_string, message):
         message_file.close()
         return True
     except UnicodeEncodeError:
-        print("Incorrect secret key - your file was not saved. Please try again.")
         message_file.close()
         os.remove(file_path)
         return False

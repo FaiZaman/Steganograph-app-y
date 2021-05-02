@@ -253,12 +253,17 @@ class GraphicalUserInterface(object):
 
     def create_success_window(self, operation, save_path):
 
+        if 'embedding' in operation:
+            saved_text = 'Stego image'
+        else:
+            saved_text = 'Extracted message'
+
         success_screen = [
             [gui.Text('Status', font=('Helvetica', 15), justification='center')],
-            [gui.Text('_' * 80)],
+            [gui.Text('_' * 90)],
             [gui.Text('')],
-            [gui.Text(operation.title() + ' was successful!')],
-            [gui.Text('Stego image saved at ' + save_path)],
+            [gui.Text(operation.title().replace('_', ' ') + ' was successful!')],
+            [gui.Text(saved_text + ' saved at ' + save_path)],
             [gui.Text('')],
             [gui.Button('Back to Main Menu'), gui.Button('Exit')]
         ]
@@ -266,6 +271,32 @@ class GraphicalUserInterface(object):
         success_window = gui.Window('{0} - {1} Status'.format(self.app_name, operation.title()),\
                                      success_screen)
         return success_window
+
+
+    def create_failure_window(self, operation, save_path):
+
+        if 'embedding' in operation:
+            saved_text = 'Stego image'
+        else:
+            saved_text = 'Extracted message'
+
+        result = [gui.Text(operation.title().replace('_', ' ')\
+                    + ' was unsuccessful. Possible reasons: invalid secret key,'\
+                    + ' incorrect edge detectors or incorrect combination method selected.')]
+
+        failure_screen = [
+            [gui.Text('Status', font=('Helvetica', 15), justification='center')],
+            [gui.Text('_' * 90)],
+            [gui.Text('')],
+            result,
+            [gui.Text(saved_text + ' saved at ' + save_path)],
+            [gui.Text('')],
+            [gui.Button('Back to Main Menu'), gui.Button('Exit')]
+        ]
+
+        failure_window = gui.Window('{0} - {1} Status'.format(self.app_name, operation.title()),\
+                                     failure_screen)
+        return failure_window
 
 
     def display_algorithm_information(self, values, operation):
@@ -361,9 +392,25 @@ class GraphicalUserInterface(object):
 
     def status(self, saved, operation, save_path):
 
+        print(saved)
         if saved:
 
             window = self.create_success_window(operation, save_path)
+            while True:
+                event, values = window.read()
+                if event in (None, 'Exit'):
+                    sys.exit()
+                    break
+                if event == 'Back to Main Menu':
+                    window.close()
+                    return True
+
+            window.close()
+            return False
+        
+        else:
+
+            window = self.create_failure_window(operation, save_path)
             while True:
                 event, values = window.read()
                 if event in (None, 'Exit'):

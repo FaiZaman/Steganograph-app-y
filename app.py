@@ -72,7 +72,7 @@ if __name__ == '__main__':
             combinator = hybrid_type()
             hybrid_edges = combinator.merge(edges_1, edges_2)
 
-            # initialise LSBMR algorithm and embed within hybrid edge areas, then display status
+            # initialise LSBMR algorithm, embed within hybrid edge areas, and display status
             Hybrid_LSBMR_algorithm = Hybrid_LSBMR(cover_data, hybrid_edges, message, key, save_path)
             saved = Hybrid_LSBMR_algorithm.embed_image()
             running = GUI.status(saved, operation, save_path)
@@ -84,9 +84,10 @@ if __name__ == '__main__':
             stego_data = read_image(stego_file)
             message = ""
 
-            # initalise algorithm and decode message
+            # initalise algorithm, decode message, and display status
             algorithm = algorithm_name(stego_data, message, key, save_path)
-            extracted_message = algorithm.extract()
+            saved = algorithm.extract()
+            running = GUI.status(saved, operation, save_path)
 
         else:
 
@@ -110,6 +111,7 @@ if __name__ == '__main__':
             combinator = hybrid_type()
             hybrid_edges = combinator.merge(edges_1, edges_2)
 
-            # initialise LSBMR algorithm and decode message
+            # initialise hybrid LSBMR algorithm, decode message, and display status
             Hybrid_LSBMR_algorithm = Hybrid_LSBMR(stego_data, hybrid_edges, message, key, save_path)
-            Hybrid_LSBMR_algorithm.extract()
+            saved = Hybrid_LSBMR_algorithm.extract()
+            running = GUI.status(saved, operation, save_path)
