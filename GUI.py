@@ -252,8 +252,9 @@ class GraphicalUserInterface(object):
 
 
     def create_success_window(self, operation, save_path):
-
-        if 'embedding' in operation:
+        
+        operation = operation.title().replace('_', ' ')
+        if 'Embedding' in operation:
             saved_text = 'Stego image'
         else:
             saved_text = 'Extracted message'
@@ -262,39 +263,39 @@ class GraphicalUserInterface(object):
             [gui.Text('Status', font=('Helvetica', 15), justification='center')],
             [gui.Text('_' * 90)],
             [gui.Text('')],
-            [gui.Text(operation.title().replace('_', ' ') + ' was successful!')],
+            [gui.Text(operation + ' was successful!')],
             [gui.Text(saved_text + ' saved at ' + save_path)],
             [gui.Text('')],
             [gui.Button('Back to Main Menu'), gui.Button('Exit')]
         ]
 
-        success_window = gui.Window('{0} - {1} Status'.format(self.app_name, operation.title()),\
+        success_window = gui.Window('{0} - {1} Status'.format(self.app_name, operation),\
                                      success_screen)
         return success_window
 
 
     def create_failure_window(self, operation, save_path):
 
-        if 'embedding' in operation:
+        operation = operation.title().replace('_', ' ')
+        if 'Embedding' in operation:
             saved_text = 'Stego image'
+            failure_text = [gui.Text(operation + ' was unsuccessful.'\
+                + ' Possible reasons: colour image used instead of greyscale image', size=(60, 4))]
         else:
             saved_text = 'Extracted message'
-
-        result = [gui.Text(operation.title().replace('_', ' ')\
-                    + ' was unsuccessful. Possible reasons: invalid secret key,'\
-                    + ' incorrect edge detectors or incorrect combination method selected.')]
+            failure_text = [gui.Text(operation + ' was unsuccessful.'\
+                + ' Possible reasons: invalid secret key, incorrect edge'\
+                + ' detectors or incorrect combination method selected.', size=(60, 4))]
 
         failure_screen = [
             [gui.Text('Status', font=('Helvetica', 15), justification='center')],
-            [gui.Text('_' * 90)],
+            [gui.Text('_' * 70)],
             [gui.Text('')],
-            result,
-            [gui.Text(saved_text + ' saved at ' + save_path)],
-            [gui.Text('')],
+            failure_text,
             [gui.Button('Back to Main Menu'), gui.Button('Exit')]
         ]
 
-        failure_window = gui.Window('{0} - {1} Status'.format(self.app_name, operation.title()),\
+        failure_window = gui.Window('{0} - {1} Status'.format(self.app_name, operation),\
                                      failure_screen)
         return failure_window
 
@@ -392,7 +393,6 @@ class GraphicalUserInterface(object):
 
     def status(self, saved, operation, save_path):
 
-        print(saved)
         if saved:
 
             window = self.create_success_window(operation, save_path)

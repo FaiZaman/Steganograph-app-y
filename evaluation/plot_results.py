@@ -40,11 +40,11 @@ rects8 = plt.bar(r8, Canny_OR_LoG_error, width, label='Canny OR LoG')
 rects9 = plt.bar(r9, Sobel_OR_LoG_error, width, label='Sobel OR LoG')
 rects10 = plt.bar(r10, Canny_OR_Sobel_error, width, label='Canny OR Sobel')
 
-plt.xlabel('Embedding Rates', fontweight='bold')
-plt.ylabel('Testing Error', fontweight='bold')
+plt.xlabel('Embedding Rates', fontweight='bold', fontsize='15')
+plt.ylabel('Testing Error', fontweight='bold', fontsize='15')
 
-plt.xticks([r + width + 0.28 for r in range(len(labels))], labels)
-plt.legend()
+plt.xticks([r + width + 0.28 for r in range(len(labels))], labels, fontsize=12)
+plt.legend(prop={'size': 15})
 
 fig.tight_layout()
 plt.show()
