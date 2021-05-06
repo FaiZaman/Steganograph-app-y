@@ -88,19 +88,14 @@ class GraphicalUserInterface(object):
                 gui.Button('Algorithm Information')],
             [gui.Text('Image file', size=(16, 1)),
                 gui.In(size=(40, 1), enable_events=True, key="cover_image"), 
-                gui.FileBrowse(initial_folder=
-                'C:/Users/faizz/University Work/Year 4/Advanced Project/Images/Cover', 
-                file_types=(("Image Files", "*.png *.pgm"),))],
+                gui.FileBrowse(file_types=(("Image Files", "*.png *.pgm"),))],
             [gui.Text('Text file', size=(16, 1)),
                 gui.In(size=(40, 1), enable_events=True, key="message"),
-                gui.FileBrowse(initial_folder=
-                'C:/Users/faizz/University Work/Year 4/Advanced Project/Messages/Embedding', 
-                file_types=(("Text Files", "*.txt"),))],
+                gui.FileBrowse(file_types=(("Text Files", "*.txt"),))],
             [gui.Text('Secret key', size=(16, 1)), gui.Input(size=(40, 1), key="input_key")],
             [gui.Text('Save Folder', size=(16, 1)),
                 gui.In(size=(40, 1), enable_events=True, key="save_folder"),
-                gui.FolderBrowse(initial_folder=
-                'C:/Users/faizz/University Work/Year 4/Advanced Project/Images/Stego')],
+                gui.FolderBrowse()],
             [gui.Text('')],
             [gui.Button('Embed'), gui.Button('Back to Main Menu')]
         ]
@@ -131,19 +126,14 @@ class GraphicalUserInterface(object):
             [gui.Text('_' * 55)],
             [gui.Text('Image file', size=(16, 1)),
                 gui.In(size=(40, 1), enable_events=True, key="hybrid_cover_image"), 
-                gui.FileBrowse(initial_folder=
-                'C:/Users/faizz/University Work/Year 4/Advanced Project/Images/Cover', 
-                file_types=(("Image Files", "*.png *.pgm"),))],
+                gui.FileBrowse(file_types=(("Image Files", "*.png *.pgm"),))],
             [gui.Text('Text file', size=(16, 1)),
                 gui.In(size=(40, 1), enable_events=True, key="hybrid_message"),
-                gui.FileBrowse(initial_folder=
-                'C:/Users/faizz/University Work/Year 4/Advanced Project/Messages/Embedding', 
-                file_types=(("Text Files", "*.txt"),))],
+                gui.FileBrowse(file_types=(("Text Files", "*.txt"),))],
             [gui.Text('Secret key', size=(16, 1)), gui.Input(size=(40, 1), key="hybrid_in_key")],
             [gui.Text('Save Folder', size=(16, 1)),
                 gui.In(size=(40, 1), enable_events=True, key="hybrid_save_folder"),
-                gui.FolderBrowse(initial_folder=
-                'C:/Users/faizz/University Work/Year 4/Advanced Project/Images/Stego')],
+                gui.FolderBrowse()],
             [gui.Text('')],
             [gui.Button('Hybrid Embed'), gui.Button('Back to Main Menu')]
         ]

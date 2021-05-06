@@ -5,16 +5,15 @@ from PSNR import PSNR
 
 embedding_rate = 50
 
-# initialise paths
+# initialise paths - replace with your own
 cover_dataset_path = "C:/Users/faizz/University Work/Year 4/Advanced Project/Dataset/BOSSbase (Cover)/"
 stego_dataset_path = "C:/Users/faizz/University Work/Year 4/Advanced Project/Dataset/BOSSbase (Stego)/"\
                         + str(embedding_rate) + "%/"
 extension = ".pgm"
 
-# command to run ensemble classifier:
-
-# python aletheia.py e4s-predict models/e4s_srm_bossbase_lsbm0.10_gs.model srm sample_images/1_lsb.pgm
-# for ($num = 1; $num -le 100; $num++){python aletheia.py rs C:/Users/faizz/"University Work"/"Year 4"/"Advanced Project"/Dataset/"BOSSbase (Stego)"/10%/LSB/"$num".pgm}
+# command to run RS Analysis:
+# for ($num = 1; $num -le 100; $num++){python aletheia.py rs C:/Users/faizz/"University Work"/
+# "Year 4"/"Advanced Project"/Dataset/"BOSSbase (Stego)"/10%/LSB/"$num".pgm}
 
 # initalise error metrics
 MSE = MSE()

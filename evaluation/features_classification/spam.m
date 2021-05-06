@@ -37,9 +37,9 @@ function names_F = spam
     % pp. 215�224, 2010.
     % -------------------------------------------------------------------------
     
+    % stego path - replace with your own
     path = 'C:/Users/faizz/University Work/Year 4/Advanced Project/Dataset/BOSSbase (Stego)/Canny';
     d = dir(fullfile(path, '*.pgm'));
-    %new_d = dir(fullfile('C:/Users/faizz/University Work/Year 4/Advanced Project/Dataset/BOSSbase (Cover)'));
     names_F = struct;
     F = zeros(686, 1);
     names_F.F = F;
@@ -66,6 +66,7 @@ function names_F = spam
     names_F.names = permute(names_F.names, [2, 1]);
     F = names_F.F;
     names = names_F.names;
+    % save path - replace with your own
     save('Canny_stego', 'F', 'names');
     
     

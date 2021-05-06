@@ -19,18 +19,18 @@ from hybridisation.AND import AND
 
 embedding_rate = 5
 
-# initialise dataset strings
+# initialise dataset strings - replace with your own paths
 dataset_path = "C:/Users/faizz/University Work/Year 4/Advanced Project/Dataset/BOSSbase (Cover)/"
 save_path = "C:/Users/faizz/University Work/Year 4/Advanced Project/Dataset/BOSSbase (Stego)/"\
             + str(embedding_rate) + "%/"
 extension = ".pgm"
 
-# initialise parameters
+# initialise parameters and seed
 global_key = "hi"
 random.seed(global_key)
 letters = string.ascii_lowercase
 
-# initialising secret message
+# initialising secret message - replace with your own path
 message_file = "C:/Users/faizz/University Work/Year 4/Advanced Project/Messages/Embedding/"\
                 + str(embedding_rate) + "%.txt"
 message_file = open(message_file, "r", encoding='utf-8')
@@ -100,7 +100,7 @@ def generate_hybrid(detector_1, detector_2, hybrid_type, save_path):
     save_path = save_path + edge_detector_1.name + '-' + combinator.name + '-' + edge_detector_2.name + '/'
 
     # loop through image files
-    for filename in range(1, 2756):
+    for filename in range(1, 10001):
 
         filename_string = str(filename) + extension
         key = ''.join(random.choice(letters) for i in range(10))
@@ -130,7 +130,7 @@ def validate_basic(algorithm, algorithm_string, save_path):
     message = ""
     save_path = save_path + algorithm_string + '/'
 
-    for filename in range(1, 10001):  # 7736
+    for filename in range(1, 10001):
 
         filename_string = str(filename) + extension
         key = ''.join(random.choice(letters) for i in range(10))
@@ -214,9 +214,9 @@ def validate_hybrid(detector_1, detector_2, hybrid_type, save_path):
         print(message)
 
 
-#generate_basic(PVD, 'PVD', save_path)
+generate_basic(LSB, 'LSB', save_path)
 #validate_basic(LSB, 'LSB', save_path)
-#generate_standalone(LoG, save_path)
-#validate_standalone(Sobel, save_path)
-generate_hybrid(Sobel, LoG, OR, save_path)
-#validate_hybrid(Canny, Sobel, AND, save_path)
+#generate_standalone(Canny, save_path)
+#validate_standalone(Canny, save_path)
+#generate_hybrid(Sobel, LoG, OR, save_path)
+#validate_hybrid(Sobel, LoG, OR, save_path)

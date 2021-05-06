@@ -41,7 +41,7 @@ Click `Embed`/`Hybrid Embed`/`Extract`/`Hybrid Extract` for the respective actio
 3) Select the hybridisation technique from the dropdown list.
 4) Select the cover image file to embed your message into.
 5) Select the message file to embed into the cover image.
-6) Enter a secret key based on which the embedding order is determined. (do not lose this key as you need it for extraction!).
+6) Enter a secret key based on which the embedding order is determined (do not lose this key as you need it for extraction!).
 7) Select the folder where the stego image will be saved.
 8) Click `Hybrid Embed`
 
