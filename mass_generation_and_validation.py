@@ -1,3 +1,9 @@
+"""
+Mass Generation of Stego Images and Validation of Implementation
+Generates 10,000 stego images based on the BOSSbase dataset for a specified scheme and embedding rate
+Validates 10,000 messages based on the stego images generated for a specified scheme and embedding rate
+"""
+
 import os
 import cv2
 import string

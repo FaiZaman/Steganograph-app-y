@@ -1,3 +1,8 @@
+"""
+Logical OR
+Merges two edge areas together based on a union of their edge pixels
+"""
+
 import numpy as np
 
 class OR():

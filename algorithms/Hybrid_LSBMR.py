@@ -1,3 +1,8 @@
+"""
+Hybrid LSBMR embedding & extraction algorithms
+Uses edge pixels for LSBMR embedding
+"""
+
 import random
 from algorithms.LSBMR import LSBMR
 from utility import integer_to_binary, message_to_binary, is_message_complete,\

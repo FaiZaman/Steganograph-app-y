@@ -1,3 +1,8 @@
+"""
+Mean Squared Error (MSE)
+Calculates the MSE between a cover and stego image
+"""
+
 import cv2
 
 class MSE():

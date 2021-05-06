@@ -1,3 +1,8 @@
+"""
+Main file for Steganograph-app-y
+Run to display the GUI and embed and extract
+"""
+
 import cv2
 import ntpath
 
@@ -5,7 +10,6 @@ from algorithms.LSBMR import LSBMR
 from algorithms.Hybrid_LSBMR import Hybrid_LSBMR
 
 from GUI import GraphicalUserInterface
-from utility import save_image, mask_LSB
 
 
 def read_image(image_file):

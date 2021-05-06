@@ -1,3 +1,9 @@
+"""
+Laplacian Of Gaussian (LoG) Edge Detection
+Implementation taken from OpenCV
+Blurs the image with Gaussian blurring and detects edges on resulting image using zero crossings
+"""
+
 import cv2
 import json
 import numpy as np

@@ -1,3 +1,10 @@
+"""
+Least Significant Bit Matching Revisited embedding & extraction algorithm
+Embeds two message bits in a two-pixel block
+The first bit is embedded in the LSB of the first pixel
+The second bit is embedded in the output of a binary function f on both pixels
+"""
+
 import math
 import random
 from algorithms.LSBM import LSBM

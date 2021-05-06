@@ -1,3 +1,9 @@
+"""
+Least Significant Bit Matching (LSBM) embedding & extraction algorithm
+The same as LSB algorithm, but if the pixel value does not match the message bit
+its entire value is incremented or decremented
+"""
+
 from algorithms.LSB import LSB
 import random
 import numpy as np

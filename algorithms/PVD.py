@@ -1,3 +1,9 @@
+"""
+Pixel Value Differencing (PVD) embedding & extraction algorithms
+Embeds two message bits in a two-pixel block
+The number of message bits embedded is based on the difference value between the pixels in the block
+"""
+
 import math
 import random
 import numpy as np

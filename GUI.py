@@ -1,3 +1,9 @@
+"""
+Graphical User Interface (GUI)
+Displays the screens used for embedding and extraction
+Initiates the algorithms
+"""
+
 import sys
 import json
 import PySimpleGUI as gui

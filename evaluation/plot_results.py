@@ -1,3 +1,7 @@
+"""
+Clustered column chart for Ensemble Classifier results
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 

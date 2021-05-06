@@ -1,3 +1,8 @@
+"""
+Mass Evaluation for Imperceptibility Metrics
+Calculates the average MSE over the whole dataset of cover and stego images for an embedding rate
+"""
+
 import cv2
 from pathlib import Path
 from MSE import MSE

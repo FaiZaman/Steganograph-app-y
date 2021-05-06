@@ -1,8 +1,12 @@
+"""
+Least Significant Bit (LSB) embedding & extraction algorithm
+Replaces the LSB of each pixel with a secret message bit from the message in binary
+"""
+
 import random
 import numpy as np
 from datetime import datetime
-from utility import message_to_binary, integer_to_binary, binary_to_string, save_image,\
-                    save_message
+from utility import message_to_binary, integer_to_binary, binary_to_string, save_image, save_message
 
 class LSB():
 

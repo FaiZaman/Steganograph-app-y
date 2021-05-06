@@ -1,3 +1,8 @@
+"""
+Peak Signal-to-Noise Ratio (PSNR)
+Calculates the PSNR between a cover and stego image
+"""
+
 import cv2
 import math
 from MSE import MSE

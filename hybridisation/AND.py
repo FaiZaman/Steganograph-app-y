@@ -1,3 +1,8 @@
+"""
+Logical AND
+Merges two edge areas together based on an intersection of their edge pixels
+"""
+
 import numpy as np
 
 class AND():
