@@ -1,3 +1,9 @@
+"""
+Laplacian Of Gaussian (LoG) Edge Detection
+Implementation taken from OpenCV
+Blurs the image with Gaussian blurring and detects edges on resulting image using zero crossings
+"""
+
 import cv2
 import json
 import numpy as np
@@ -7,7 +13,7 @@ class LoG(object):
 
     def __init__(self):    # x and y necessary as same parameters for all detectors
 
-        self.name = "Laplacian of Gaussian Edge Detector"
+        self.name = "LoG"
 
         with open('data/detectors.json') as f:
             data = json.load(f)

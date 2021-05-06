@@ -1,3 +1,7 @@
+"""
+Utility functions
+"""
+
 import os
 import cv2
 import numpy as np
@@ -63,7 +67,7 @@ def is_message_complete(binary_message, delimiter):
 # set all the LSBs to zero before detecting edges so same edges are detected in embedding and extraction
 def mask_LSB(image):
 
-    # uses binary 1111100 to AND all pixels in image to reset 2 LSBs to 0
+    # uses binary 11111100 to AND all pixels in image to reset 2 LSBs to 0
     mask = np.full(image.shape, 252, np.uint8)
     masked_image = cv2.bitwise_and(image, mask)
 
@@ -72,8 +76,9 @@ def mask_LSB(image):
 
 def save_image(save_path, image_name, time_string, stego):
 
-    cv2.imwrite(os.path.join(save_path, image_name), stego)
-    #cv2.imwrite(os.path.join(save_path, '{0}_{1}'.format(time_string, image_name)), stego)
+    #cv2.imwrite(os.path.join(save_path, image_name), stego)
+    saved_image = cv2.imwrite(os.path.join(save_path, '{0}_{1}'.format(time_string, image_name)), stego)
+    return saved_image
 
 
 def save_message(save_path, time_string, message):
@@ -86,7 +91,6 @@ def save_message(save_path, time_string, message):
         message_file.close()
         return True
     except UnicodeEncodeError:
-        print("Incorrect secret key - your file was not saved. Please try again.")
         message_file.close()
         os.remove(file_path)
         return False

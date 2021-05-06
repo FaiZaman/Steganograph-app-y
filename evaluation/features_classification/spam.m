@@ -37,26 +37,37 @@ function names_F = spam
     % pp. 215�224, 2010.
     % -------------------------------------------------------------------------
     
-    path = 'C:/Users/faizz/University Work/Year 4/Advanced Project/Dataset/BOSSbase (Cover)';
+    % stego path - replace with your own
+    path = 'C:/Users/faizz/University Work/Year 4/Advanced Project/Dataset/BOSSbase (Stego)/Canny';
     d = dir(fullfile(path, '*.pgm'));
     names_F = struct;
     F = zeros(686, 1);
     names_F.F = F;
+    file_number = 1;
     
     for k = 1 : length(d)
      baseFileName = [num2str(k), '.pgm'];
      fullFileName = fullfile(d(k).folder, baseFileName);
-     if mod(k, 10) == 0
-          fprintf(1, 'Now reading %s\n', fullFileName);
+     if isfile(fullFileName)
+      fullFileName = fullfile(d(k).folder, baseFileName);
+      if mod(k, 100) == 0
+       fprintf(1, 'Now reading %s\n', fullFileName);
+      end
+      names_F = spam_extract_2(double(imread(fullFileName)),3,file_number,names_F);
+      file_number = file_number + 1;
+     else
+      if mod(k, 100) == 0
+       fprintf(1, 'Now at %s\n', fullFileName);
+      end
      end
-     names_F = spam_extract_2(double(imread(fullFileName)),3,k,names_F);
     end
     
     names_F.F = permute(names_F.F, [2, 1]);
     names_F.names = permute(names_F.names, [2, 1]);
     F = names_F.F;
     names = names_F.names;
-    save('cover', 'F', 'names');
+    % save path - replace with your own
+    save('Canny_stego', 'F', 'names');
     
     
     function names_F = spam_extract_2(X,T,k,names_F)

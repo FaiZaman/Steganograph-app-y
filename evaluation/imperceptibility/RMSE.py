@@ -1,3 +1,8 @@
+"""
+Root Mean Squared Error (MSE)
+Calculates the RMSE between a cover and stego image
+"""
+
 import cv2
 import math
 from MSE import MSE

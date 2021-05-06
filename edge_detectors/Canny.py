@@ -1,3 +1,9 @@
+"""
+Canny Edge Detection
+Implementation taken from OpenCV
+Masks the input image on the two LSBs and detects edges based on the masked image
+"""
+
 import cv2
 import json
 from utility import mask_LSB
@@ -6,7 +12,7 @@ class Canny(object):
 
     def __init__(self):
 
-        self.name = "Canny Edge Detector"
+        self.name = "Canny"
 
         with open('data/detectors.json') as f:
             data = json.load(f)

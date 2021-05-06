@@ -1,3 +1,9 @@
+"""
+Graphical User Interface (GUI)
+Displays the screens used for embedding and extraction
+Initiates the algorithms
+"""
+
 import sys
 import json
 import PySimpleGUI as gui
@@ -44,7 +50,6 @@ class GraphicalUserInterface(object):
             "LSBM": LSBM,
             "LSBMR": LSBMR,
             "PVD": PVD,
-            "EA-LSBMR": EA_LSBMR
         }
 
         self.detector_instantiators = {
@@ -88,19 +93,14 @@ class GraphicalUserInterface(object):
                 gui.Button('Algorithm Information')],
             [gui.Text('Image file', size=(16, 1)),
                 gui.In(size=(40, 1), enable_events=True, key="cover_image"), 
-                gui.FileBrowse(initial_folder=
-                'C:/Users/faizz/University Work/Year 4/Advanced Project/Images/Cover', 
-                file_types=(("Image Files", "*.png *.pgm"),))],
+                gui.FileBrowse(file_types=(("Image Files", "*.png *.pgm"),))],
             [gui.Text('Text file', size=(16, 1)),
                 gui.In(size=(40, 1), enable_events=True, key="message"),
-                gui.FileBrowse(initial_folder=
-                'C:/Users/faizz/University Work/Year 4/Advanced Project/Messages/Embedding', 
-                file_types=(("Text Files", "*.txt"),))],
+                gui.FileBrowse(file_types=(("Text Files", "*.txt"),))],
             [gui.Text('Secret key', size=(16, 1)), gui.Input(size=(40, 1), key="input_key")],
             [gui.Text('Save Folder', size=(16, 1)),
                 gui.In(size=(40, 1), enable_events=True, key="save_folder"),
-                gui.FolderBrowse(initial_folder=
-                'C:/Users/faizz/University Work/Year 4/Advanced Project/Images/Stego')],
+                gui.FolderBrowse()],
             [gui.Text('')],
             [gui.Button('Embed'), gui.Button('Back to Main Menu')]
         ]
@@ -131,19 +131,14 @@ class GraphicalUserInterface(object):
             [gui.Text('_' * 55)],
             [gui.Text('Image file', size=(16, 1)),
                 gui.In(size=(40, 1), enable_events=True, key="hybrid_cover_image"), 
-                gui.FileBrowse(initial_folder=
-                'C:/Users/faizz/University Work/Year 4/Advanced Project/Images/Cover', 
-                file_types=(("Image Files", "*.png *.pgm"),))],
+                gui.FileBrowse(file_types=(("Image Files", "*.png *.pgm"),))],
             [gui.Text('Text file', size=(16, 1)),
                 gui.In(size=(40, 1), enable_events=True, key="hybrid_message"),
-                gui.FileBrowse(initial_folder=
-                'C:/Users/faizz/University Work/Year 4/Advanced Project/Messages/Embedding', 
-                file_types=(("Text Files", "*.txt"),))],
+                gui.FileBrowse(file_types=(("Text Files", "*.txt"),))],
             [gui.Text('Secret key', size=(16, 1)), gui.Input(size=(40, 1), key="hybrid_in_key")],
             [gui.Text('Save Folder', size=(16, 1)),
                 gui.In(size=(40, 1), enable_events=True, key="hybrid_save_folder"),
-                gui.FolderBrowse(initial_folder=
-                'C:/Users/faizz/University Work/Year 4/Advanced Project/Images/Stego')],
+                gui.FolderBrowse()],
             [gui.Text('')],
             [gui.Button('Hybrid Embed'), gui.Button('Back to Main Menu')]
         ]
@@ -181,7 +176,7 @@ class GraphicalUserInterface(object):
 
         hybrid_extracting_screen = [
             [gui.Text('Hybrid Extracting', font=('Helvetica', 15), justification='center')],
-            [gui.Text('_'  * 70)],
+            [gui.Text('_'  * 80)],
             [gui.Text('')],
             [gui.Text('Edge Detector 1', size=(16, 1)),
                 gui.Combo(list(self.detector_data.keys()), size=(10, 1),
@@ -249,6 +244,55 @@ class GraphicalUserInterface(object):
 
         parameter_window = gui.Window('{0} - Parameters'.format(self.app_name), parameter_screen)
         return parameter_window
+
+
+    def create_success_window(self, operation, save_path):
+        
+        operation = operation.title().replace('_', ' ')
+        if 'Embedding' in operation:
+            saved_text = 'Stego image'
+        else:
+            saved_text = 'Extracted message'
+
+        success_screen = [
+            [gui.Text('Status', font=('Helvetica', 15), justification='center')],
+            [gui.Text('_' * 90)],
+            [gui.Text('')],
+            [gui.Text(operation + ' was successful!')],
+            [gui.Text(saved_text + ' saved at ' + save_path)],
+            [gui.Text('')],
+            [gui.Button('Back to Main Menu'), gui.Button('Exit')]
+        ]
+
+        success_window = gui.Window('{0} - {1} Status'.format(self.app_name, operation),\
+                                     success_screen)
+        return success_window
+
+
+    def create_failure_window(self, operation, save_path):
+
+        operation = operation.title().replace('_', ' ')
+        if 'Embedding' in operation:
+            saved_text = 'Stego image'
+            failure_text = [gui.Text(operation + ' was unsuccessful.'\
+                + ' Possible reasons: colour image used instead of greyscale image', size=(60, 4))]
+        else:
+            saved_text = 'Extracted message'
+            failure_text = [gui.Text(operation + ' was unsuccessful.'\
+                + ' Possible reasons: invalid secret key, incorrect edge'\
+                + ' detectors or incorrect combination method selected.', size=(60, 4))]
+
+        failure_screen = [
+            [gui.Text('Status', font=('Helvetica', 15), justification='center')],
+            [gui.Text('_' * 70)],
+            [gui.Text('')],
+            failure_text,
+            [gui.Button('Back to Main Menu'), gui.Button('Exit')]
+        ]
+
+        failure_window = gui.Window('{0} - {1} Status'.format(self.app_name, operation),\
+                                     failure_screen)
+        return failure_window
 
 
     def display_algorithm_information(self, values, operation):
@@ -340,6 +384,39 @@ class GraphicalUserInterface(object):
                 if event in (None, 'Close'):
                     info_window.close()
                     break
+
+
+    def status(self, saved, operation, save_path):
+
+        if saved:
+
+            window = self.create_success_window(operation, save_path)
+            while True:
+                event, values = window.read()
+                if event in (None, 'Exit'):
+                    sys.exit()
+                    break
+                if event == 'Back to Main Menu':
+                    window.close()
+                    return True
+
+            window.close()
+            return False
+        
+        else:
+
+            window = self.create_failure_window(operation, save_path)
+            while True:
+                event, values = window.read()
+                if event in (None, 'Exit'):
+                    sys.exit()
+                    break
+                if event == 'Back to Main Menu':
+                    window.close()
+                    return True
+
+            window.close()
+            return False
 
 
     def display(self):

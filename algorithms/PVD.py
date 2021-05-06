@@ -1,3 +1,9 @@
+"""
+Pixel Value Differencing (PVD) embedding & extraction algorithms
+Embeds two message bits in a two-pixel block
+The number of message bits embedded is based on the difference value between the pixels in the block
+"""
+
 import math
 import random
 import numpy as np
@@ -9,6 +15,7 @@ class PVD():
 
     def __init__(self, image, message, key, save_path):
 
+        self.name = 'PVD'
         self.image_name = image[0]
         self.image = image[1]
         self.delimiter = "-----"
@@ -196,9 +203,9 @@ class PVD():
 
         # reassign, save, and return stego image
         stego_image = cover_image
-        save_image(self.save_path, self.image_name, self.time_string, stego_image)
+        is_saved = save_image(self.save_path, self.image_name, self.time_string, stego_image)
 
-        return stego_image
+        return is_saved
 
 
     # loops through image in same order as when encoding and extracts message bits
@@ -246,6 +253,6 @@ class PVD():
 
         # extract the original message, save to file, and return
         extracted_message, _ = binary_to_string(binary_message, self.delimiter)
-        saved = save_message(self.save_path, self.time_string, extracted_message)
+        is_saved = save_message(self.save_path, self.time_string, extracted_message)
 
-        return extracted_message, saved
+        return is_saved

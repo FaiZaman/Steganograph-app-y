@@ -1,3 +1,8 @@
+"""
+Hybrid LSBMR embedding & extraction algorithms
+Uses edge pixels for LSBMR embedding
+"""
+
 import random
 from algorithms.LSBMR import LSBMR
 from utility import integer_to_binary, message_to_binary, is_message_complete,\
@@ -100,9 +105,9 @@ class Hybrid_LSBMR(LSBMR):
 
         # reassign, save, and return stego image
         stego_image = cover_image
-        save_image(self.save_path, self.image_name, self.time_string, stego_image)
+        is_saved = save_image(self.save_path, self.image_name, self.time_string, stego_image)
 
-        return stego_image
+        return is_saved
 
 
     # traverses edge or non-edge path and extracts data using LSBMR
@@ -166,5 +171,5 @@ class Hybrid_LSBMR(LSBMR):
             extracted_message, delimiter_present = binary_to_string(binary_message, self.delimiter)
 
         # save to file, and return
-        save_message(self.save_path, self.time_string, extracted_message)
-        return extracted_message
+        is_saved = save_message(self.save_path, self.time_string, extracted_message)
+        return is_saved

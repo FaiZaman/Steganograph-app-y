@@ -1,3 +1,8 @@
+"""
+Main file for Steganograph-app-y
+Run to display the GUI and embed and extract
+"""
+
 import cv2
 import ntpath
 
@@ -5,7 +10,6 @@ from algorithms.LSBMR import LSBMR
 from algorithms.Hybrid_LSBMR import Hybrid_LSBMR
 
 from GUI import GraphicalUserInterface
-from utility import save_image, mask_LSB
 
 
 def read_image(image_file):
@@ -32,8 +36,9 @@ if __name__ == '__main__':
 
     # run GUI and retrieve img and txt files
     GUI = GraphicalUserInterface()
+    running = True
 
-    while True:
+    while running:
 
         data = GUI.display()
         operation = data[-1]
@@ -47,7 +52,10 @@ if __name__ == '__main__':
             # convert into proper formats and initialise algorithm to encode message
             cover_data, message = read_files(cover_file, message_file)
             algorithm = algorithm_name(cover_data, message, key, save_path)
-            algorithm.embed_image()
+
+            # embed the message and display result of embedding
+            saved = algorithm.embed_image()
+            running = GUI.status(saved, operation, save_path)
 
         elif operation == "hybrid_embedding":
 
@@ -68,13 +76,10 @@ if __name__ == '__main__':
             combinator = hybrid_type()
             hybrid_edges = combinator.merge(edges_1, edges_2)
 
-            cv2.imshow(detector_1.name, edges_1)
-            cv2.imshow(detector_2.name, edges_2)
-            cv2.imshow('Hybrid', hybrid_edges)
-
-            # initialise LSBMR algorithm and embed within hybrid edge areas
+            # initialise LSBMR algorithm, embed within hybrid edge areas, and display status
             Hybrid_LSBMR_algorithm = Hybrid_LSBMR(cover_data, hybrid_edges, message, key, save_path)
-            Hybrid_LSBMR_algorithm.embed_image()
+            saved = Hybrid_LSBMR_algorithm.embed_image()
+            running = GUI.status(saved, operation, save_path)
 
         elif operation == "extracting":
 
@@ -83,9 +88,10 @@ if __name__ == '__main__':
             stego_data = read_image(stego_file)
             message = ""
 
-            # initalise algorithm and decode message
+            # initalise algorithm, decode message, and display status
             algorithm = algorithm_name(stego_data, message, key, save_path)
-            extracted_message = algorithm.extract()
+            saved = algorithm.extract()
+            running = GUI.status(saved, operation, save_path)
 
         else:
 
@@ -109,6 +115,7 @@ if __name__ == '__main__':
             combinator = hybrid_type()
             hybrid_edges = combinator.merge(edges_1, edges_2)
 
-            # initialise LSBMR algorithm and decode message
+            # initialise hybrid LSBMR algorithm, decode message, and display status
             Hybrid_LSBMR_algorithm = Hybrid_LSBMR(stego_data, hybrid_edges, message, key, save_path)
-            Hybrid_LSBMR_algorithm.extract()
+            saved = Hybrid_LSBMR_algorithm.extract()
+            running = GUI.status(saved, operation, save_path)

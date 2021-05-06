@@ -1,3 +1,10 @@
+"""
+Sobel Edge Detection
+Implementation taken from OpenCV
+Masks the input image on the two LSBs and detects edges based on the masked image for both Sobel filters
+The edge areas are then combined and returned
+"""
+
 import cv2
 import json
 from utility import mask_LSB
@@ -6,7 +13,7 @@ class Sobel(object):
 
     def __init__(self):
 
-        self.name = "Sobel Edge Detector"
+        self.name = "Sobel"
 
         with open('data/detectors.json') as f:
             data = json.load(f)

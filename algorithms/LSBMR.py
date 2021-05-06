@@ -1,3 +1,10 @@
+"""
+Least Significant Bit Matching Revisited embedding & extraction algorithm
+Embeds two message bits in a two-pixel block
+The first bit is embedded in the LSB of the first pixel
+The second bit is embedded in the output of a binary function f on both pixels
+"""
+
 import math
 import random
 from algorithms.LSBM import LSBM
@@ -10,6 +17,7 @@ class LSBMR(LSBM, PVD):
     def __init__(self, image, message, key, save_path):
 
         super().__init__(image, message, key, save_path)
+        self.name = 'LSBMR'
 
         # initialise outliers for masking
         self.outliers = {}
@@ -152,9 +160,9 @@ class LSBMR(LSBM, PVD):
 
         # reassign, save, and return stego image
         stego_image = cover_image
-        save_image(self.save_path, self.image_name, self.time_string, stego_image)
+        is_saved = save_image(self.save_path, self.image_name, self.time_string, stego_image)
 
-        return stego_image
+        return is_saved
 
 
     # loops through image in the same order as when encoding and extracts message bits
@@ -194,6 +202,6 @@ class LSBMR(LSBM, PVD):
 
         # extract the original message, save to file, and return
         extracted_message, _ = binary_to_string(binary_message, self.delimiter)
-        save_message(self.save_path, self.time_string, extracted_message)
+        is_saved = save_message(self.save_path, self.time_string, extracted_message)
 
-        return extracted_message
+        return is_saved

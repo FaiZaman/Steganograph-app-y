@@ -1,3 +1,8 @@
+"""
+UNFINISHED
+Edge Adaptive Least Significant Bit Matching Revisited (EA-LSBMR) embedding & extraction algorithms
+"""
+
 import cv2
 import random
 import numpy as np
