@@ -50,7 +50,6 @@ class GraphicalUserInterface(object):
             "LSBM": LSBM,
             "LSBMR": LSBMR,
             "PVD": PVD,
-            "EA-LSBMR": EA_LSBMR
         }
 
         self.detector_instantiators = {
